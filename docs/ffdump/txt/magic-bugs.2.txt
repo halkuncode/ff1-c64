@@ -1,0 +1,1026 @@
+;;; Lots of bugs in this patch:
+;;; - Warriors need to load/save Damage and Hit%
+;;; - Enemies need to load/save Hit%
+;;; - Enemies need to store elemental resistance in RAM
+;;; - Enemy absorb should be loaded from RAM, not ROM
+;;; - TMPR needs effect 0B, not 0D
+;;; - Int needs to be used. We'll make it add to hit rate, and add Int/4 to
+;;;    effectivity for damage/healing spells.
+
+
+; Notation:
+; p[$xx] -> pointer at address $xx, usually used with ($xx),Y addressing
+; w[n] -> word at $6856+2*n, used by many of the support routines
+; w[$xxxx] -> word at $xxxx
+
+
+;; VARIABLES FOR MAGIC CASTING
+;; These are set for each spell cast, then saved back when done.
+; $686c   = (removed, was caster status)
+; $686d   = target status ailments
+; $686e   = current spell effect
+; $6870   = current spell hit rate
+; $6872   = target magic defense
+; $6873   = caster Int (was always zero)
+; $6874   = current spell effectivity
+; $6875   = (removed, was caster damage)
+; $6876   = target elemental weakness
+; $6877   = target elemental resistance
+; $6878   = current spell element
+; $6879   = (removed, was caster class ID)
+; $687a-b = target HP
+; $687d   = target hit multiplier
+; $687e   = target "courage"
+; $687f   = target absorb
+; $6880-1 = target Max HP
+; $6882   = target damage
+; $6883   = (removed, was caster level)
+; $6884   = target hit %
+; $6885   = target evade
+; $6886   = target creature type
+
+;; PERMANENT PLAYER STRUCT
+;; $82 or $92
+;; 0x40 bytes
+;; Stored at $6100, $6140, $6180, $61C0
+; 00:    Class ID (00=FT, 0B=BW)
+; 01:    Status
+;         in-battle: a bitmap of statuses
+;         out-of-battle: 1=dead, 2=stone, 3=poison
+; 02-05: Name
+; 06:    [unused?]
+; 07-09: Exp
+; 0a-0b: HP
+; 0c-0d: Max HP
+; 0e:    [unused?]
+; 0f:    [unused?]
+; 10:    Str
+; 11:    Agl
+; 12:    Int
+; 13:    Vit
+; 14:    Luck
+; 15:    [unused?]
+; 16-17: Exp for level up
+; 18-1b: Weapons
+; 1c-1f: Armor
+; 20:    Damage
+; 21:    Hit %
+; 22:    Absorb
+; 23:    Evade %
+; 24:    Elemental Resistances
+; 25:    MagDef
+; 26:    Level (Level-1 out of battle)
+; 27-3f: [unused?]
+
+;; IN-BATTLE PLAYER STRUCT
+;; $80 or $90
+;; 0x12 bytes
+;; Stored at $6800, $6812, $6824, $6836
+; 00:    player idx 0-3
+; 01:    class
+; 02:    Status (not really necessary, BTW, and seemingly not much used)
+; 03-04: HP     (not really necessary, BTW, and seemingly not much used)
+; 05:    Hit %
+; 06:    MagDef (why?)
+; 07:    Evade %
+; 08:    Absorb
+; 09:    Damage
+; 0a:    Elemental Resistances
+; 0b:    hit multiplier
+; 0c:    Number of hits (Hit%/32+1)
+; 0d:    category attack
+; 0e:    elemental attack
+; 0f:    critical hit rate
+; 10:    Weapon GFX block
+; 11:    Weapon palette
+
+;; ENEMY IN-ROM STRUCT
+;; $86 or $92 or $9c
+;; 0x14 bytes
+;; Not writable, this is in ROM!!
+; 00-01: exp gained for defeating
+; 02-03: gold gained for defeating
+; 04-05: MaxHP
+; 06:    "courage"
+; 07:    AI
+; 08:    Evade %
+; 09:    Absorb
+; 0a:    number of hits
+; 0b:    Hit %
+; 0c:    Damage
+; 0d:    critical hit chance
+; 0e:    status attack elemental
+; 0f:    attack status
+; 10:    category
+; 11:    MagDef
+; 12:    Elemental weakness
+; 13:    Elemental resistance
+
+;; ENEMY IN-RAM STRUCT
+;; $84 or $90 or $9a
+;; 0x14 bytes
+;; Stored starting at 0x6BD3
+; 00-01: address of enemy in-ROM struct
+; 02-03: HP
+; 04:    absorb
+; 05:    hit multiplier
+; 06:    status ailments
+; 07:    AI magic index
+; 08:    AI special attack index
+; 09:    "courage"
+; 0a:    Evade %
+; 0b:    damage
+; 0c:    AI (bug? Maybe MagDef to match player? Unused, anyway)
+; 0d-0e: exp
+; 0f-10: gold
+; 11:    monster index number (Unused?)
+; 12:    Hit% (was Max HP low byte, used in curing sleep)
+; 13:    Elemental resistance (was unset, but still used in curing sleep)
+
+
+;;; BANK 12
+;;; PART 1 A
+; TMPR effect is at $8254, change that to 0B. Only SABR should raise Hit%.
+8254: 0b           .DB $0b
+
+;;; PART 1 B
+; LOK2 effect is at $8298, change that to 0E.
+829c: 0e           .DB $0e
+
+
+
+;;; PART 2
+; Initialize enemies for battle (mid-routine)
+af83: 4c ca af     JMP $afca
+af86: a2 14        LDX #$14    ;;; Get pointer for in-ROM data for enemy in A
+af88: 20 09 ae     JSR $ae09   ; XA = X*A
+af8b: 18           CLC
+af8c: 69 20        ADC #$20    ; XA += #$8520
+af8e: 85 9c        STA $9c     ; and store in p[$9c] and in-RAM[0]
+af90: a0 00        LDY #$00
+af92: 91 9a        STA ($9a),Y
+af94: 8a           TXA
+af95: 69 85        ADC #$85
+af97: 85 9d        STA $9d
+af99: c8           INY
+af9a: 91 9a        STA ($9a),Y
+af9c: a2 13        LDX #$13    ; Set up in-RAM table in p[$9a] from p[$9c] using the table below
+af9e: bd d6 af     LDA $afd6,X ; (Yes, $afd6 not $afd8)
+afa1: a8           TAY
+afa2: b1 9c        LDA ($9c),Y
+afa4: 48           PHA
+afa5: 8a           TXA
+afa6: a8           TAY
+afa7: 68           PLA
+afa8: 91 9a        STA ($9a),Y
+afaa: ca           DEX
+afab: e0 01        CPX #$01
+afad: d0 ef        BNE +$ef  [$af9e]
+afaf: a0 05        LDY #$05      ; Finish it by storing 1 in hit multiplier,
+afb1: a9 01        LDA #$01
+afb3: 91 9a        STA ($9a),Y
+afb5: c8           INY
+afb6: a9 00        LDA #$00      ;  ... 0 in statuses,
+afb8: 91 9a        STA ($9a),Y
+afba: c8           INY
+afbb: 91 9a        STA ($9a),Y   ;  ... 0 in AI magic index,
+afbd: c8           INY
+afbe: 91 9a        STA ($9a),Y   ;  ... 0 in AI special attack index,
+afc0: ae d2 6b     LDX $6bd2
+afc3: bd b7 6b     LDA $6bb7,X   ;  ... and enemy index in the enemy index
+afc6: a0 11        LDY #$11
+afc8: 91 9a        STA ($9a),Y
+afca: ee d2 6b     INC $6bd2
+afcd: ce d1 6b     DEC $6bd1
+afd0: f0 03        BEQ +$03  [$afd5]
+afd2: 4c 71 af     JMP $af71
+afd5: 4c 8a 97     JMP $978a   ; Some sort of graphics thing
+
+; Table for setting up enemy in-RAM struct. Starts at index 2, actually
+afd8: 04 05        .DB $04, $05  ; MaxHP -> HP
+afda: 09           .DB $09       ; Absorb
+afdb: 00           .DB $00       ; garbage (hit multiplier, overwritten later)
+afdc: 00           .DB $00       ; garbage (status, overwritten later)
+afdd: 00           .DB $00       ; garbage (AI magic index, overwritten later)
+afde: 00           .DB $00       ; garbage (AI special index, overwritten later)
+afdf: 06           .DB $06       ; "courage"
+afe0: 08           .DB $08       ; Evade%
+afe1: 0c           .DB $0c       ; Damage
+afe2: 07           .DB $07       ; AI (BUG?)
+afe3: 00 01        .DB $00, $01  ; Exp
+afe5: 02 03        .DB $02, $03  ; Gold
+afe7: 00           .DB $00       ; garbage (enemy index, overwritten later)
+afe8: 0b           .DB $0b       ; Hit%
+afe9: 13           .DB $13       ; Elemental resistance
+
+afea: ea           NOP
+afeb: ea           NOP
+
+;; Since we have extra space here, let's put some support routines here
+; w[2] = Int*X/32, w[1] = effectivity + w[1]
+afec: 20 68 b6     JSR $b668   ; w[1] = effectivity
+
+; w[2] = Int*X/32, w[1]+=w[2]
+afef: ad 73 68     LDA $6873   ; caster Int
+aff2: 20 09 ae     JSR $ae09   ; XA = X*A
+aff5: 8e 5b 68     STX $685b   
+aff8: a2 05        LDX #$05    ; @@@1 log2(divisor) for most Int adjustments
+affa: 4e 5b 68     LSR $685b
+affd: 6a           ROR
+affe: ca           DEX 
+afff: d0 f9        BNE +$f9  [$affa]
+b001: 8d 5a 68     STA $685a
+b004: e8           INX
+b005: 8a           TXA 
+b006: a0 02        LDY #$02
+b008: 20 7b ae     JSR $ae7b   ; w[A] = w[X] + w[Y]
+b00b: 60           RTS
+
+
+
+;;; PART 4 A
+; This routine had to be moved
+b599: 4c 49 b7     JMP $b749   ; Save data for enemy magic target
+
+;;; PART 4 B
+; This routine had to be moved too
+b5b3: 4c 8f b7     JMP $b78f   ; Save data for player magic target
+
+
+
+;;; PART 3
+; Load data for magic targeting player
+b602: ad a7 6d     LDA $6da7
+b605: 20 b8 be     JSR $beb8   ; Play sound
+b608: ad 8a 6c     LDA $6c8a
+b60b: 48           PHA
+b60c: 29 03        AND #$03
+b60e: 20 fc a0     JSR $a0fc
+b611: 68           PLA
+b612: 20 eb b5     JSR $b5eb   ; Set pointers for warrior A: p[$92]=permanent, p[$90]=in-battle
+b615: a0 00        LDY #$00
+b617: 8c 76 68     STY $6876   ; target elemental weakness
+b61a: 8c 7e 68     STY $687e   ; target "courage"
+b61d: 8c 86 68     STY $6886   ; target creature type
+
+b620: c8           INY ; Y = $01
+b621: b1 92        LDA ($92),Y
+b623: 8d 6d 68     STA $686d   ; target status ailments
+
+b626: a0 05        LDY #$05
+b628: b1 90        LDA ($90),Y
+b62a: 8d 84 68     STA $6884   ; target Hit%
+
+b62d: c8           INY ; Y = $06
+b62e: b1 90        LDA ($90),Y
+b630: 8d 72 68     STA $6872   ; target magic defense
+
+b633: c8           INY ; Y = $07
+b634: b1 90        LDA ($90),Y
+b636: 8d 85 68     STA $6885   ; target evade
+
+b639: c8           INY ; Y = $08
+b63a: b1 90        LDA ($90),Y
+b63c: 8d 7f 68     STA $687f   ; target absorb
+
+b63f: c8           INY ; Y = $09
+b640: b1 90        LDA ($90),Y
+b642: 8d 82 68     STA $6882   ; target damage
+
+b645: c8           INY ; Y = $0a
+b646: b1 90        LDA ($90),Y
+b648: 8d 77 68     STA $6877   ; target elemental resistance
+b64b: b1 92        LDA ($92),Y
+b64d: 8d 7a 68     STA $687a   ; target HP low byte
+
+b650: c8           INY ; Y = $0b
+b651: b1 90        LDA ($90),Y
+b653: 8d 7d 68     STA $687d   ; target hit multiplier
+b656: b1 92        LDA ($92),Y
+b658: 8d 7b 68     STA $687b   ; target HP high byte
+
+b65b: c8           INY ; Y = $0c
+b65c: b1 92        LDA ($92),Y
+b65e: 8d 80 68     STA $6880   ; target Max HP low byte
+
+b661: c8           INY ; Y = $0d
+b662: b1 92        LDA ($92),Y
+b664: 8d 81 68     STA $6881   ; target Max HP high byte
+
+b667: 60           RTS
+
+;; More support routines in the empty space
+; w[1] = effectivity
+b668: ad 74 68     LDA $6874   ; spell effectivity
+
+; w[1] = A
+b66b: 8d 58 68     STA $6858
+b66e: a9 00        LDA #$00
+b670: 8d 59 68     STA $6859
+b673: 60           RTS
+
+
+;;; PART 4
+; GFX and load caster data for player
+b684: ae 8f 6c     LDX $6c8f
+b687: d0 05        BNE +$05  [$b68e]
+b689: a9 00        LDA #$00
+b68b: 20 b8 be     JSR $beb8  ; if magic, play 'cast' sound
+b68e: ad 89 6c     LDA $6c89
+b691: 29 7f        AND #$7f
+b693: ae 8f 6c     LDX $6c8f
+b696: 20 2d a3     JSR $a32d   ; load palette and do GFX?
+b699: ad 89 6c     LDA $6c89
+b69c: 20 eb b5     JSR $b5eb   ; Set pointers for warrior A: p[$92]=permanent, p[$90]=in-battle
+b69f: a9 00        LDA #$00
+b6a1: ae 8f 6c     LDX $6c8f
+b6a4: d0 04        BNE +$04  [$b6aa]
+b6a6: a0 12        LDY #$12
+b6a8: b1 92        LDA ($92),Y
+b6aa: 8d 73 68     STA $6873  ; caster Int
+b6ad: 60           RTS
+
+; Whee, NOPs!
+b6ae: ea           NOP
+b6af: ea           NOP
+b6b0: ea           NOP
+b6b1: ea           NOP
+
+;; More support routines in the empty space
+; w[2] = Int*X/32, w[1] = effectivity + w[1], and A = clamp255(w[1])
+b6b2: 20 68 b6     JSR $b668   ; w[1] = effectivity
+
+; w[2] = Int*X/32, w[1]+=w[2], and A = clamp255(w[1])
+b6b5: 20 ef af     JSR $afef   ; w[2] = Int*X/32, w[1]+=w[2]
+
+; A = clamp255(w[1])
+b6b8: a9 01        LDA #$01
+
+; A = clamp255(w[A])
+b6ba: 0a           ASL
+b6bb: aa           TAX
+b6bc: bd 57 68     LDA $6857,X
+b6bf: f0 03        BEQ +$03  [$b6c4]
+b6c1: a9 ff        LDA #$ff
+b6c3: 60           RTS
+b6c4: bd 56 68     LDA $6856,X
+b6c7: 60           RTS
+
+
+; Load data for magic targeting enemy
+b6c8: ad 8a 6c     LDA $6c8a
+b6cb: 20 be b4     JSR $b4be   ; Set pointers for slot A: p[$92]=in-ROM, p[$90]=in-RAM
+
+b6ce: a0 02        LDY #$02
+b6d0: b1 90        LDA ($90),Y
+b6d2: 8d 7a 68     STA $687a   ; target HP low byte
+
+b6d5: c8           INY ; Y = $03
+b6d6: b1 90        LDA ($90),Y
+b6d8: 8d 7b 68     STA $687b   ; target HP high byte
+
+b6db: c8           INY ; Y = $04
+b6dc: b1 90        LDA ($90),Y
+b6de: 8d 7f 68     STA $687f   ; target absorb
+b6e1: b1 92        LDA ($92),Y
+b6e3: 8d 80 68     STA $6880   ; target Max HP low byte
+
+b6e6: c8           INY ; Y = $05
+b6e7: b1 90        LDA ($90),Y
+b6e9: 8d 7d 68     STA $687d   ; target hit multiplier
+b6ec: b1 92        LDA ($92),Y
+b6ee: 8d 81 68     STA $6881   ; target Max HP high byte
+
+b6f1: c8           INY ; Y = $06
+b6f2: b1 90        LDA ($90),Y
+b6f4: 8d 6d 68     STA $686d   ; target status ailments
+
+b6f7: a0 09        LDY #$09
+b6f9: b1 90        LDA ($90),Y
+b6fb: 8d 7e 68     STA $687e   ; target "courage"
+
+b6fe: c8           INY ; Y = $0a
+b6ff: b1 90        LDA ($90),Y
+b701: 8d 85 68     STA $6885   ; target evade
+
+b704: c8           INY ; Y = $0b
+b705: b1 90        LDA ($90),Y
+b707: 8d 82 68     STA $6882   ; target damage
+
+b70a: a0 10        LDY #$10
+b70c: b1 92        LDA ($92),Y
+b70e: 8d 86 68     STA $6886   ; target creature type
+
+b711: c8           INY ; Y = $11
+b712: b1 92        LDA ($92),Y
+b714: 8d 72 68     STA $6872   ; target magic defense
+
+b717: c8           INY ; Y = $12
+b718: b1 90        LDA ($90),Y
+b71a: 8d 84 68     STA $6884   ; target Hit%
+b71d: b1 92        LDA ($92),Y
+b71f: 8d 76 68     STA $6876   ; target elemental weakness
+
+b722: c8           INY ; Y = $13
+b723: b1 90        LDA ($90),Y
+b725: 8d 77 68     STA $6877   ; target elemental resistance
+
+b728: a9 02        LDA #$02
+b72a: 20 b8 be     JSR $beb8   ; Play sound
+b72d: 4c fa bb     JMP $bbfa   ; do attack sound & sparkles
+
+; Load data for enemy caster
+; Enemy Int=0
+b730: a9 00        LDA #$00
+b732: 8d 73 68     STA $6873
+b735: 60           RTS
+b736: ea           NOP
+b737: ea           NOP
+b738: ea           NOP
+b739: ea           NOP
+b73a: ea           NOP
+b73b: ea           NOP
+b73c: ea           NOP
+b73d: ea           NOP
+b73e: ea           NOP
+b73f: ea           NOP
+
+; Alternate choice: enemy Int = MagDef/4
+;b730: ad 89 6c     LDA $6c89
+;b733: 20 be b4     JSR $b4be   ; Set pointers for slot A: p[$92]=in-ROM, p[$90]=in-RAM
+;b736: a0 11        LDY #$11    ; Let's make enemy Int = MagDef/4
+;b738: b1 92        LDA ($92),Y
+;b73a: 4a           LSR
+;b73b: 4a           LSR
+;b73c: 8d 73 68     STA $6873
+;b73f: 60           RTS
+
+; Whee, NOPs
+b740: ea           NOP
+b741: ea           NOP
+b742: ea           NOP
+b743: ea           NOP
+b744: ea           NOP
+b745: ea           NOP
+b746: ea           NOP
+b747: ea           NOP
+b748: ea           NOP
+
+
+; Save data for enemy magic target
+b749: ad 8a 6c     LDA $6c8a
+b74c: 20 be b4     JSR $b4be   ; Set pointers for slot A: p[$92]=in-ROM, p[$90]=in-RAM
+
+b74f: ad 7a 68     LDA $687a   ; Save target HP low byte
+b752: a0 02        LDY #$02
+b754: 91 90        STA ($90),Y
+
+b756: ad 7b 68     LDA $687b   ; Save target HP high byte
+b759: c8           INY ; Y = $03
+b75a: 91 90        STA ($90),Y
+
+b75c: ad 7f 68     LDA $687f   ; Save target absorb
+b75f: c8           INY ; Y = $04
+b760: 91 90        STA ($90),Y
+
+b762: ad 7d 68     LDA $687d   ; Save target hit multiplier
+b765: c8           INY ; Y = $05
+b766: 91 90        STA ($90),Y
+
+b768: ad 6d 68     LDA $686d   ; Save target status ailments
+b76b: c8           INY ; Y = $06
+b76c: 91 90        STA ($90),Y
+
+b76e: ad 7e 68     LDA $687e   ; Save target "courage"
+b771: a0 09        LDY #$09
+b773: 91 90        STA ($90),Y
+
+b775: ad 85 68     LDA $6885   ; Save target evade
+b778: c8           INY ; Y = $0a
+b779: 91 90        STA ($90),Y
+
+b77b: ad 82 68     LDA $6882   ; Save target damage
+b77e: c8           INY ; Y = $0b
+b77f: 91 90        STA ($90),Y
+
+b781: ad 84 68     LDA $6884   ; Save target Hit%
+b784: a0 12        LDY #$12
+b786: 91 90        STA ($90),Y
+
+b788: ad 77 68     LDA $6877   ; Save target elemental resistance
+b78b: c8           INY ; Y = $13
+b78c: 91 90        STA ($90),Y
+
+b78e: 60           RTS
+
+
+; Save data for player magic target
+b78f: ad 8a 6c     LDA $6c8a
+b792: 20 eb b5     JSR $b5eb   ; Set pointers for warrior A: p[$92]=permanent, p[$90]=in-battle
+
+b795: a0 01        LDY #$01
+b797: ad 6d 68     LDA $686d   ; Save target status ailments
+b79a: 91 92        STA ($92),Y
+
+b79c: a0 05        LDY #$05
+b79e: ad 84 68     LDA $6884   ; Save target Hit%
+b7a1: 91 90        STA ($90),Y
+
+b7a3: a0 07        LDY #$07
+b7a5: ad 85 68     LDA $6885   ; Save target evade
+b7a8: 91 90        STA ($90),Y
+
+b7aa: c8           INY ; Y = $08
+b7ab: ad 7f 68     LDA $687f   ; Save target absorb
+b7ae: 91 90        STA ($90),Y
+
+b7b0: c8           INY ; Y = $09
+b7b1: ad 82 68     LDA $6882   ; Save target damage
+b7b4: 91 90        STA ($90),Y
+
+b7b6: c8           INY ; Y = $0a
+b7b7: ad 77 68     LDA $6877   ; Save target elemental resistance
+b7ba: 91 90        STA ($90),Y
+b7bc: ad 7a 68     LDA $687a   ; Save target HP low byte
+b7bf: 91 92        STA ($92),Y
+
+b7c1: c8           INY ; Y = $0b
+b7c2: ad 7d 68     LDA $687d   ; Save target hit multiplier
+b7c5: 91 90        STA ($90),Y
+b7c7: ad 7b 68     LDA $687b   ; Save target HP high byte
+b7ca: 91 92        STA ($92),Y
+
+b7cc: 60           RTS
+
+
+
+;;; PART 5
+; Jump table for magic effects
+b807: 94 b8        .DW $b894   ; Effect 00: "Ineffective"
+b809: 06 b9        .DW $b906   ; Effect 01: Damage
+b80b: fa b8        .DW $b8fa   ; Effect 02: Undead damage
+b80d: b2 b9        .DW $b9b2   ; Effect 03: Apply status ailment
+b80f: 08 ba        .DW $ba08   ; Effect 04: hit multiplier down
+b811: 3f ba        .DW $ba3f   ; Effect 05: "courage" down
+b813: 94 b8        .DW $b894   ; Effect 06: unused
+b815: 64 b9        .DW $b964   ; Effect 07: HP up
+b817: f4 b9        .DW $b9f4   ; Effect 08: Cure status ailment
+b819: 46 ba        .DW $ba46   ; Effect 09: Absorb up
+b81b: 33 ba        .DW $ba33   ; Effect 0a: Grant elemental resistance
+b81d: 71 ba        .DW $ba71   ; Effect 0b: Damage up
+b81f: 16 ba        .DW $ba16   ; Effect 0c: hit multiplier up
+b821: 5b ba        .DW $ba5b   ; Effect 0d: Hit% and Damage up
+b823: 4d ba        .DW $ba4d   ; Effect 0e: Evade down
+b825: a0 b9        .DW $b9a0   ; Effect 0f: CUR4
+b827: 54 ba        .DW $ba54   ; Effect 10: Evade up
+b829: 24 ba        .DW $ba24   ; Effect 11: Remove elemental resistance
+b82b: cf b9        .DW $b9cf   ; Effect 12: Apply status if not strong and HP<300
+b82d: 94 b8        .DW $b894   ; Effect 13: unused
+b82f: 94 b8        .DW $b894   ; Effect 14: unused
+b831: 94 b8        .DW $b894   ; Effect 15: unused
+b833: 94 b8        .DW $b894   ; Effect 16: unused
+b835: 94 b8        .DW $b894   ; Effect 17: unused
+b837: 94 b8        .DW $b894   ; Effect 18: unused
+b839: 94 b8        .DW $b894   ; Effect 19: unused
+b83b: 94 b8        .DW $b894   ; Effect 1a: unused
+b83d: 94 b8        .DW $b894   ; Effect 1b: unused
+b83f: 94 b8        .DW $b894   ; Effect 1c: unused
+b841: 94 b8        .DW $b894   ; Effect 1d: unused
+b843: 94 b8        .DW $b894   ; Effect 1e: unused
+b845: 94 b8        .DW $b894   ; Effect 1f: unused
+b847: 94 b8        .DW $b894   ; Effect 20: unused
+b849: 94 b8        .DW $b894   ; Effect 21: unused
+b84b: 94 b8        .DW $b894   ; Effect 22: unused
+b84d: 94 b8        .DW $b894   ; Effect 23: unused
+b84f: 94 b8        .DW $b894   ; Effect 24: unused
+b851: 94 b8        .DW $b894   ; Effect 25: unused
+b853: 94 b8        .DW $b894   ; Effect 26: unused
+
+; Decrease stat in $6800,Y by effectivity + Int*X/32
+b855: 98           TYA
+b856: 48           PHA
+b857: 8A           TXA
+b858: 48           PHA
+b859: 20 af b8     JSR $b8af   ; do hit roll, and apply if pass
+b85c: 68           PLA
+b85d: 90 02        BCC +$02  [$b861]
+b85f: 68           PLA
+b860: 60           RTS
+b861: AA           TAX
+b862: 20 b2 b6     JSR $b6b2   ; Get effectivity + Int*X/32
+b865: 8d 58 68     STA $6858
+b868: 68           PLA
+b869: AA           TAX
+b86a: bd 00 68     LDA $6800,X ; target stat
+b86d: 38           SEC
+b86e: ed 58 68     SBC $6858
+b871: b0 02        BCS +$02  [$b875]
+b873: a9 00        LDA #$00
+b875: 9d 00 68     STA $6800,X ; target stat
+b878: 60           RTS
+
+; Increase stat in $6800,Y by effectivity + Int*X/32
+b879: 98           TYA
+b87a: 48           PHA
+b87b: 20 b2 b6     JSR $b6b2   ; Get effectivity + Int*X/32
+b87e: 8d 58 68     STA $6858
+b881: 68           PLA
+b882: AA           TAX
+b883: bd 00 68     LDA $6800,X ; target stat
+b886: 18           CLC
+b887: 6d 58 68     ADC $6858
+b88a: 90 02        BCC +$02  [$b88e]
+b88c: a9 ff        LDA #$ff
+b88e: 9d 00 68     STA $6800,X ; target stat
+b891: 4c f4 b8     JMP $b8f4   ; $685c = #$01 ("spell was effective"?)
+
+; Effect 00: Display "ineffective" message
+; (many routines try to JMP/JSR here, so don't move it!)
+;b894
+b894: a9 04        LDA #$04
+b896: 4c f2 b0     JMP $b0f2   ; Display message indicated in A
+;b899
+
+; w[0] = A + INT + spell hit rate
+b899: 8d 56 68     STA $6856
+b89c: ad 73 68     LDA $6873   ; caster INT
+b89f: ea           NOP         ; @@@0 Set to '4a' to halve Int contribution to doubling chance
+b8a0: aa           TAX 
+b8a1: a9 00        LDA #$00
+b8a3: 8d 57 68     STA $6857
+b8a6: 20 dd ae     JSR $aedd   ; w[A] = clamp(w[A] + X)
+b8a9: ae 70 68     LDX $6870   ; current spell hit rate
+b8ac: 4c dd ae     JMP $aedd   ; w[A] = clamp(w[A] + X)
+
+; Do hit roll:
+;   Apply elements, Int, MagDef, and spell hit rate, and base chance of 0x94
+;   Get random number
+;   Result in C flag: CC -> pass, CS -> fail
+b8af: a9 94        LDA #$94    ; @@@1 base hit chance
+b8b1: 20 99 b8     JSR $b899   ; Add INT and hit rate
+b8b4: ad 78 68     LDA $6878   ; current spell element
+b8b7: 48           PHA
+b8b8: 2d 76 68     AND $6876   ; target elemental weakness
+b8bb: f0 07        BEQ +$07  [$b8c4]
+b8bd: a9 00        LDA #$00
+b8bf: a2 28        LDX #$28    ; @@@1 elemental weakness bonus to hit chance
+b8c1: 20 dd ae     JSR $aedd   ; w[A] = clamp(w[A] + X)
+b8c4: 68           PLA
+b8c5: 2d 77 68     AND $6877   ; target elemental resistance
+b8c8: f0 07        BEQ +$07  [$b8d1]
+b8ca: a9 00        LDA #$00  
+b8cc: a2 94        LDX #$94    ; @@@1 elemental resistance penalty to hit chance
+b8ce: 20 0a af     JSR $af0a   ; w[A] = clamp(w[A] - X)
+b8d1: ae 72 68     LDX $6872   ; target magic defense
+b8d4: 20 0a af     JSR $af0a   ; w[A] = clamp(w[A] - X)
+;; Do the roll against w[0]:
+;   Get random number
+;   Result in C flag: CC -> pass, CS -> fail
+b8d7: ad 57 68     LDA $6857   ; clamp to 255
+b8da: f0 05        BEQ +$05  [$b8e1]
+b8dc: a9 ff        LDA #$ff
+b8de: 8d 56 68     STA $6856
+b8e1: a9 00        LDA #$00    ; Do roll...
+b8e3: a2 c8        LDX #$c8
+b8e5: 20 5d ae     JSR $ae5d   ; A = RND (A .. X)
+b8e8: c9 c8        CMP #$c8
+b8ea: f0 06        BEQ +$06  [$b8f2]
+b8ec: cd 56 68     CMP $6856
+b8ef: d0 01        BNE +$01  [$b8f2]
+b8f1: 18           CLC
+b8f2: b0 05        BCS +$05  [$b8f9]
+
+; $685c = #$01 ("spell was effective"?)
+b8f4: a9 01        LDA #$01
+b8f6: 8d 5c 68     STA $685c
+b8f9: 60           RTS
+
+; Effect 02: Undead damage
+b8fa: ad 86 68     LDA $6886   ; target creature type
+b8fd: 29 08        AND #$08    ; @@@1 HARM creature type(s)
+b8ff: d0 05        BNE +$05  [$b906]
+b901: a9 00        LDA #$00    ;;; Not undead, do 0 damage
+b903: 4c 6b b6     JMP $b66b   ; w[1] = A
+
+; Effect 01: Damage
+b906: 20 f4 b8     JSR $b8f4   ; Set effective
+b909: a2 00        LDX #$00    ; @@@1 base damage Int contribution (X/32)
+b90b: 20 ec af     JSR $afec
+b90e: ad 78 68     LDA $6878   ; current spell element
+b911: 2d 77 68     AND $6877   ; target elemental resistance
+b914: f0 06        BEQ +$06  [$b91c]
+b916: 4e 59 68     LSR $6859   ;; @@@0 6 bytes: Resistant -> damage /= 2
+b919: 6e 58 68     ROR $6858
+b91c: ad 78 68     LDA $6878   ; current spell element
+b91f: 2d 76 68     AND $6876   ; target elemental weakness
+b922: f0 15        BEQ +$15  [$b939]
+b924: a2 01        LDX #$01    ;; @@@0 21 bytes: Weak -> damage *= 1.5
+b926: a0 02        LDY #$02
+b928: 20 4d af     JSR $af4d   ; w[Y] = w[X]
+b92b: 4e 59 68     LSR $6859
+b92e: 6e 58 68     ROR $6858
+b931: a9 01        LDA #$01
+b933: a8           TAY
+b934: a2 02        LDX #$02
+b936: 20 7b ae     JSR $ae7b   ; w[A] = w[X] + w[Y]
+b939: ae 58 68     LDX $6858    ;;; damage = E .. (E+clamp255(E))
+b93c: ad 59 68     LDA $6859
+b93f: f0 04        BEQ +$04  [$b945]
+b941: a2 ff        LDX #$ff
+b943: a9 00        LDA #$00
+b945: 20 5d ae     JSR $ae5d   ; A = RND (A .. X)
+b948: aa           TAX 
+b949: a9 01        LDA #$01
+b94b: 20 dd ae     JSR $aedd   ; w[A] = clamp(w[A] + X)
+b94e: 20 af b8     JSR $b8af   ; do hit roll, and damage*=2 if pass
+b951: b0 06        BCS +$06  [$b959]
+b953: 0e 58 68     ASL $6858
+b956: 2e 59 68     ROL $6859
+b959: a9 12        LDA #$12    ;;; HP = HP - damage
+b95b: aa           TAX 
+b95c: a0 01        LDY #$01
+b95e: 20 ac ae     JSR $aeac   ; w[A] = w[X] - w[Y]
+b961: 4c cd b0     JMP $b0cd   
+
+; Effect 07: HP up 
+b964: ad 6d 68     LDA $686d   ;;; Is dead? do nothing
+b967: 29 01        AND #$01
+b969: f0 01        BEQ +$01  [$b96c]
+b96b: 60           RTS
+b96c: a2 00        LDX #$00    ; @@@1 CURE Int bonus (X/32)
+b96e: 20 b2 b6     JSR $b6b2   ; Get effectivity + Int*X/32
+b971: aa           TAX 
+b972: a9 00        LDA #$00
+b974: 20 5d ae     JSR $ae5d   ; A = RND (A .. X)
+b977: aa           TAX 
+b978: a9 01        LDA #$01
+b97a: 20 dd ae     JSR $aedd   ; w[A] = clamp(w[A] + X)
+b97d: a9 24        LDA #$24    ; @@@1 base heal doubling chance
+b97f: 20 99 b8     JSR $b899   ; w[0] = A + INT + spell hit chance
+b982: 20 d7 b8     JSR $b8d7   ; do hit roll, and healing*=2 if pass
+b985: b0 06        BCS +$06  [$b98d]
+b987: 0e 58 68     ASL $6858
+b98a: 2e 59 68     ROL $6859
+b98d: a9 12        LDA #$12
+b98f: a8           TAY
+b990: a2 01        LDX #$01
+b992: 20 7b ae     JSR $ae7b   ; w[A] = w[X] + w[Y]
+b995: a2 15        LDX #$15
+b997: a0 12        LDY #$12
+b999: 20 ea ad     JSR $adea   ; CMP w[Y] >= w[X] (sets NC, clear others)
+b99c: 90 11        BCC +$11  [$b9af]
+b99e: b0 08        BCS +$08  [$b9a8]
+
+; Effect 0f: CUR4
+b9a0: ad 6d 68     LDA $686d   ; target status ailments
+b9a3: 29 03        AND #$03    ; @@@1 CUR4 cures statuses NOT mentioned here
+b9a5: 8d 6d 68     STA $686d   ; target status ailments
+b9a8: a2 15        LDX #$15
+b9aa: a0 12        LDY #$12
+b9ac: 20 4d af     JSR $af4d   ; w[Y] = w[X]
+b9af: 4c f4 b8     JMP $b8f4   ; $685c = #$01 ("spell was effective"?)
+
+; Effect 03: Apply status ailment
+b9b2: 20 af b8     JSR $b8af   ; do hit roll, and apply if pass
+b9b5: b0 17        BCS +$17  [$b9ce]
+; jump here to apply a status ailment for other cases, e.g. Effect 12
+b9b7: ad 6d 68     LDA $686d   ; spell effectivity stores ailments
+b9ba: 2d 74 68     AND $6874   ;;; Display "ineffective" if target already has ailments
+b9bd: cd 74 68     CMP $6874
+b9c0: d0 03        BNE +$03  [$b9c5]
+b9c2: 4c 94 b8     JMP $b894   ; Display "Ineffective" message
+b9c5: ad 6d 68     LDA $686d   ;;; apply ailments
+b9c8: 0d 74 68     ORA $6874   ; spell effectivity stores ailments
+b9cb: 8d 6d 68     STA $686d
+b9ce: 60           RTS
+
+; Effect 12: Apply status if not strong and HP<300
+b9cf: ad 78 68     LDA $6878   ; current spell element
+b9d2: 2d 77 68     AND $6877   ; target elemental resistance
+b9d5: d0 f7        BNE +$f7  [$b9ce]
+b9d7: a9 2c        LDA #$2c    ; @@@1 Effect 12 HP limit low byte
+b9d9: 8d 58 68     STA $6858   
+b9dc: a9 01        LDA #$01    ; @@@1 Effect 12 HP limit high byte
+b9de: 8d 59 68     STA $6859   
+b9e1: a2 20        LDX #$20    ; @@@1 Int bonus to Effect 12 HP limit (X/32)
+b9e3: 20 ef af     JSR $afef
+b9e6: a0 01        LDY #$01
+b9e8: a2 12        LDX #$12
+b9ea: 20 ea ad     JSR $adea   ; CMP w[Y] >= w[X] (sets NC, clear others)
+b9ed: 90 df        BCC +$df  [$b9ce]
+b9ef: 20 f4 b8     JSR $b8f4   ; $685c = #$01 ("spell was effective"?)
+b9f2: b0 c3        BCS +$c3  [$b9b7]
+
+; Effect 08: Cure status ailment
+b9f4: ad 74 68     LDA $6874   ; current spell effectivity
+b9f7: 2c 6d 68     BIT $686d   ; target status ailments
+b9fa: f0 0b        BEQ +$0b  [$ba07]
+b9fc: 49 ff        EOR #$ff
+b9fe: 2d 6d 68     AND $686d   ; target status ailments
+ba01: 8d 6d 68     STA $686d   ; target status ailments
+ba04: 20 f4 b8     JSR $b8f4   ; $685c = #$01 ("spell was effective"?)
+ba07: 60           RTS
+
+; Effect 04: hit multiplier down
+ba08: 20 af b8     JSR $b8af   ; do hit roll, and apply if pass
+ba0b: b0 08        BCS +$08  [$ba15]
+ba0d: ce 7d 68     DEC $687d   ; target hit multiplier
+ba10: 10 03        BPL +$03  [$ba15]
+ba12: ee 7d 68     INC $687d   ; target hit multiplier
+ba15: 60           RTS
+
+; Effect 0c: hit multiplier up
+ba16: ad 7d 68     LDA $687d   ; target hit multiplier
+ba19: c9 02        CMP #$02    ; @@@1 Max FAST stacking
+ba1b: 90 01        BCC +$01  [$ba1e]
+ba1d: 60           RTS
+ba1e: ee 7d 68     INC $687d   ; target hit multiplier
+ba21: 4c f4 b8     JMP $b8f4   ; $685c = #$01 ("spell was effective"?)
+
+; Effect 11: Remove elemental resistance (mask)
+ba24: 20 af b8     JSR $b8af   ; do hit roll, and apply if pass
+ba27: b0 09        BCS +$09  [$ba32]
+ba29: ad 77 68     LDA $6877   ; target elemental resistance
+ba2c: 2d 74 68     AND $6874   ; current spell effectivity
+ba2f: 8d 77 68     STA $6877   ; target elemental resistance
+ba32: 60           RTS
+
+; Effect 0a: Grant elemental resistance 
+ba33: ad 77 68     LDA $6877   ; target elemental resistance
+ba36: 0d 74 68     ORA $6874   ; current spell effectivity
+ba39: 8d 77 68     STA $6877   ; target elemental resistance
+ba3c: 4c f4 b8     JMP $b8f4   ; $685c = #$01 ("spell was effective"?)
+
+; Effect 05: "courage" down
+ba3f: a2 08        LDX #$08    ; @@@1 FEAR Int contribution (X/32)
+ba41: a0 7e        LDY #$7e    ; target "courage"
+ba43: 4c 55 b8     JMP $b855
+
+; Effect 09: Absorb up 
+ba46: a2 00        LDX #$00    ; @@@1 FOG Int contribution (X/32)
+ba48: a0 7f        LDY #$7f    ; target absorb
+ba4a: 4c 79 b8     JMP $b879
+
+; Effect 0e: Evade down
+ba4d: a2 10        LDX #$10    ; @@@1 LOCK Int contribution (X/32)
+ba4f: a0 85        LDY #$85    ; target evade
+ba51: 4c 55 b8     JMP $b855
+
+; Effect 10: Evade up
+ba54: a2 00        LDX #$00    ; @@@1 RUSE/INVS Int contribution (X/32)
+ba56: a0 85        LDY #$85    ; target evade
+ba58: 4c 79 b8     JMP $b879
+
+; Effect 0d: Hit% and damage up
+ba5b: ad 84 68     LDA $6884   ; target hit %
+ba5e: 20 6b b6     JSR $b66b   ; w[1] = A
+ba61: a9 01        LDA #$01
+ba63: ae 70 68     LDX $6870   ; current spell hit rate
+ba66: 20 dd ae     JSR $aedd   ; w[A] = clamp(w[A] + X)
+ba69: a2 10        LDX #$10    ; @@@1 SABR Int contribution to Hit% (X/32)
+ba6b: 20 b5 b6     JSR $b6b5
+ba6e: 8d 84 68     STA $6884   ; target hit %
+
+; Effect 0b: Damage up 
+ba71: a2 00        LDX #$00    ; @@@1 TMPR/SABR Int contribution to damage (X/32)
+ba73: a0 82        LDY #$82    ; target damage
+ba75: 4c 79 b8     JMP $b879
+
+ba78: ea           NOP         ; @@@0 Start of free space for extra effect routines
+ba79: ea           NOP
+ba7a: ea           NOP
+ba7b: ea           NOP
+ba7c: ea           NOP
+ba7d: ea           NOP
+ba7e: ea           NOP
+ba7f: ea           NOP
+ba80: ea           NOP
+ba81: ea           NOP
+ba82: ea           NOP
+ba83: ea           NOP
+ba84: ea           NOP
+ba85: ea           NOP
+ba86: ea           NOP
+ba87: ea           NOP
+ba88: ea           NOP
+ba89: ea           NOP
+ba8a: ea           NOP
+ba8b: ea           NOP
+ba8c: ea           NOP
+ba8d: ea           NOP
+ba8e: ea           NOP
+ba8f: ea           NOP
+ba90: ea           NOP
+ba91: ea           NOP
+ba92: ea           NOP
+ba93: ea           NOP
+ba94: ea           NOP
+ba95: ea           NOP
+ba96: ea           NOP
+ba97: ea           NOP
+ba98: ea           NOP
+ba99: ea           NOP
+ba9a: ea           NOP
+ba9b: ea           NOP
+ba9c: ea           NOP
+ba9d: ea           NOP
+ba9e: ea           NOP
+ba9f: ea           NOP
+baa0: ea           NOP
+baa1: ea           NOP
+baa2: ea           NOP
+baa3: ea           NOP
+baa4: ea           NOP
+baa5: ea           NOP
+baa6: ea           NOP
+baa7: ea           NOP
+baa8: ea           NOP
+baa9: ea           NOP
+baaa: ea           NOP
+baab: ea           NOP
+baac: ea           NOP
+baad: ea           NOP
+baae: ea           NOP
+baaf: ea           NOP
+bab0: ea           NOP
+bab1: ea           NOP
+bab2: ea           NOP
+bab3: ea           NOP
+bab4: ea           NOP
+bab5: ea           NOP
+bab6: ea           NOP
+bab7: ea           NOP
+bab8: ea           NOP
+bab9: ea           NOP
+baba: ea           NOP
+babb: ea           NOP
+babc: ea           NOP
+babd: ea           NOP
+babe: ea           NOP
+babf: ea           NOP
+bac0: ea           NOP
+bac1: ea           NOP
+bac2: ea           NOP
+bac3: ea           NOP
+bac4: ea           NOP
+bac5: ea           NOP
+bac6: ea           NOP
+bac7: ea           NOP
+bac8: ea           NOP
+bac9: ea           NOP
+baca: ea           NOP
+bacb: ea           NOP
+bacc: ea           NOP
+bacd: ea           NOP
+bace: ea           NOP
+bacf: ea           NOP
+bad0: ea           NOP
+bad1: ea           NOP
+bad2: ea           NOP
+bad3: ea           NOP
+bad4: ea           NOP
+bad5: ea           NOP
+bad6: ea           NOP
+bad7: ea           NOP
+bad8: ea           NOP
+bad9: ea           NOP
+bada: ea           NOP
+badb: ea           NOP
+badc: ea           NOP
+badd: ea           NOP
+bade: ea           NOP
+badf: ea           NOP
+bae0: ea           NOP
+bae1: ea           NOP
+bae2: ea           NOP
+bae3: ea           NOP
+bae4: ea           NOP
+bae5: ea           NOP
+bae6: ea           NOP
+bae7: ea           NOP
+bae8: ea           NOP
+bae9: ea           NOP
+baea: ea           NOP
+baeb: ea           NOP
+baec: ea           NOP
+baed: ea           NOP
+baee: ea           NOP
+baef: ea           NOP
+baf0: ea           NOP
+baf1: ea           NOP
+baf2: ea           NOP
+baf3: ea           NOP
+baf4: ea           NOP
+baf5: ea           NOP
+baf6: ea           NOP
+baf7: ea           NOP         ; @@@0 Last byte of free space for extra effect routines
+
+;baf8
+
+
+;; This command will convert the above file into an IPS patch, at least if the
+;; file is named "magic-bugs.txt".
+; perl -nwe 'BEGIN{ print "50 41 54 43 48"; $a=-1; $b=""; } sub xx { $l=length($b)/3; printf(" %02x %02x %02x %02x %02x%s", ($a>>16)&0xff, ($a>>8)&0xff, $a&0xff, ($l>>8)&0xff, $l&0xff, $b) if $l>0; $a=-1; $b=""; } xx() if /^;;; PART /; next unless /^([0-9a-f]{4}):((?: [0-9a-f]{2})+) */i; $a=hex($1)-0x8000+0x30010 if $a<0; $b.=$2; END { xx(); print " 45 4f 46\n"; }' < magic-bugs.txt
+
+;; This command will extract all lines marked as being an interesting offset
+; grep '@[@]@' txt/magic-bugs.2.txt | perl -pwe 's/^([0-9a-f]{4}): (..) (..) (..) (..)  (.*?)  *;+ @[@]@(\d+) / $x=$7+2; sprintf("%06x: %s ", hex($1)-0x8000+0x30010+$7, $$x) /e;'

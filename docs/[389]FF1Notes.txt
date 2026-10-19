@@ -1,0 +1,48 @@
+// For Magic accessibility
+// This data is NOT in ffbytes.zip
+
+What is done:
+  When a spell is being purchased
+  the code compares "Spell BITS" to a value
+  from a bit test table. [ $08, $40, $20, $10, $08, $04, $02, $01 ]
+  Each bit represents a spell. If the BIT in "Spell BITS" is SET
+  Then that spell CAN NOT be learned!
+  
+
+// Data can be found from $3AD28 - $3AD88 in the ROM
+
+Spell BITS Lv-1
+|  Spell BITS Lv-2
+|  |  Spell BITS Lv-3
+|  |  |  Spell BITS Lv-4
+|  |  |  |  Spell BITS Lv-5
+|  |  |  |  |  Spell BITS Lv-6
+|  |  |  |  |  |  Spell BITS Lv-7
+|  |  |  |  |  |  |  Spell BITS Lv-8
+|  |  |  |  |  |  |  |   Character
+|__|__|__|__|__|__|__|________|______
+FF-FF-FF-FF-FF-FF-FF-FF  Fighter   
+FF-FF-FF-FF-FF-FF-FF-FF  Thief	    
+FF-FF-FF-FF-FF-FF-FF-FF  Black Belt  
+50-00-50-50-76-FF-FF-FF  Red Mage
+0F-0F-0F-0F-0F-4F-CF-FF  White Mage
+F0-F0-F0-F0-F2-F0-F6-FF  Black Mage
+4F-0F-5F-FF-FF-FF-FF-FF  Knight
+F0-F0-F0-F0-FF-FF-FF-FF  Ninja
+FF-FF-FF-FF-FF-FF-FF-FF  Master
+40-00-50-40-30-87-D7-FF  Red Wizard
+0F-0F-0F-0F-0F-0F-0F-0F  White Wizard
+F0-F0-F0-F0-F0-F0-F0-F0  Black Wizard
+
+
+//-------------------------------------------------------//
+// This information below is for all characters starting //
+// Change the value to #$00 to make any                  //
+// Character able to start off using magic               //
+// Any character greater than #$02 and less than #$06    //
+// Is known to possess magic according to the game.      //
+//-------------------------------------------------------//
+// Offset: $3C7DE
+$C7CE #$03		; change to #$00
+
+

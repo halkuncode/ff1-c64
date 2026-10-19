@@ -1,0 +1,29 @@
+;; This enhancement allows all battle numbers except 0x80 to be used as spiked
+;; squares, instead of only 00-7f. If I weren't trying to keep compatability
+;; with Hackster, it'd allow all except 00 instead because that would be a
+;; simpler patch.
+
+;;; BANK 15
+;;; PART 1
+cda9: e0 cd        .DW $cde0  ; Chest (generic can't walk here)
+cdab: c1 cd        .DW $cdc1  ; Battle/spiked square (+1 is battle number if <128)
+cdad: 51 ce        .DW $ce51  ; Damage square (generic can walk)
+
+;;; PART 2a
+; Random battle or spiked square, depending on $45 bit 7
+cdc1: a5 45        LDA $45
+cdc3: c9 80        CMP #$80
+cdc5: d0 15        BNE +$15  [$cddc]
+
+;;; PART 2b
+cdde: d0 f6        BNE +$f6  [$cdd6]
+
+;;; PART 3
+; Can't walk here
+cde0: 38           SEC
+cde1: 60           RTS
+
+cde2: ea           NOP
+cde3: ea           NOP
+cde4: ea           NOP
+cde5: ea           NOP

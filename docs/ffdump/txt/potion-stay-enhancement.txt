@@ -1,0 +1,83 @@
+;;; BANK 14
+;;; PART 1
+b1a9: 1a b3        .DW $b31a   ; HEAL[potion]
+b1ab: 47 b3        .DW $b347   ; PURE[potion]
+b1ad: 65 b3        .DW $b365   ; SOFT[potion]
+
+;;; PART 2
+; New subroutine to display out-of-battle magic target select, display message in A, and wait for a button
+b301: 48           PHA
+b302: 20 00 b4     JSR $b400   ; Display out-of-battle magic target select screen
+b305: 68           PLA
+b306: 20 2b b9     JSR $b92b   ; Display out-of-battle magic message A
+b309: 20 a0 b3     JSR $b3a0   ; Out-of-battle magic target select: target in $62, C if A pressed
+b30c: 60           RTS
+
+; Display select screen and bleep
+b30d: 20 00 b4     JSR $b400   ; Display out-of-battle magic target select screen
+b310: 20 13 b6     JSR $b613   ; Wait for A or B to be pressed, then bleep
+b313: 60           RTS
+
+; Branch target for back-to-menu
+b314: 4c 1d b1     JMP $b11d   ; ITEM screen!
+
+b317: 20 26 db     JSR $db26   ; "can't do that" buzz?
+; HEAL[potion]
+b31a: a9 20        LDA #$20
+b31c: 20 01 b3     JSR $b301   ; Select target
+b31f: b0 f3        BCS +$f3  [$b314]  ; ITEM screen!
+b321: a5 62        LDA $62
+b323: 6a           ROR
+b324: 6a           ROR
+b325: 6a           ROR
+b326: 29 c0        AND #$c0
+b328: aa           TAX
+b329: bd 01 61     LDA $6101,X
+b32c: c9 01        CMP #$01
+b32e: f0 e7        BEQ +$e7  [$b317]
+b330: c9 02        CMP #$02
+b332: f0 e3        BEQ +$e3  [$b317]
+b334: a9 1e        LDA #$1e
+b336: 20 61 b5     JSR $b561   ; Restore HP (amount in A) for warrior X
+b339: 20 0d b3     JSR $b30d   ; Display select screen and bleep
+b33c: ce 39 60     DEC $6039
+b33f: f0 d3        BEQ +$d3  [$b314]
+b341: 4c 1a b3     JMP $b31a   ; Next!
+
+b344: 20 26 db     JSR $db26   ; "can't do that" buzz?
+; PURE[potion]
+b347: a9 21        LDA #$21
+b349: 20 01 b3     JSR $b301   ; Select target
+b34c: b0 c6        BCS +$c6  [$b314]
+b34e: a9 03        LDA #$03
+b350: 85 10        STA $10
+b352: 20 88 b3     JSR $b388   ; Cure warrior $62 status in $10
+b355: b0 ed        BCS +$ed  [$b344]
+b357: 20 0d b3     JSR $b30d   ; Display select screen and bleep
+b35a: ce 3a 60     DEC $603a
+b35d: f0 b5        BEQ +$b5  [$b314]
+b35f: 4c 47 b3     JMP $b347   ; Next!
+
+b362: 20 26 db     JSR $db26   ; "can't do that" buzz?
+; SOFT[potion]
+b365: a9 22        LDA #$22
+b367: 20 01 b3     JSR $b301   ; Select target
+b36a: b0 a8        BCS +$a8  [$b314]
+b36c: a9 02        LDA #$02
+b36e: 85 10        STA $10
+b370: 20 88 b3     JSR $b388   ; Cure warrior $62 status in $10
+b373: b0 ed        BCS +$ed  [$b362]
+b375: 20 0d b3     JSR $b30d   ; Display select screen and bleep
+b378: ce 3b 60     DEC $603b
+b37b: f0 97        BEQ +$97  [$b314]
+b37d: 4c 65 b3     JMP $b365   ; Next!
+
+b380: ea           NOP
+b381: ea           NOP
+b382: ea           NOP
+b383: ea           NOP
+b384: ea           NOP
+b385: ea           NOP
+b386: ea           NOP
+b387: ea           NOP
+;b388

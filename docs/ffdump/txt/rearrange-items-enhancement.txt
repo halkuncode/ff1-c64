@@ -1,0 +1,12 @@
+;;; BANK 15
+;;; PART 1
+ef37: a0 16        LDY #$16
+
+;;; PART 2
+ef44: c0 12        CPY #$12
+ef46: f0 08        BEQ +$08  [$ef50]
+ef48: c0 1c        CPY #$1c
+ef4a: 90 ed        BCC +$ed  [$ef39]
+ef4c: a0 01        LDY #$01
+ef4e: d0 e9        BNE +$e9  [$ef39]
+;ef50: e0 00        CPX #$00

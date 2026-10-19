@@ -1,0 +1,808 @@
+
+
+
+
+
+....................X0---Overview
+....................X1---Misc
+....................X2---Starting Stats and Items
+....................X3---Starting Equipment and Magic
+....................X4---Paramenters and Limits for all Stats
+....................X5---Experience Points per Level
+....................X6---Stats up per level
+....................X7---Palettes and Text
+
+
+....................Missing - BB parameters
+
+
+
+
+******************************************************---X0---***********************************************************
+*************************************************************************************************************************
+
+_____________________________________________________-Overview-__________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........In the Class Editor, there is MP and MP Range, do not change these. These have to do with who can or cant
+..........learn magic. They dont appear to be correctly lined up in GFF.
+
+..........Choosing everything else with Hackster appears to work fine. 
+
+..........There are many options here before going ahead with Hackster.
+
+
+
+******************************************************---X1---***********************************************************
+*************************************************************************************************************************
+
+_______________________________________________________-Misc-____________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+3a18b-Respond Rate
+
+
+302c/2d-Starting Gold
+
+
+2d9b3/b5-Gold and Experience Cap
+ 
+(40 42 0f = 999,999) (81 84 1e = 2,000,000) (81 96 98 = 10,000,000) (ff ff ff = 16,777,216)
+
+This does not display correctly at all, so you will have no idea how much Gold/Exp you have after 1,001,155 = 999,9P5
+
+
+
+Ship Game Payout
+
+If Warrior 1 (the other 3 aren't checked) is below L50:
+
+377f3:Low - 01=1
+377f7:Mid - 01=256
+377fb:High- 01=65536
+
+If Warrior 1 is L50:
+
+37802:Low - 01=1
+37806:Mid - 01=256
+3780a:High- 01=65536
+
+
+
+******************************************************---X2---***********************************************************
+*************************************************************************************************************************
+
+_____________________________________________-Starting Stats and Items-__________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+.................Set the Hex Editor to 16 wide
+
+.................Starting Stats
+
+.................Make sure to factor in what Weapons and Armor are equiped.
+.................Adjust Damage, Hit%, Absorb, and Evasion accordingly.
+
+
+----------Index|.HP--|-Str-|-Agi-|-Int-|-Vit-|Luck-|-Dmg-|-Hit-|-Eva-|M-Eva|-Abs-|-MP--|-Wep-|-Arm-|-Mag-|--------------
+-----------00----01----02----03----04----05----06----07----08----09----0a----0b----0c----0d----0e----0f-----------------
+
+FI-3050....00....23....0f....03....03....0f....03....0c....14....31....05....02....00....82....81....00
+.................HP....Str...Agi...Int...Vit...Luc...Dmg...Hit...Eva...MEv...Abs...MP....Wep...Arm...Mag
+
+TH-3060....01....1e....05....0f....03....05....0c....07....0f....3d....05....02....00....82....81....00
+.................HP....Str...Agi...Int...Vit...Luc...Dmg...Hit...Eva...MEv...Abs...MP....Wep...Arm...Mag
+
+BB-3070....02....23....05....05....05....14....05....02....0a....35....00....02....00....00....00....00
+.................HP....Str...Agi...Int...Vit...Luc...Dmg...Hit...Eva...MEv...Abs...MP....Wep...Arm...Mag
+
+----------Index|.HP--|-Str-|-Agi-|-Int-|-Vit-|Luck-|-Dmg-|-Hit-|-Eva-|M-Eva|-Abs-|-MP--|-Wep-|-Arm-|-Mag-|--------------
+-----------00----01----02----03----04----05----06----07----08----09----0a----0b----0c----0d----0e----0f-----------------
+
+RM-3080....03....1e....0a....07....0a....07....05....0a....0f....35....0a....02....02....82....81....06
+.................HP....Str...Agi...Int...Vit...Luc...Dmg...Hit...Eva...MEv...Abs...MP....Wep...Arm...Mag
+
+WM-3090....04....1e....05....05....0f....0a....05....06....05....33....0a....02....02....83....81....01
+.................HP....Str...Agi...Int...Vit...Luc...Dmg...Hit...Eva...MEv...Abs...MP....Wep...Arm...Mag
+
+BM-30A0....05....19....01....0c....14....01....07....05....05....3a....0a....02....02....83....81....05
+.................HP....Str...Agi...Int...Vit...Luc...Dmg...Hit...Eva...MEv...Abs...MP....Wep...Arm...Mag
+
+----------Index|.HP--|-Str-|-Agi-|-Int-|-Vit-|Luck-|-Dmg-|-Hit-|-Eva-|M-Eva|-Abs-|-MP--|-Wep-|-Arm-|-Mag-|--------------
+-----------00----01----02----03----04----05----06----07----08----09----0a----0b----0c----0d----0e----0f-----------------
+
+
+
+.......................Starting Items
+
+
+3042-Heal Potion.......3043-Pure Potion.......3044-Gold Needle.......304a-Sleeping Bag......304b-Tent..............
+
+3045-Phoenix Down......3047-Mind Plus.........3048-Stamina Plus......3049-Luck Plus.........3046-Spell Book........
+
+
+3031-Sara's Lute.......3032-Royal Crown.......3033-Crystal Eye.......3034-Wake up Herb......3035-Mystic Key........
+
+3036-Nitro Powder......3037-Adamantite........3038-Rosetta Stone.....3039-Star Ruby.........303a-Earth Rod.........
+
+303b-Floatstone........303c-Tintinnabulum.....303d-Rat's Tail........303e-Warp Cube.........303f-Mystery Jar.......
+
+3040-Fairy Water.......3041-Canoe (Inventory).
+
+
+3010-Ship     (Change 00 to 01 to access immediately)
+
+3022-Canoe    (Change 00 to 01 to access immediately)
+
+3014-Airship  (Change 00 to 01 to access immediately)
+
+3018-Bridge   (Change 00 to 01 to access immediately)
+
+301c-Canal    (Change 01 to 00 to make it disappear)
+
+
+
+******************************************************---X3---***********************************************************
+*************************************************************************************************************************
+
+___________________________________________-Starting Equipment and Magic-________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........Set the Hex Editor to 16 wide
+
+..........When changing Damage, Hit%, or Evade, the default equipment is also combined with the starting values. 
+..........Make sure to factor this in, because once you unequip your starting Weapon or Armor,
+..........your base Damage, Hit%, and Evade will show.
+
+..........01-28 is for unequiped, and 81-a8 is for equiped at start.
+
+
+
+...........Starting Weapons............................................Starting Armor...............................
+
+---------------------------------------------------------------------------------------|-Wep-|-Arm-|------
+-----------00----01----02----03----04----05----06----07----08----09----0a----0b----0c----0d----0e----0f---
+
+04/84-Short Sword----(09,05)-Sword 5............................02/82-Leather Armor------(04,08)....................
+06/86-Broad Sword----(15,10)-Sword 1............................03/83-Chain Armor--------(12,10)....................
+0d/8d-Claymore-------(20,10)-Sword 4............................04/84-Iron Armor---------(20,24)....................
+22/a2-Vorpal Blade---(22,20)-Sword 3............................06/86-Silver Armor-------(20,10)....................
+11/91-Silver Sword---(24,15)-Sword 4............................07/87-Flame Armor--------(32,20)....................
+25/a5-Razor Edge-----(24,25)-Sword 5............................08/88-Ice Armor----------(32,20)....................
+14/94-Flametongue----(26,20)-Sword 3............................09/89-Diamond Armor------(40,24)....................
+15/95-Icebrand-------(29,19)-Sword 4............................0a/8a-Dragon Armor-------(40,20)....................
+20/a0-Defender-------(30,35)-Sword 6............................05/85-Maximilian---------(88,32)....................
+18/98-Gaia Blade-----(32,30)-Sword 4............................01/81-Linen Tunic--------(02,02)....................
+27/a7-Excalibur------(45,35)-Sword 6............................0f/8f-White Robe---------(28,04)....................
+1c/9c-SaveTheQueen---(47,47)-Sword 6............................10/90-Black Robe---------(28,04)....................
+
+---------------------------------------------------------------------------------------|-Wep-|-Arm-|------
+-----------00----01----02----03----04----05----06----07----08----09----0a----0b----0c----0d----0e----0f---
+
+0c/8c-Cutlass--------(15,05)-Sword 2............................0b/8b-Bronze Band--------(06,01)....................
+19/99-Coral Sword----(18,15)-Sword 3............................0c/8c-Silver Band--------(16,01)....................
+1b/9b-Rune Blade-----(18,15)-Sword 5............................0d/8d-Ruby Band----------(24,01)....................
+16/96-Dragonslayer---(19,15)-Sword 2............................0e/8e-Pearl Band---------(32,01)....................
+26/a6-Katana---------(28,35)-Sword 2............................11/91-Wooden Shield------(02,+1)....................
+28/a8-Masamune-------(45,45)-Sword 2............................12/92-Iron Shield--------(04,+2)....................
+
+---------------------------------------------------------------------------------------|-Wep-|-Arm-|------
+-----------00----01----02----03----04----05----06----07----08----09----0a----0b----0c----0d----0e----0f---
+
+07/87-Battle Axe-----(18,05)-Axe................................13/93-Silver Shield------(08,+4)....................
+0e/8e-Titans Axe-----(24,07)-Axe................................14/94-Flame Shield-------(12,+4)....................
+13/93-Silver Axe-----(29,10)-Axe................................15/95-Ice Shield---------(12,+4)....................
+1d/9d-Sacred Axe-----(34,15)-Axe................................16/96-Diamond Shield-----(16,+8)....................
+
+01/81-Iron Fist------(09,06)-Hands..............................17/97-Aegis Shield-------(16,+8)....................
+09/89-Burning Fist---(12,08)-Hands..............................18/98-Buckler------------(02,+2)....................
+0b/8b-Dragon Claw----(15,10)-Hands..............................19/99-Fey Mantle---------(08,+8)....................
+0f/8f-Tiger Fangs----(18,12)-Hands..............................1b/9b-Bronze Helm--------(02,02)....................
+08/88-Kaiser Fist----(24,16)-Hands..............................1c/9c-Iron Helm----------(04,04)....................
+
+---------------------------------------------------------------------------------------|-Wep-|-Arm-|------
+-----------00----01----02----03----04----05----06----07----08----09----0a----0b----0c----0d----0e----0f---
+
+05/85-Heavy Mallet---(09,00)-Hammer.............................1d/9d-Silver Helm--------(06,03)....................
+1a/9a-Beast Killer---(23,07)-Hammer.............................1e/9e-Diamond Helm-------(10,05)....................
+24/a4-Mjolnir--------(29,15)-Hammer.............................20/a0-Ribbon-------------(00,00)....................
+
+02/82-Battle Knife---(05,10)-Knife..............................1a/9a-Felt Hat-----------(01,01)....................
+0a/8a-Baselard-------(07,10)-Knife..............................1f/9f-Plumed Hat---------(2,+12)....................
+10/90-Silver Knife---(10,15)-Knife..............................22/a2-Bronze Glove-------(02,02)....................
+17/97-Cleaver--------(16,15)-Knife..............................23/a3-Iron Glove---------(04,03)....................
+23/a3-Orichalcum-----(16,40)-Knife..............................24/a4-Silver Glove-------(06,02)....................
+
+---------------------------------------------------------------------------------------|-Wep-|-Arm-|------
+-----------00----01----02----03----04----05----06----07----08----09----0a----0b----0c----0d----0e----0f---
+
+03/83-Cypress Cane---(04,00)-Staff 1............................26/a6-Power Glove--------(06,02)....................
+1e/9e-Healing Staff--(06,00)-Staff 1............................27/a7-Diamond Glove------(10,04)....................
+1f/9f-Mages Wand-----(12,10)-Staff 2............................21/a1-Leather Glove------(01,00)....................
+12/92-Silver Staff---(15,05)-Staff 2............................25/a5-Magical Ring-------(01,00)....................
+1f/9f-Wizards Wand---(15,15)-Staff 2............................28/a8-Angels Ring--------(08,00)....................
+
+
+
+.............................Starting Magic
+
+
+---------------------------------------------------------------------------------------------------|-Mag-|
+-----------00----01----02----03----04----05----06----07----08----09----0a----0b----0c----0d----0e----0f---
+
+
+01-Cure........02-Dia.........03-Protect.....04-Invisible...05-Fire........06-Sleep.......07-Poison......08-Thunder.....
+
+09-Poisona.....0a-Silence.....0b-Fear........0c-Float.......0d-Blizzard....0e-Darkness....0f-Strike......10-Slow........
+
+11-Cura........12-Diara.......13-A.Spell.....14-Stona.......15-Fira........16-Hold........17-Thundara....18-Sleepra.....
+
+19-Tornado.....1a-Heal........1b-A.Element...1c-Raise.......1d-Quake.......1e-Haste.......1f-Confuse.....20-Blizzara....
+
+21-Curaga......22-Ruin........23-Diaga.......24-A.Death.....25-Firaga......26-Scourge.....27-Teleport....28-Slowra......
+
+29-Healara.....2a-Silega......2b-Protera.....2c-Invisira....2d-Thundaga....2e-Death.......2f-Chasm.......30-Stun........
+
+31-Curaja......32-Diaja.......33-Exit........34-Arise.......35-Blizzaga....36-Break.......37-Sever.......38-Bio.........
+
+39-Healaga.....3a-Holy........3b-Barrier.....3c-Dispel......3d-Flare.......3e-Stop........3f-Banish......40-Kill........
+
+
+---------------------------------------------------------------------------------------------------|-Mag-|
+-----------00----01----02----03----04----05----06----07----08----09----0a----0b----0c----0d----0e----0f---
+
+
+
+******************************************************---X4---***********************************************************
+*************************************************************************************************************************
+
+_______________________________________________-Parametes and Limits-____________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..............................Set the Hex Editor to 16 wide
+
+
+----------BLACK BELT----------------------------------------------------------------------------------------------------
+
+
+Natural Damage increase per level***
+
+Natural Absorb increase per level***
+
+
+----------HIT POINTS----------------------------------------------------------------------------------------------------
+
+
+2d9b6/b7-HP Max
+
+e8 03 = 999 | 38 18 = 6199 | 10 27 = 9999 | ff ff = 65535
+
+Displays in battle only, with up to 9P5=1155 showing out of battle
+ 
+(A00=1000, a00=3600, z00=6100). After that, you cant tell what the values are
+
+
+
+2dcd8-Strong HP Gain Low
+
+2dcda-Strong HP Gain High
+
+
+----------MAGIC POINTS--------------------------------------------------------------------------------------------------
+
+
+2dca6-Max MP Cap for Mages.....byte value is 1 more than real amount. 0a=9
+
+2dcaa-Max MP Cap for Kn/Ni.....byte value is 1 more than real amount. 05=4
+
+
+2dc91-MP up XX instead of 1
+
+
+MP on level up for FI
+2dc7d/82 > ea ea c9 01 f0 3c
+
+MP on level up for TH
+2dc7d/82 > f0 40 c9 01 ea ea
+
+MP on level up for both Fi and TH
+2dc7d/82 > ea ea c9 01 ea ea 
+
+Note: There are no restrictions for BB/MA. They can earn MP on any level up
+
+
+----------STAT LIMIT----------------------------------------------------------------------------------------------------
+
+
+2dd35-Max stats
+
+64=100 - fe=255 - ff=0
+
+
+----------STRENGTH/DAMAGE and HITS--------------------------------------------------------------------------------------
+
+
+2dd50:4a + 2dd59:01 = Strength2/Damage1
+2dd50:2a + 2dd59:01 = Strength1/Damage1
+2dd50:2a + 2dd59:02 = Strength1/Damage2
+2dd50:2a + 2dd59:03 = Strength1/Damage3
+2dd50:2a + 2dd59:04 = Strength1/Damage4
+
+
+32d71/75-Number of Hits increase every...
+
+32 > 4a 4a 4a 4a 4a
+16 > 4a 4a 4a 4a ea
+08 > 4a 4a 4a ea ea
+04 > 4a 4a ea ea ea
+02 > 4a ea ea ea ea
+
+
+----------AGILITY/EVADE-------------------------------------------------------------------------------------------------
+
+
+2dd6b:01 Agility1/Evade1
+2dd6b:02 Agility1/Evade2
+2dd6b:03 Agility1/Evade3
+2dd6b:04 Agility1/Evade4
+
+
+----------VITALITY------------------------------------------------------------------------------------------------------
+
+
+2dcca/cc
+1 HP per 4/+1 > 4a 4a 18
+1 HP per 2/+1 > 4a ea 18
+1 HP per 1/+1 > ea ea 18
+2 HP per 1/+1 > 2a ea 18
+3 HP per 1/+1 > 2a ea 38
+4 HP per 1/+1 > 2a 2a 18
+5 HP per 1/+1 > 2a 2a 38
+
+
+----------LUCK------------------------------------------------------------------------------------------------------------
+
+
+313f1/f3-Agility+Luck/8 for lead warrior
+
+4a 4a 4a - 8
+4a 4a ea - 4
+4a ea ea - 2
+ea ea ea - 1
+
+
+----------HIT % and MAGIC EVADE-----------------------------------------------------------------------------------------
+
+
+Hit % Gain on Level up, per Class
+
+2ddec-Fi........2dded-Th........2ddee-BB........2ddef-RM........2ddf0-WM........2ddf1-BM
+2ddf2-Kn........2ddf3-Ni........2ddf4-Ma........2ddf5-RW........2ddf6-WW........2ddf7-BW
+
+
+Magic Evade Gain on Level up, per Class
+
+2ddf8-Fi........2ddf9-Th........2ddfa-BB........2ddfb-RM........2ddfc-WM........2ddfd-BM
+2ddfe-Kn........2ddff-Ni........2de00-Ma........2de01-RW........2de02-WW........2de03-BW
+
+
+Hit% and Magic Evade growth capacity to 255. Must be used together, and must match.
+2de2d:ff
+2de31:ff
+
+
+Spellbook to raise Magic Evade to 255. Must be used together, and must match.
+0x3dfe8:ff
+0x3dff7:ff
+
+
+..........When it comes to the 255 cap, it will roll over back to 0 when you equip something past it.
+ 
+..........Damage and Evade will roll over upon level up if it exceeds 255.
+
+..........Hit% and Magic Evade will cap off at the desired amount, given those two offsets match.
+
+..........Spellbook will be effective on Magic Evade to the desired amount, given those two offsets match.
+
+
+
+******************************************************---X5---***********************************************************
+*************************************************************************************************************************
+
+___________________________________________-Experience Points per Level-_________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........Set the Hex Editor to 16 wide
+
+..........Experience points per level consist of 3 bytes. The first one is for single numbers 0-255. The second one is
+..........for increments of 256, and the third one is for increments of 65,536.
+
+..........Hackster works fine, but here is the complete list anyway.
+
+
+3c059-Initial "To Next Level" amount in the menu screen
+
+
+2d010-Lv2........2d013-Lv3........2d016-Lv4........2d019-Lv5........2d01c-Lv6........2d01f-Lv7........2d022-Lv8.........
+
+2d025-Lv9........2d028-Lv10.......2d02b-Lv11.......2d02e-Lv12.......2d031-Lv13.......2d034-Lv14.......2d037-Lv15........
+
+2d03a-Lv16.......2d03d-Lv17.......2d040-Lv18.......2d043-Lv19.......2d046-Lv20.......2d049-Lv21.......2d04c-Lv22........
+
+2d04f-Lv23.......2d052-Lv24.......2d055-Lv25.......2d058-Lv26.......2d05b-Lv27.......2d05e-Lv28.......2d061-Lv29........
+
+2d064-Lv30.......2d067-Lv31.......2d06a-Lv32.......2d06d-Lv33.......2d070-Lv34.......2d073-Lv35.......2d076-Lv36........
+
+2d079-Lv37.......2d07c-Lv38.......2d07f-Lv39.......2d082-Lv40.......2d085-Lv41.......2d088-Lv42.......2d08b-Lv43........
+
+2d08e-Lv44.......2d091-Lv45.......2d094-Lv46.......2d097-Lv47.......2d09a-Lv48.......2d09d-Lv49.......2d0a0-Lv50........
+
+
+
+******************************************************---X6---***********************************************************
+*************************************************************************************************************************
+
+_____________________________________________-Stats/HP/MP up per Level-__________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........Hackster works fine, but here is the complete list anyway.
+
+
+..........................Set the Hex Editor to 16 wide
+
+
+Lv2
+2d0a4-Fi/Kn Stats...2d106-Th/Ni Stats...2d168-BB/Ma Stats...2d1ca-RM/RW Stats...2d22c-WM/WW Stats...2d28e-BM/BW Stats...
+2d0a5-Fi/Kn MP......2d107-Th MP.........2d169-BB/Ma MP......2d1cb-RM/RW MP......2d22d-WM/WW MP......2d28f-BM/BW MP......
+
+Lv3
+2d0a6-Fi/Kn Stats...2d108-Th/Ni Stats...2d16a-BB/Ma Stats...2d1cc-RM/RW Stats...2d22e-WM/WW Stats...2d290-BM/BW Stats...
+2d0a7-Fi/Kn MP......2d109-Th MP.........2d16b-BB/Ma MP......2d1cd-RM/RW MP......2d22f-WM/WW MP......2d291-BM/BW MP......
+
+Lv4
+2d0a8-Fi/Kn Stats...2d10a-Th/Ni Stats...2d16c-BB/Ma Stats...2d1ce-RM/RW Stats...2d230-WM/WW Stats...2d292-BM/BW Stats...
+2d0a9-Fi/Kn MP......2d10b-Th MP.........2d16d-BB/Ma MP......2d1cf-RM/RW MP......2d231-WM/WW MP......2d293-BM/BW MP......
+
+Lv5
+2d0aa-Fi/Kn Stats...2d10c-Th/Ni Stats...2d16e-BB/Ma Stats...2d1d0-RM/RW Stats...2d232-WM/WW Stats...2d294-BM/BW Stats...
+2d0ab-Fi/Kn MP......2d10d-Th MP.........2d16f-BB/Ma MP......2d1d1-RM/RW MP......2d233-WM/WW MP......2d295-BM/BW MP......
+
+Lv6
+2d0ac-Fi/Kn Stats...2d10e-Th/Ni Stats...2d170-BB/Ma Stats...2d1d2-RM/RW Stats...2d234-WM/WW Stats...2d296-BM/BW Stats...
+2d0ad-Fi/Kn MP......2d10f-Th MP.........2d171-BB/Ma MP......2d1d3-RM/RW MP......2d235-WM/WW MP......2d297-BM/BW MP......
+
+Lv7
+2d0ae-Fi/Kn Stats...2d110-Th/Ni Stats...2d172-BB/Ma Stats...2d1d4-RM/RW Stats...2d236-WM/WW Stats...2d298-BM/BW Stats...
+2d0af-Fi/Kn MP......2d111-Th MP.........2d173-BB/Ma MP......2d1d5-RM/RW MP......2d237-WM/WW MP......2d299-BM/BW MP......
+
+Lv8
+2d0b0-Fi/Kn Stats...2d112-Th/Ni Stats...2d174-BB/Ma Stats...2d1d6-RM/RW Stats...2d238-WM/WW Stats...2d29a-BM/BW Stats...
+2d0b1-Fi/Kn MP......2d113-Th MP.........2d175-BB/Ma MP......2d1d7-RM/RW MP......2d239-WM/WW MP......2d29b-BM/BW MP......
+
+Lv9
+2d0b2-Fi/Kn Stats...2d114-Th/Ni Stats...2d176-BB/Ma Stats...2d1d8-RM/RW Stats...2d23a-WM/WW Stats...2d29c-BM/BW Stats...
+2d0b3-Fi/Kn MP......2d115-Th MP.........2d177-BB/Ma MP......2d1d9-RM/RW MP......2d23b-WM/WW MP......2d29d-BM/BW MP......
+
+Lv10
+2d0b4-Fi/Kn Stats...2d116-Th/Ni Stats...2d178-BB/Ma Stats...2d1da-RM/RW Stats...2d23c-WM/WW Stats...2d29e-BM/BW Stats...
+2d0b5-Fi/Kn MP......2d117-Th MP.........2d179-BB/Ma MP......2d1db-RM/RW MP......2d23d-WM/WW MP......2d29f-BM/BW MP......
+
+Lv11
+2d0b6-Fi/Kn Stats...2d118-Th/Ni Stats...2d17a-BB/Ma Stats...2d1dc-RM/RW Stats...2d23e-WM/WW Stats...2d2a0-BM/BW Stats...
+2d0b7-Fi/Kn MP......2d119-Th MP.........2d17b-BB/Ma MP......2d1dd-RM/RW MP......2d23f-WM/WW MP......2d2a1-BM/BW MP......
+
+Lv12
+2d0b8-Fi/Kn Stats...2d11a-Th/Ni Stats...2d17c-BB/Ma Stats...2d1de-RM/RW Stats...2d240-WM/WW Stats...2d2a2-BM/BW Stats...
+2d0b9-Fi/Kn MP......2d11b-Th MP.........2d17d-BB/Ma MP......2d1df-RM/RW MP......2d241-WM/WW MP......2d2a3-BM/BW MP......
+
+Lv13
+2d0ba-Fi/Kn Stats...2d11c-Th/Ni Stats...2d17e-BB/Ma Stats...2d1e0-RM/RW Stats...2d242-WM/WW Stats...2d2a4-BM/BW Stats...
+2d0bb-Fi/Kn MP......2d11d-Th MP.........2d17f-BB/Ma MP......2d1e1-RM/RW MP......2d243-WM/WW MP......2d2a5-BM/BW MP......
+
+Lv14
+2d0bc-Fi/Kn Stats...2d11e-Th/Ni Stats...2d180-BB/Ma Stats...2d1e2-RM/RW Stats...2d244-WM/WW Stats...2d2a6-BM/BW Stats...
+2d0bd-Fi/Kn MP......2d11f-Th MP.........2d181-BB/Ma MP......2d1e3-RM/RW MP......2d245-WM/WW MP......2d2a7-BM/BW MP......
+
+Lv15
+2d0be-Fi/Kn Stats...2d120-Th/Ni Stats...2d182-BB/Ma Stats...2d1e4-RM/RW Stats...2d246-WM/WW Stats...2d2a8-BM/BW Stats...
+2d0bf-Fi/Kn MP......2d121-Th MP.........2d183-BB/Ma MP......2d1e5-RM/RW MP......2d247-WM/WW MP......2d2a9-BM/BW MP......
+
+Lv16
+2d0c0-Fi/Kn Stats...2d122-Th/Ni Stats...2d184-BB/Ma Stats...2d1e6-RM/RW Stats...2d248-WM/WW Stats...2d2aa-BM/BW Stats...
+2d0c1-Fi/Kn MP......2d123-Th MP.........2d185-BB/Ma MP......2d1e7-RM/RW MP......2d249-WM/WW MP......2d2ab-BM/BW MP......
+
+Lv17
+2d0c2-Fi/Kn Stats...2d124-Th/Ni Stats...2d186-BB/Ma Stats...2d1e8-RM/RW Stats...2d24a-WM/WW Stats...2d2ac-BM/BW Stats...
+2d0c3-Fi/Kn MP......2d125-Th MP.........2d187-BB/Ma MP......2d1e9-RM/RW MP......2d24b-WM/WW MP......2d2ad-BM/BW MP......
+
+Lv18
+2d0c4-Fi/Kn Stats...2d126-Th/Ni Stats...2d188-BB/Ma Stats...2d1ea-RM/RW Stats...2d24c-WM/WW Stats...2d2ae-BM/BW Stats...
+2d0c5-Fi/Kn MP......2d127-Th MP.........2d189-BB/Ma MP......2d1eb-RM/RW MP......2d24d-WM/WW MP......2d2af-BM/BW MP......
+
+Lv19
+2d0c6-Fi/Kn Stats...2d128-Th/Ni Stats...2d18a-BB/Ma Stats...2d1ec-RM/RW Stats...2d24e-WM/WW Stats...2d2b0-BM/BW Stats...
+2d0c7-Fi/Kn MP......2d129-Th MP.........2d18b-BB/Ma MP......2d1ed-RM/RW MP......2d24f-WM/WW MP......2d2b1-BM/BW MP......
+
+Lv20
+2d0c8-Fi/Kn Stats...2d12a-Th/Ni Stats...2d18c-BB/Ma Stats...2d1ee-RM/RW Stats...2d250-WM/WW Stats...2d2b2-BM/BW Stats...
+2d0c9-Fi/Kn MP......2d12b-Th MP.........2d18d-BB/Ma MP......2d1ef-RM/RW MP......2d251-WM/WW MP......2d2b3-BM/BW MP......
+
+Lv21
+2d0ca-Fi/Kn Stats...2d12c-Th/Ni Stats...2d18e-BB/Ma Stats...2d1f0-RM/RW Stats...2d252-WM/WW Stats...2d2b4-BM/BW Stats...
+2d0cb-Fi/Kn MP......2d12d-Th MP.........2d18f-BB/Ma MP......2d1f1-RM/RW MP......2d253-WM/WW MP......2d2b5-BM/BW MP......
+
+Lv22
+2d0cc-Fi/Kn Stats...2d12e-Th/Ni Stats...2d190-BB/Ma Stats...2d1f2-RM/RW Stats...2d254-WM/WW Stats...2d2b6-BM/BW Stats...
+2d0cd-Fi/Kn MP......2d12f-Th MP.........2d191-BB/Ma MP......2d1f3-RM/RW MP......2d255-WM/WW MP......2d2b7-BM/BW MP......
+
+Lv23
+2d0ce-Fi/Kn Stats...2d130-Th/Ni Stats...2d192-BB/Ma Stats...2d1f4-RM/RW Stats...2d256-WM/WW Stats...2d2b8-BM/BW Stats...
+2d0cf-Fi/Kn MP......2d131-Th MP.........2d193-BB/Ma MP......2d1f5-RM/RW MP......2d257-WM/WW MP......2d2b9-BM/BW MP......
+
+Lv24
+2d0d0-Fi/Kn Stats...2d132-Th/Ni Stats...2d194-BB/Ma Stats...2d1f6-RM/RW Stats...2d258-WM/WW Stats...2d2ba-BM/BW Stats...
+2d0d1-Fi/Kn MP......2d133-Th MP.........2d195-BB/Ma MP......2d1f7-RM/RW MP......2d259-WM/WW MP......2d2bb-BM/BW MP......
+
+Lv25
+2d0d2-Fi/Kn Stats...2d134-Th/Ni Stats...2d196-BB/Ma Stats...2d1f8-RM/RW Stats...2d25a-WM/WW Stats...2d2bc-BM/BW Stats...
+2d0d3-Fi/Kn MP......2d135-Th MP.........2d197-BB/Ma MP......2d1f9-RM/RW MP......2d25b-WM/WW MP......2d2bd-BM/BW MP......
+
+Lv26
+2d0d4-Fi/Kn Stats...2d136-Th/Ni Stats...2d198-BB/Ma Stats...2d1fa-RM/RW Stats...2d25c-WM/WW Stats...2d2be-BM/BW Stats...
+2d0d5-Fi/Kn MP......2d137-Th MP.........2d199-BB/Ma MP......2d1fb-RM/RW MP......2d25d-WM/WW MP......2d2bf-BM/BW MP......
+
+Lv27
+2d0d6-Fi/Kn Stats...2d138-Th/Ni Stats...2d19a-BB/Ma Stats...2d1fc-RM/RW Stats...2d25e-WM/WW Stats...2d2c0-BM/BW Stats...
+2d0d7-Fi/Kn MP......2d139-Th MP.........2d19b-BB/Ma MP......2d1fd-RM/RW MP......2d25f-WM/WW MP......2d2c1-BM/BW MP......
+
+Lv28
+2d0d8-Fi/Kn Stats...2d13a-Th/Ni Stats...2d19c-BB/Ma Stats...2d1fe-RM/RW Stats...2d260-WM/WW Stats...2d2c2-BM/BW Stats...
+2d0d9-Fi/Kn MP......2d13b-Th MP.........2d19d-BB/Ma MP......2d1ff-RM/RW MP......2d261-WM/WW MP......2d2c3-BM/BW MP......
+
+Lv29
+2d0da-Fi/Kn Stats...2d13c-Th/Ni Stats...2d19e-BB/Ma Stats...2d200-RM/RW Stats...2d262-WM/WW Stats...2d2c4-BM/BW Stats...
+2d0db-Fi/Kn MP......2d13d-Th MP.........2d19f-BB/Ma MP......2d201-RM/RW MP......2d263-WM/WW MP......2d2c5-BM/BW MP......
+
+Lv30
+2d0dc-Fi/Kn Stats...2d13e-Th/Ni Stats...2d1a0-BB/Ma Stats...2d202-RM/RW Stats...2d264-WM/WW Stats...2d2c6-BM/BW Stats...
+2d0dd-Fi/Kn MP......2d13f-Th MP.........2d1a1-BB/Ma MP......2d203-RM/RW MP......2d265-WM/WW MP......2d2c7-BM/BW MP......
+
+Lv31
+2d0de-Fi/Kn Stats...2d140-Th/Ni Stats...2d1a2-BB/Ma Stats...2d204-RM/RW Stats...2d266-WM/WW Stats...2d2c8-BM/BW Stats...
+2d0df-Fi/Kn MP......2d141-Th MP.........2d1a3-BB/Ma MP......2d205-RM/RW MP......2d267-WM/WW MP......2d2c9-BM/BW MP......
+
+Lv32
+2d0e0-Fi/Kn Stats...2d142-Th/Ni Stats...2d1a4-BB/Ma Stats...2d206-RM/RW Stats...2d268-WM/WW Stats...2d2ca-BM/BW Stats...
+2d0e1-Fi/Kn MP......2d143-Th MP.........2d1a5-BB/Ma MP......2d207-RM/RW MP......2d269-WM/WW MP......2d2cb-BM/BW MP......
+
+Lv33
+2d0e2-Fi/Kn Stats...2d144-Th/Ni Stats...2d1a6-BB/Ma Stats...2d208-RM/RW Stats...2d26a-WM/WW Stats...2d2cc-BM/BW Stats...
+2d0e3-Fi/Kn MP......2d145-Th MP.........2d1a7-BB/Ma MP......2d209-RM/RW MP......2d26b-WM/WW MP......2d2cd-BM/BW MP......
+
+Lv34
+2d0e4-Fi/Kn Stats...2d146-Th/Ni Stats...2d1a8-BB/Ma Stats...2d20a-RM/RW Stats...2d26c-WM/WW Stats...2d2ce-BM/BW Stats...
+2d0e5-Fi/Kn MP......2d147-Th MP.........2d1a9-BB/Ma MP......2d20b-RM/RW MP......2d26d-WM/WW MP......2d2cf-BM/BW MP......
+
+Lv35
+2d0e6-Fi/Kn Stats...2d148-Th/Ni Stats...2d1aa-BB/Ma Stats...2d20c-RM/RW Stats...2d26e-WM/WW Stats...2d2d0-BM/BW Stats...
+2d0e7-Fi/Kn MP......2d149-Th MP.........2d1ab-BB/Ma MP......2d20d-RM/RW MP......2d26f-WM/WW MP......2d2d1-BM/BW MP......
+
+Lv36
+2d0e8-Fi/Kn Stats...2d14a-Th/Ni Stats...2d1ac-BB/Ma Stats...2d20e-RM/RW Stats...2d270-WM/WW Stats...2d2d2-BM/BW Stats...
+2d0e9-Fi/Kn MP......2d14b-Th MP.........2d1ad-BB/Ma MP......2d20f-RM/RW MP......2d271-WM/WW MP......2d2d3-BM/BW MP......
+
+Lv37
+2d0ea-Fi/Kn Stats...2d14c-Th/Ni Stats...2d1ae-BB/Ma Stats...2d210-RM/RW Stats...2d272-WM/WW Stats...2d2d4-BM/BW Stats...
+2d0eb-Fi/Kn MP......2d14d-Th MP.........2d1af-BB/Ma MP......2d211-RM/RW MP......2d273-WM/WW MP......2d2d5-BM/BW MP......
+
+Lv38
+2d0ec-Fi/Kn Stats...2d14e-Th/Ni Stats...2d1b0-BB/Ma Stats...2d212-RM/RW Stats...2d274-WM/WW Stats...2d2d6-BM/BW Stats...
+2d0ed-Fi/Kn MP......2d14f-Th MP.........2d1b1-BB/Ma MP......2d213-RM/RW MP......2d275-WM/WW MP......2d2d7-BM/BW MP......
+
+Lv39
+2d0ee-Fi/Kn Stats...2d150-Th/Ni Stats...2d1b2-BB/Ma Stats...2d214-RM/RW Stats...2d276-WM/WW Stats...2d2d8-BM/BW Stats...
+2d0ef-Fi/Kn MP......2d151-Th MP.........2d1b3-BB/Ma MP......2d215-RM/RW MP......2d277-WM/WW MP......2d2d9-BM/BW MP......
+
+Lv40
+2d0f0-Fi/Kn Stats...2d152-Th/Ni Stats...2d1b4-BB/Ma Stats...2d216-RM/RW Stats...2d278-WM/WW Stats...2d2da-BM/BW Stats...
+2d0f1-Fi/Kn MP......2d153-Th MP.........2d1b5-BB/Ma MP......2d217-RM/RW MP......2d279-WM/WW MP......2d2db-BM/BW MP......
+
+Lv41
+2d0f2-Fi/Kn Stats...2d154-Th/Ni Stats...2d1b6-BB/Ma Stats...2d218-RM/RW Stats...2d27a-WM/WW Stats...2d2dc-BM/BW Stats...
+2d0f3-Fi/Kn MP......2d155-Th MP.........2d1b7-BB/Ma MP......2d219-RM/RW MP......2d27b-WM/WW MP......2d2dd-BM/BW MP......
+
+Lv42
+2d0f4-Fi/Kn Stats...2d156-Th/Ni Stats...2d1b8-BB/Ma Stats...2d21a-RM/RW Stats...2d27c-WM/WW Stats...2d2de-BM/BW Stats...
+2d0f5-Fi/Kn MP......2d157-Th MP.........2d1b9-BB/Ma MP......2d21b-RM/RW MP......2d27d-WM/WW MP......2d2df-BM/BW MP......
+
+Lv43
+2d0f6-Fi/Kn Stats...2d158-Th/Ni Stats...2d1ba-BB/Ma Stats...2d21c-RM/RW Stats...2d27e-WM/WW Stats...2d2e0-BM/BW Stats...
+2d0f7-Fi/Kn MP......2d159-Th MP.........2d1bb-BB/Ma MP......2d21d-RM/RW MP......2d27f-WM/WW MP......2d2e1-BM/BW MP......
+
+Lv44
+2d0f8-Fi/Kn Stats...2d15a-Th/Ni Stats...2d1bc-BB/Ma Stats...2d21e-RM/RW Stats...2d280-WM/WW Stats...2d2e2-BM/BW Stats...
+2d0f9-Fi/Kn MP......2d15b-Th MP.........2d1bd-BB/Ma MP......2d21f-RM/RW MP......2d281-WM/WW MP......2d2e3-BM/BW MP......
+
+Lv45
+2d0fa-Fi/Kn Stats...2d15c-Th/Ni Stats...2d1be-BB/Ma Stats...2d220-RM/RW Stats...2d282-WM/WW Stats...2d2e4-BM/BW Stats...
+2d0fb-Fi/Kn MP......2d15d-Th MP.........2d1bf-BB/Ma MP......2d221-RM/RW MP......2d283-WM/WW MP......2d2e5-BM/BW MP......
+
+Lv46
+2d0fc-Fi/Kn Stats...2d15e-Th/Ni Stats...2d1c0-BB/Ma Stats...2d222-RM/RW Stats...2d284-WM/WW Stats...2d2e6-BM/BW Stats...
+2d0fd-Fi/Kn MP......2d15f-Th MP.........2d1c1-BB/Ma MP......2d223-RM/RW MP......2d285-WM/WW MP......2d2e7-BM/BW MP......
+
+Lv47
+2d0fe-Fi/Kn Stats...2d160-Th/Ni Stats...2d1c2-BB/Ma Stats...2d224-RM/RW Stats...2d286-WM/WW Stats...2d2e8-BM/BW Stats...
+2d0ff-Fi/Kn MP......2d161-Th MP.........2d1c3-BB/Ma MP......2d225-RM/RW MP......2d287-WM/WW MP......2d2e9-BM/BW MP......
+
+Lv48
+2d100-Fi/Kn Stats...2d162-Th/Ni Stats...2d1c4-BB/Ma Stats...2d226-RM/RW Stats...2d288-WM/WW Stats...2d2ea-BM/BW Stats...
+2d101-Fi/Kn MP......2d163-Th MP.........2d1c5-BB/Ma MP......2d227-RM/RW MP......2d289-WM/WW MP......2d2eb-BM/BW MP......
+
+Lv49
+2d102-Fi/Kn Stats...2d164-Th/Ni Stats...2d1c6-BB/Ma Stats...2d228-RM/RW Stats...2d28a-WM/WW Stats...2d2ec-BM/BW Stats...
+2d103-Fi/Kn MP......2d165-Th MP.........2d1c7-BB/Ma MP......2d229-RM/RW MP......2d28b-WM/WW MP......2d2ed-BM/BW MP......
+
+Lv50
+2d104-Fi/Kn Stats...2d166-Th/Ni Stats...2d1c8-BB/Ma Stats...2d22a-RM/RW Stats...2d28c-WM/WW Stats...2d2ee-BM/BW Stats...
+2d105-Fi/Kn MP......2d167-Th MP.........2d1c9-BB/Ma MP......2d22b-RM/RW MP......2d28d-WM/WW MP......2d2ef-BM/BW MP......
+
+
+
+..........All the checkbox options follow the same byte order, so here is the easiest way to find the option you want.
+..........At the top of the page in Notepad options, go to (Edit), then choose (Find), and then type in the letters that
+..........correspond to your choice(s). Im using G-N because 0-9 and A-F are used in all the hex locations.
+..........Make sure you type in the letters like this, g/h/i, ect. Capitol/noncapitol doesnt matter, the / does. 
+ 
+
+......Reference..............Stats up.......................MP up........................................................
+.......[G][K]...........[Luck...][Str....]............[Lv1....][Lv5....].................................................
+.......[H][L]...........[Vit....][Lg.HP..]............[Lv2....][Lv6....].................................................
+.......[I][M]...........[Int....][.......]............[Lv3....][Lv7....].................................................
+.......[J][N]...........[Agi....][.......]............[Lv4....][Lv8....].................................................
+
+
+00-None...01-G...02-H...03-G/H...04-I...05-G/I...06-H/I...07-G/H/I...08-J...09-G/J...0a-H/J...0b-G/H/J...0c-I/J..0d-G/I/J
+0e-H/I/J...0f-G/H/I/J...10-K...11-G/K...12-H/K...13-G/H/K...14-I/K...15-G/I/K...16-H/I/K...17-G/H/I/K...18-J/K...19-G/J/K
+1a-H/J/K....1b-G/H/J/K....1c-I/J/K....1d-G/I/J/K...1e-H/I/J/K...1f-G/H/I/J/K...20-L...21-G/L...22-H/L...23-G/H/L...24-I/L
+25-G/I/L....26-H/I/L....27-G/H/I/L....28-J/L....29-G/J/L....2a-H/J/L....2b-G/H/J/L....2c-I/J/L....2d-G/I/J/L...2e-H/I/J/L
+2f-G/H/I/J/L....30-K/L....31-G/K/L...32-H/K/L...33-G/H/K/L...34-I/K/L...35-G/I/K/L...36-H/I/K/L...37-G/H/I/K/L...38-J/K/L
+39-G/J/K/L....3a-H/J/K/L....3b-G/H/J/K/L....3c-I/J/K/L....3d-G/I/J/K/L....3e-H/I/J/K/L....3f-G/H/I/J/K/L....40-M...41-G/M
+42-H/M....43-G/H/M....44-I/M....45-G/I/M....46-H/I/M....47-G/H/I/M...48-J/M...49-G/J/M...4a-H/J/M...4b-G/H/J/M...4c-I/J/M
+4d-G/I/J/M....4e-H/I/J/M....4f-G/H/I/J/M...50-K/M...51-G/K/M...52-H/K/M...53-G/H/K/M...54-I/K/M...55-G/I/K/M...56-H/I/K/M
+57-G/H/I/K/M...58-J/K/M...59-G/J/K/M...5a-H/J/K/M...5b-G/H/J/K/M..5c-I/J/K/M...5d-G/I/J/K/M..5e-H/I/J/K/M..5f-G/H/I/J/K/M
+60-L/M....61-G/L/M....62-H/L/M....63-G/H/L/M....64-I/L/M...65-G/I/L/M...66-H/I/L/M...67-G/H/I/L/M...68-J/L/M...69-G/J/L/M
+6a-H/J/L/M...6b-G/H/J/L/M...6c-I/J/L/M...6d-G/I/J/L/M...6e-H/I/J/L/M...6f-G/H/I/J/L/M...70-K/L/M...71-G/K/L/M..72-H/K/L/M
+73-G/H/K/L/M....74-I/K/L/M....75-G/I/K/L/M....76-H/I/K/L/M....77-G/H/I/K/L/M....78-J/K/L/M....79-G/J/K/L/M...7a-H/J/K/L/M
+7b-G/H/J/K/L/M....7c-I/J/K/L/M....7d-G/I/J/K/L/M....7e-H/I/J/K/L/M...7f-G/H/I/J/K/L/M...80-N...81-G/N...82-H/N...83-G/H/N
+84-I/N...85-G/I/N...86-H/I/N...87-G/H/I/N...88-J/N...89-G/J/N...8a-H/J/N...8b-G/H/J/N...8c-I/J/N...8d-G/I/J/N..8e-H/I/J/N
+8f-G/H/I/J/N....90-K/N....91-G/K/N...92-H/K/N...93-G/H/K/N...94-I/K/N...95-G/I/K/N...96-H/I/K/N...97-G/H/I/K/N...98-J/K/N
+99-G/J/K/N....9a-H/J/K/N....9b-G/H/J/K/N....9c-I/J/K/N...9d-G/I/J/K/N...9e-H/I/J/K/N...9f-G/H/I/J/K/N...a0-L/N...a1-G/L/N
+a2-H/L/N...a3-G/H/L/N...a4-I/L/N...a5-G/I/L/N...a6-H/I/L/N...a7-G/H/I/L/N..a8-J/L/N..a9-G/J/L/N..aa-H/J/L/N..ab-G/H/J/L/N
+ac-I/J/L/N...ad-G/I/J/L/N...ae-H/I/J/L/N...af-G/H/I/J/L/N...b0-K/L/N...b1-G/K/L/N...b2-H/K/L/N...b3-G/H/K/L/N..b4-I/K/L/N
+b5-G/I/K/L/N....b6-H/I/K/L/N....b7-G/H/I/K/L/N...b8-J/K/L/N...b9-G/J/K/L/N...ba-H/J/K/L/N...bb-G/H/J/K/L/N...bc-I/J/K/L/N
+bd-G/I/J/K/L/N....be-H/I/J/K/L/N....bf-G/H/I/J/K/L/N....c0-M/N...c1-G/M/N...c2-H/M/N...c3-G/H/M/N...c4-I/M/N...c5-G/I/M/N
+c6-H/I/M/N....c7-G/H/I/M/N...c8-J/M/N...c9-G/J/M/N...ca-H/J/M/N...cb-G/H/J/M/N...cc-I/J/M/N...cd-G/I/J/M/N...ce-H/I/J/M/N
+cf-G/H/I/J/M/N...d0-K/M/N...d1-G/K/M/N...d2-H/K/M/N..d3-G/H/K/M/N..d4-I/K/M/N..d5-G/I/K/M/N..d6-H/I/K/M/N..d7-G/H/I/K/M/N
+d8-J/K/M/N...d9-G/J/K/M/N...da-H/J/K/M/N...db-G/H/J/K/M/N..dc-I/J/K/M/N..dd-G/I/J/K/M/N..de-H/I/J/K/M/N..df-G/H/I/J/K/M/N
+e0-L/M/N...e1-G/L/M/N...e2-H/L/M/N...e3-G/H/L/M/N...e4-I/L/M/N...e5-G/I/L/M/N...e6-H/I/L/M/N...e7-G/H/I/L/M/N..e8-J/L/M/N
+e9-G/J/L/M/N...ea-H/J/L/M/N...eb-G/H/J/L/M/N...ec-I/J/L/M/N..ed-G/I/J/L/M/N..ee-H/I/J/L/M/N..ef-G/H/I/J/L/M/N..f0-K/L/M/N
+f1-G/K/L/M/N...f2-H/K/L/M/N..f3-G/H/K/L/M/N..f4-I/K/L/M/N..f5-G/I/K/L/M/N..f6-H/I/K/L/M/N..f7-G/H/I/K/L/M/N..f8-J/K/L/M/N
+f9-G/J/K/L/M/N...fa-H/J/K/L/M/N..fb-G/H/J/K/L/M/N..fc-I/J/K/L/M/N..fd-G/I/J/K/L/M/N..fe-H/I/J/K/L/M/N..ff-G/H/I/J/K/L/M/N
+
+
+
+******************************************************---X7---***********************************************************
+*************************************************************************************************************************
+
+________________________________________________-Palettes and Text-______________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........For Character Palettes, you open either Edit Battle Pic, or Edit Mapman Pic, in Hackster.
+..........Click on any of the colors, and you will have a Palette map with the 64 available colors.
+..........The first row starts with grey, and ends with 3 black. The second row starts with light grey, ect.
+..........Each row has 16 colors each, and going from left to right, the byte choices are as follows.
+
+..........1st-00/0f.....2nd-10/1f.....3rd-20/2f.....4th-30/3f
+
+
+..........Here are the offsets for this, and a description of how the characters are effected. 
+
+
+
+.......................Battle Palettes
+
+
+3ebb6-Th/BB/BM (Th/BB- Face, part of Arms, and Hands) (BM- Hands, Eyes, and front of Hat)
+
+3ebb7-Th/BB/BM (Th- Body and Feet) (BB- Hair, Cuffs, and Feet) (BM- Back of Hat)
+
+3ebb8-Th/BB/BM (Th- Hair) (BB- Body, Legs, and Bandanna) (BM- Robe)
+
+3ebba-Fi/RM/WM (Fi- Hair, Body, and Feet) (RM- Hat, Robe, Body, and Feet) (WM- Hair and front edge of Robe)
+
+3ebbb-Fi/RM/WM (Fi- Belt) (RM- Feather, Hair, and Belt) (WM- Hood and back of Robe)
+
+3ebbc-Fi/RM/WM (Fi- Face, Hands, and Arms) (RM- Face and Hands) (WM- Face)
+
+
+
+....................Character Map Palettes
+
+
+003d0-Fi Top........003d1-Fi Bottom........003dc-Kn Top........003dd-Kn Bottom........
+
+003d2-Th Top........003d3-Th Bottom........003de-Ni Top........003df-Ni Bottom........
+
+003d4-BB Top........003d5-BB Bottom........003e0-Ma Top........003e1-Ma Bottom........
+
+003d6-RM Top........003d7-RM Bottom........003e2-RW Top........003e3-RW Bottom........
+
+003d8-WM Top........003d9-WM Bottom........003e4-WW Top........003e5-WW Bottom........
+
+003da-BM Top........003db-BW Bottom........003e6-BW Top........003e7-BW Bottom........
+
+
+
+
+............................................Text
+
+
+..........The last byte for anything you rename must end with 00, before the next Pointer.
+..........The words will bleed into each other if the (00) is removed.
+
+
+.........................Default Names
+
+
+3a0bf/c4-Sigurd..........3a0cf/d4-Baram...........3a0df/e4-Duncan..........3a0ef/f4-Gungho..........
+
+
+
+.........................Class Type Names
+
+
+2bf4d/53-Fighter.........2bf80/86-Paladin.........
+
+2bf54/5a-Rogue...........2bf88/90-Ninja...........
+
+2bf5c/64-Monk............2bf92/99-High Monk.......
+
+2bf66/6d-Red Mage........2bf9b/a2-Red Wizard......
+
+2bf6f/75-White Mage......2bfa4/ab-White Wizard....
+
+2bf77/7e-Black Mage......2bfad/b5-Black Wizard....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,6 @@
+128x64
+default 
+00 00 00
+66 66 66
+AA AA AA
+FF FF FF

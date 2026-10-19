@@ -1,0 +1,4 @@
+;;; BANK 14
+;;; PART 1
+a17a: a9 07        LDA #$07  ; New default response rate - 1
+a17c: 85 fa        STA $fa

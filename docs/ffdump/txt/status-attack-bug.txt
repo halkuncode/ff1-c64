@@ -1,0 +1,7 @@
+;;; BANK 12
+;;; PART 1
+; When you miss, the code still goes ahead and adds 0 to the total damage
+; (which is useless but ok) and tests if an attack effect should apply (BUG!).
+; Easy fix: when you miss, just skip all that.
+
+a811: 90 df       BCC +$df  [$a7f2]  ; points to a JMP $a8cc, which is where we need to go

@@ -1,0 +1,1872 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\FFHackster.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\FFHackster.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_FFHACKSTER_DIALOG DIALOGEX 0, 0, 237, 210
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "FFHackster"
+MENU IDR_MAINMENU
+FONT 8, "MS Sans Serif"
+BEGIN
+    PUSHBUTTON      "Exit",IDCANCEL,163,57,67,14
+    CONTROL         129,IDC_STATIC,"Static",SS_BITMAP,7,7,78,62
+    CONTROL         132,IDC_STATIC,"Static",SS_BITMAP,89,7,114,8
+    LTEXT           "The ultimate FF1 ROM hacking tool!\n\nProgrammed by Disch\nInspired by FFBytes (by Y Dienyddiwr Da)\nLots of additional help by lots of other people",
+                    IDC_STATIC,89,16,141,41
+    PUSHBUTTON      "About",IDC_ABOUT,89,57,67,14
+    LTEXT           "Editing:",IDC_STATIC,7,74,24,8
+    LTEXT           "",IDC_ROMPATH,34,74,196,32
+    PUSHBUTTON      "Overworld Editor",IDC_OVERWORLDMAP,121,189,109,14
+    PUSHBUTTON      "Text Editor",IDC_TEXT,121,166,109,14
+    PUSHBUTTON      "Armor Editor",IDC_ARMOR,7,109,109,14
+    PUSHBUTTON      "Weapon Editor",IDC_WEAPON,7,173,109,14
+    PUSHBUTTON      "Enemy Editor",IDC_ENEMY,7,141,109,14
+    PUSHBUTTON      "Attack Editor",IDC_ATTACK,121,118,109,14
+    PUSHBUTTON      "Magic Editor",IDC_MAGIC,121,150,109,14
+    PUSHBUTTON      "Shop Editor",IDC_SHOP,7,157,109,14
+    PUSHBUTTON      "Battle Editor",IDC_BATTLE,7,125,109,14
+    PUSHBUTTON      "Standard Map Editor",IDC_MAPS,7,189,109,14
+    PUSHBUTTON      "Class Editor",IDC_CLASSES,121,134,109,14
+END
+
+IDD_OVERWORLDMAP DIALOG DISCARDABLE  0, 0, 403, 343
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Overworld Map"
+MENU IDR_MAPMENU
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "Coords",IDC_STATIC,212,71,184,33
+    CONTROL         "Fight - River",IDC_FIGHT_RIVER,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP,218,125,56,8
+    GROUPBOX        "Battle Backdrop",IDC_STATIC,7,199,206,38,WS_GROUP
+    GROUPBOX        "Palettes",IDC_STATIC,7,232,206,40
+    GROUPBOX        "",IDC_STATIC,7,267,388,69,WS_GROUP
+    GROUPBOX        "Domain:  0,0 - N",IDC_RANDOMENCOUNTER,7,267,193,69,
+                    WS_GROUP
+    GROUPBOX        "Tile Data",IDC_STATIC,212,99,184,85,WS_GROUP
+    GROUPBOX        "Tiles",IDC_STATIC,212,179,184,93,WS_GROUP
+    DEFPUSHBUTTON   "Done",IDOK,212,7,60,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,336,7,60,14,WS_GROUP
+    PUSHBUTTON      "Save",IDC_SAVE,274,7,60,14,WS_GROUP
+    GROUPBOX        "Map",IDC_STATIC,7,7,184,175,WS_GROUP
+    SCROLLBAR       IDC_HSCROLL,7,186,184,11,WS_GROUP
+    SCROLLBAR       IDC_VSCROLL,195,11,10,172,SBS_VERT | WS_GROUP
+    CONTROL         "No Fight",IDC_FIGHT_NONE,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,218,109,56,8
+    CONTROL         "Fight",IDC_FIGHT_NORMAL,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,218,117,56,8
+    CONTROL         "Fight - Ocean",IDC_FIGHT_OCEAN,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP,218,133,56,8
+    CONTROL         "Caravan",IDC_CARAVAN,"Button",BS_AUTOCHECKBOX | 
+                    WS_GROUP | WS_TABSTOP,280,109,41,8
+    CONTROL         "Need Chime",IDC_CHIME,"Button",BS_AUTOCHECKBOX | 
+                    WS_GROUP | WS_TABSTOP,280,117,53,8
+    CONTROL         "Raise Airship",IDC_RAISEAIRSHIP,"Button",
+                    BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,280,125,57,8
+    CONTROL         "Walk",IDC_MOVE_WALK,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,337,109,41,8
+    CONTROL         "Canoe",IDC_MOVE_CANOE,"Button",BS_AUTOCHECKBOX | 
+                    WS_GROUP | WS_TABSTOP,337,117,41,8
+    CONTROL         "Ship",IDC_MOVE_SHIP,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,337,125,41,8
+    CONTROL         "Land Airship",IDC_MOVE_AIRSHIP,"Button",BS_AUTOCHECKBOX | 
+                    WS_GROUP | WS_TABSTOP,337,133,52,8
+    CONTROL         "Dock Ship",IDC_DOCKSHIP,"Button",BS_AUTOCHECKBOX | 
+                    WS_GROUP | WS_TABSTOP,337,141,47,8
+    CONTROL         "Forest Effect",IDC_FOREST,"Button",BS_AUTOCHECKBOX | 
+                    WS_GROUP | WS_TABSTOP,337,149,54,8
+    CONTROL         "Teleport",IDC_TELEPORT,"Button",BS_AUTOCHECKBOX | 
+                    WS_GROUP | WS_TABSTOP,218,142,47,8
+    COMBOBOX        IDC_TELEPORTBOX,218,151,113,112,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    RTEXT           "1.",IDC_STATIC,13,280,8,8
+    RTEXT           "2.",IDC_STATIC,13,293,8,8
+    RTEXT           "3.",IDC_STATIC,13,307,8,8
+    RTEXT           "4.",IDC_STATIC,13,319,8,8
+    RTEXT           "5.",IDC_STATIC,207,280,8,8
+    RTEXT           "6.",IDC_STATIC,207,293,8,8
+    RTEXT           "7.",IDC_STATIC,207,307,8,8
+    RTEXT           "8.",IDC_STATIC,207,319,8,8
+    COMBOBOX        IDC_BATTLE1,24,278,113,128,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_GROUP | WS_TABSTOP
+    COMBOBOX        IDC_BATTLE2,24,291,113,128,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_GROUP | WS_TABSTOP
+    COMBOBOX        IDC_BATTLE3,24,304,113,128,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_GROUP | WS_TABSTOP
+    COMBOBOX        IDC_BATTLE4,24,317,113,128,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_GROUP | WS_TABSTOP
+    COMBOBOX        IDC_BATTLE5,218,278,113,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    COMBOBOX        IDC_BATTLE6,218,291,113,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    COMBOBOX        IDC_BATTLE7,218,304,113,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    COMBOBOX        IDC_BATTLE8,218,317,113,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    CONTROL         "F-2",IDC_FORMATION1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,139,280,24,8
+    CONTROL         "F-2",IDC_FORMATION4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,139,319,24,8
+    CONTROL         "F-2",IDC_FORMATION2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,139,293,24,8
+    CONTROL         "F-2",IDC_FORMATION3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,139,307,24,8
+    CONTROL         "F-2",IDC_FORMATION5,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,334,280,24,8
+    CONTROL         "F-2",IDC_FORMATION6,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,334,293,24,8
+    CONTROL         "F-2",IDC_FORMATION7,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,334,307,24,8
+    CONTROL         "F-2",IDC_FORMATION8,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,334,319,24,8
+    EDITTEXT        IDC_PROBABILITY1,167,278,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_PROBABILITY2,167,291,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_PROBABILITY3,167,304,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_PROBABILITY4,167,317,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_PROBABILITY5,361,278,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_PROBABILITY6,361,291,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_PROBABILITY7,361,304,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_PROBABILITY8,361,317,13,12,ES_AUTOHSCROLL | WS_GROUP
+    COMBOBOX        IDC_BACKDROP,107,207,95,120,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    PUSHBUTTON      "Edit Label",IDC_EDITLABEL,107,223,46,11,WS_GROUP
+    PUSHBUTTON      "Edit Gfx",IDC_EDITGRAPHICS,156,223,46,11,WS_GROUP
+    RTEXT           "Hovering:",IDC_STATIC,212,23,34,8
+    LTEXT           "",IDC_HOVERING,247,23,33,8
+    RTEXT           "Last Click:",IDC_STATIC,212,31,34,8
+    LTEXT           "0,0",IDC_LASTCLICK,247,31,33,8
+    RTEXT           "Domain:",IDC_STATIC,212,39,34,8
+    LTEXT           "0,0 - N",IDC_DOMAIN,247,39,33,8
+    LTEXT           "/64",IDC_STATIC,376,280,12,8
+    LTEXT           "/64",IDC_STATIC,376,293,12,8
+    LTEXT           "/64",IDC_STATIC,376,307,12,8
+    LTEXT           "/64",IDC_STATIC,376,319,12,8
+    LTEXT           "/64",IDC_STATIC,184,280,12,8
+    LTEXT           "/64",IDC_STATIC,184,293,12,8
+    LTEXT           "/64",IDC_STATIC,184,319,12,8
+    LTEXT           "/64",IDC_STATIC,184,307,12,8
+    CONTROL         "Draw Domain Grid",IDC_DRAWGRID,"Button",BS_AUTOCHECKBOX | 
+                    WS_GROUP | WS_TABSTOP,321,23,73,8
+    CONTROL         "Show Last Click",IDC_SHOWLASTCLICK,"Button",
+                    BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,321,31,73,8
+    RTEXT           "KAB:",IDC_STATIC,286,39,34,8
+    LTEXT           "",IDC_KAB,321,39,24,8
+    PUSHBUTTON      "Find KAB",IDC_FINDKAB,346,39,50,9
+    PUSHBUTTON      "Customize Tool",IDC_CUSTOMIZETOOL,305,58,91,9,
+                    WS_DISABLED
+    RTEXT           "Std:",IDC_STATIC,11,245,14,8
+    RTEXT           "Ctrl:",IDC_STATIC,11,256,14,8
+    COMBOBOX        IDC_MISCCOORDS,218,83,95,112,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "X:",IDC_STATIC,319,87,8,8
+    LTEXT           "Y:",IDC_STATIC,347,87,8,8
+    EDITTEXT        IDC_MISCX,327,83,17,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_MISCY,355,83,17,12,ES_AUTOHSCROLL
+    CONTROL         "View MiniMap",IDC_MINIMAP,"Button",BS_AUTOCHECKBOX | 
+                    BS_PUSHLIKE | WS_TABSTOP,305,48,91,9
+    CONTROL         "View Coords",IDC_VIEWCOORDS,"Button",BS_AUTOCHECKBOX | 
+                    BS_PUSHLIKE | WS_TABSTOP,218,167,113,10
+END
+
+IDD_TEXT DIALOG DISCARDABLE  0, 0, 218, 206
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Text editor"
+FONT 8, "Courier New"
+BEGIN
+    LISTBOX         IDC_MAINLIST,7,7,67,83,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | 
+                    WS_TABSTOP
+    LISTBOX         IDC_TEXTLIST,78,7,133,83,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_TEXTBOX,102,109,104,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_DIALOGUEBOX,102,109,104,69,ES_MULTILINE | 
+                    ES_AUTOHSCROLL | ES_WANTRETURN | NOT WS_VISIBLE
+    EDITTEXT        IDC_POINTER,35,92,39,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Delete Slot",IDC_DELETESLOT,7,125,62,14
+    PUSHBUTTON      "New Slot",IDC_NEWSLOT,7,142,62,14
+    PUSHBUTTON      "Update",IDC_UPDATE,7,185,48,14
+    PUSHBUTTON      "Save",IDC_SAVE,57,185,48,14
+    PUSHBUTTON      "Done",IDOK,107,185,48,14
+    PUSHBUTTON      "Cancel",IDCANCEL,157,185,48,14
+    LTEXT           "Text:",IDC_STATIC,78,111,19,8
+    LTEXT           "Ptr:",IDC_STATIC,17,93,17,8
+    CONTROL         "View With DTE",IDC_DTE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,7,159,64,8
+    LTEXT           "KAB:",IDC_STATIC,7,170,17,8
+    LTEXT           "",IDC_KAB,25,170,24,8
+    PUSHBUTTON      "Edit Label",IDC_EDITLABEL,79,91,133,10
+    PUSHBUTTON      "Change Ptr.",IDC_CHANGEPTR,7,106,62,9
+END
+
+IDD_NEWLABEL DIALOG DISCARDABLE  0, 0, 141, 68
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "New Label"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_LABEL,7,20,127,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,7,47,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,84,47,50,14
+    LTEXT           "Enter a new label:",IDC_STATIC,7,7,58,8
+END
+
+IDD_ARMOR DIALOG DISCARDABLE  0, 0, 373, 122
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Armor"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Done",IDOK,268,93,46,14
+    PUSHBUTTON      "Cancel",IDCANCEL,320,93,46,14
+    LISTBOX         IDC_ARMORLIST,7,7,77,108,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Price:",IDC_STATIC,89,7,19,8
+    EDITTEXT        IDC_PRICE,89,16,40,12,ES_AUTOHSCROLL
+    LTEXT           "Defense:",IDC_STATIC,89,33,30,8
+    EDITTEXT        IDC_DEF,89,42,40,12,ES_AUTOHSCROLL
+    LTEXT           "Evade %:",IDC_STATIC,151,33,31,8
+    EDITTEXT        IDC_EVADE,151,42,40,12,ES_AUTOHSCROLL
+    GROUPBOX        "Special Defense",IDC_STATIC,89,57,120,58
+    CONTROL         "Unknown 1",IDC_DEF1,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,93,67,49,8
+    CONTROL         "Stun / Squint",IDC_DEF2,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,93,79,55,8
+    CONTROL         "Poison",IDC_DEF3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    93,91,56,8
+    CONTROL         "Insta-Death",IDC_DEF4,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,93,103,53,8
+    CONTROL         "Fire",IDC_DEF5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    155,67,33,8
+    CONTROL         "Ice",IDC_DEF6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,
+                    79,33,8
+    CONTROL         "Lit",IDC_DEF7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,
+                    91,33,8
+    CONTROL         "Unknown 2",IDC_DEF8,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,155,103,50,8
+    LTEXT           "Spell Cast:",IDC_STATIC,151,7,34,8
+    COMBOBOX        IDC_SPELLCAST,151,17,70,112,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Equipped by:",IDC_STATIC,227,7,139,74
+    CONTROL         "",IDC_USE1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,233,18,
+                    56,8
+    CONTROL         "",IDC_USE2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,233,28,
+                    56,8
+    CONTROL         "",IDC_USE3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,233,38,
+                    56,8
+    CONTROL         "",IDC_USE4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,233,48,
+                    56,8
+    CONTROL         "",IDC_USE5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,233,58,
+                    56,8
+    CONTROL         "",IDC_USE6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,233,69,
+                    56,8
+    CONTROL         "",IDC_USE7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,304,18,
+                    56,8
+    CONTROL         "",IDC_USE8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,304,28,
+                    56,8
+    CONTROL         "",IDC_USE9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,304,38,
+                    56,8
+    CONTROL         "",IDC_USE10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,304,
+                    48,56,8
+    CONTROL         "",IDC_USE11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,304,
+                    58,56,8
+    CONTROL         "",IDC_USE12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,304,
+                    69,56,8
+    PUSHBUTTON      "Save",IDC_SAVE,216,93,46,14
+END
+
+IDD_WEAPON DIALOG DISCARDABLE  0, 0, 406, 177
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Weapon"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Done",IDOK,203,156,93,14
+    PUSHBUTTON      "Cancel",IDCANCEL,306,156,93,14
+    PUSHBUTTON      "Save",IDC_SAVE,100,156,93,14
+    LISTBOX         IDC_WEAPONLIST,7,7,87,163,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Price:",IDC_STATIC,100,7,19,8
+    EDITTEXT        IDC_PRICE,100,16,40,12,ES_AUTOHSCROLL
+    LTEXT           "Spell Cast:",IDC_STATIC,148,7,34,8
+    COMBOBOX        IDC_SPELLCAST,148,16,56,112,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Hit %:",IDC_STATIC,100,31,19,8
+    EDITTEXT        IDC_HIT,100,40,40,12,ES_AUTOHSCROLL
+    LTEXT           "Damage:",IDC_STATIC,100,55,30,8
+    EDITTEXT        IDC_DAMAGE,100,64,40,12,ES_AUTOHSCROLL
+    LTEXT           "Unknown:",IDC_STATIC,211,7,34,8
+    EDITTEXT        IDC_UNKNOWN,211,16,40,12,ES_AUTOHSCROLL
+    GROUPBOX        "Hurt Category:",IDC_STATIC,285,91,114,57
+    CONTROL         "Unknown",IDC_CAT1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    291,101,44,8
+    CONTROL         "Dragon",IDC_CAT2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    291,112,44,8
+    CONTROL         "Giant",IDC_CAT3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    291,123,44,8
+    CONTROL         "Undead",IDC_CAT4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    291,134,44,8
+    CONTROL         "Were",IDC_CAT5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    341,101,45,8
+    CONTROL         "Water",IDC_CAT6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    341,112,45,8
+    CONTROL         "Mage",IDC_CAT7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    341,123,45,8
+    CONTROL         "Regenerative",IDC_CAT8,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,341,134,55,8
+    COMBOBOX        IDC_GFX,106,97,89,88,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    GROUPBOX        "Graphic:",IDC_STATIC,100,86,182,64
+    PUSHBUTTON      "Edit Label",IDC_EDITLABEL,106,112,89,10
+    GROUPBOX        "Equipped by:",IDC_STATIC,260,7,139,74
+    CONTROL         "",IDC_USE1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,266,18,
+                    56,8
+    CONTROL         "",IDC_USE2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,266,28,
+                    56,8
+    CONTROL         "",IDC_USE3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,266,38,
+                    56,8
+    CONTROL         "",IDC_USE4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,266,48,
+                    56,8
+    CONTROL         "",IDC_USE5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,266,58,
+                    56,8
+    CONTROL         "",IDC_USE6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,266,69,
+                    56,8
+    CONTROL         "",IDC_USE7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,338,18,
+                    56,8
+    CONTROL         "",IDC_USE8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,338,28,
+                    56,8
+    CONTROL         "",IDC_USE9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,338,38,
+                    56,8
+    CONTROL         "",IDC_USE10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,338,
+                    48,56,8
+    CONTROL         "",IDC_USE11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,338,
+                    58,56,8
+    CONTROL         "",IDC_USE12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,338,
+                    69,56,8
+    PUSHBUTTON      "Edit Gfx",IDC_EDITGFX,199,97,41,12
+    GROUPBOX        "Element:",IDC_STATIC,151,34,87,52,WS_GROUP
+    CONTROL         "Stun",IDC_ELEM1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,157,44,29,8
+    CONTROL         "Bane",IDC_ELEM2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,157,54,30,8
+    CONTROL         "Dark",IDC_ELEM3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,157,63,29,8
+    CONTROL         "Conf.",IDC_ELEM4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,157,72,30,8
+    CONTROL         "Fire",IDC_ELEM5,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,199,44,25,8
+    CONTROL         "Ice",IDC_ELEM6,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,199,54,24,8
+    CONTROL         "Lit",IDC_ELEM7,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,199,63,23,8
+    CONTROL         "Earth",IDC_ELEM8,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,199,72,31,8
+END
+
+IDD_ENEMY DIALOG DISCARDABLE  0, 0, 403, 233
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Enemies"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Done",IDOK,305,7,90,14
+    PUSHBUTTON      "Cancel",IDCANCEL,306,39,90,14
+    LISTBOX         IDC_ENEMYLIST,7,7,71,220,LBS_SORT | LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Exp:",IDC_STATIC,128,42,15,8
+    EDITTEXT        IDC_EXP,128,51,30,12,ES_AUTOHSCROLL
+    LTEXT           "Gold:",IDC_STATIC,128,17,18,8
+    EDITTEXT        IDC_GOLD,128,26,30,12,ES_AUTOHSCROLL
+    LTEXT           "HP:",IDC_STATIC,91,17,13,8
+    EDITTEXT        IDC_HP,91,26,30,12,ES_AUTOHSCROLL
+    LTEXT           "Morale:",IDC_STATIC,319,82,24,8
+    EDITTEXT        IDC_MORALE,319,92,30,12,ES_AUTOHSCROLL
+    LTEXT           "Agility:",IDC_STATIC,357,82,21,8
+    EDITTEXT        IDC_AGILITY,357,92,30,12,ES_AUTOHSCROLL
+    LTEXT           "Defense:",IDC_STATIC,243,82,30,8
+    EDITTEXT        IDC_DEF,243,92,30,12,ES_AUTOHSCROLL
+    LTEXT           "# of Hits:",IDC_STATIC,167,86,30,8
+    EDITTEXT        IDC_HITS,167,97,30,12,ES_AUTOHSCROLL
+    LTEXT           "Hit %:",IDC_STATIC,89,117,19,8
+    EDITTEXT        IDC_HITPCT,89,126,30,12,ES_AUTOHSCROLL
+    LTEXT           "Strength:",IDC_STATIC,89,86,30,8
+    EDITTEXT        IDC_STR,89,97,30,12,ES_AUTOHSCROLL
+    LTEXT           "Crit %:",IDC_STATIC,127,86,20,8
+    EDITTEXT        IDC_CRITICAL,127,97,30,12,ES_AUTOHSCROLL
+    LTEXT           "Unknown:",IDC_STATIC,91,42,34,8
+    EDITTEXT        IDC_UNKNOWN,91,51,30,12,ES_AUTOHSCROLL
+    GROUPBOX        "Added Effect:",IDC_STATIC,123,112,79,42
+    CONTROL         "Death",IDC_EFF1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    129,124,32,8
+    CONTROL         "Stone",IDC_EFF2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    129,133,32,8
+    CONTROL         "Poison",IDC_EFF3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    129,142,35,8
+    CONTROL         "Dark",IDC_EFF4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    167,124,29,8
+    CONTROL         "Stun",IDC_EFF5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    167,133,29,8
+    GROUPBOX        "Category:",IDC_STATIC,175,7,114,57
+    CONTROL         "Unknown",IDC_CAT1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    181,17,44,8
+    CONTROL         "Dragon",IDC_CAT2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    181,28,44,8
+    CONTROL         "Giant",IDC_CAT3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    181,39,44,8
+    CONTROL         "Undead",IDC_CAT4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    181,50,44,8
+    CONTROL         "Were",IDC_CAT5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    231,17,45,8
+    CONTROL         "Water",IDC_CAT6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    231,28,45,8
+    CONTROL         "Mage",IDC_CAT7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    231,39,45,8
+    CONTROL         "Regenerative",IDC_CAT8,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,231,50,55,8
+    LTEXT           "Mag. Def.:",IDC_STATIC,281,82,34,8
+    EDITTEXT        IDC_MAGDEF,281,92,30,12,ES_AUTOHSCROLL
+    GROUPBOX        "Weakness",IDC_STATIC,237,106,80,51
+    CONTROL         "Stun",IDC_WEAK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    243,119,28,8
+    CONTROL         "Bane",IDC_WEAK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    243,127,30,8
+    CONTROL         "Dark",IDC_WEAK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    243,135,29,8
+    CONTROL         "Conf.",IDC_WEAK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    243,143,30,8
+    CONTROL         "Fire",IDC_WEAK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    279,119,28,8
+    CONTROL         "Ice",IDC_WEAK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    279,127,30,8
+    CONTROL         "Lit",IDC_WEAK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    279,135,29,8
+    CONTROL         "Earth",IDC_WEAK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    279,143,31,8
+    GROUPBOX        "Resistance:",IDC_STATIC,316,106,79,51
+    CONTROL         "Stun",IDC_RES1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    322,119,29,8
+    CONTROL         "Bane",IDC_RES2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    322,127,30,8
+    CONTROL         "Dark",IDC_RES3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    322,135,29,8
+    CONTROL         "Conf.",IDC_RES4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    322,143,30,8
+    CONTROL         "Fire",IDC_RES5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    358,119,28,8
+    CONTROL         "Ice",IDC_RES6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,358,
+                    127,30,8
+    CONTROL         "Lit",IDC_RES7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,358,
+                    135,29,8
+    CONTROL         "Earth",IDC_RES8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    358,143,30,8
+    GROUPBOX        "AI:",IDC_STATIC,83,156,313,70
+    COMBOBOX        IDC_AI,89,166,96,128,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    LTEXT           "Chance of Magic:",IDC_STATIC,89,193,57,8
+    EDITTEXT        IDC_AI_MAGICRATE,149,191,18,12,ES_AUTOHSCROLL
+    LTEXT           "Chance of Ability:",IDC_STATIC,91,209,56,8
+    EDITTEXT        IDC_AI_ABILITYRATE,149,207,18,12,ES_AUTOHSCROLL
+    GROUPBOX        "Magic:",IDC_STATIC,193,163,203,38
+    COMBOBOX        IDC_AI_MAGIC1,199,172,46,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_AI_MAGIC2,247,172,46,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_AI_MAGIC3,297,172,46,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_AI_MAGIC4,345,172,46,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_AI_MAGIC5,199,186,46,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_AI_MAGIC6,247,186,46,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_AI_MAGIC7,297,186,46,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_AI_MAGIC8,345,186,46,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Ability",IDC_STATIC,193,201,203,25
+    COMBOBOX        IDC_AI_ABILITY1,199,211,46,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_AI_ABILITY2,247,211,46,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_AI_ABILITY3,297,211,46,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_AI_ABILITY4,345,211,46,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Save",IDC_SAVE,306,23,90,14
+    PUSHBUTTON      "Edit Label",IDC_EDITLABEL,89,180,96,10
+    LTEXT           "/ 128",IDC_STATIC,169,193,18,8
+    LTEXT           "/ 128",IDC_STATIC,169,209,18,8
+    GROUPBOX        "General",IDC_STATIC,87,7,77,65
+    GROUPBOX        "Attack:",IDC_STATIC,83,75,119,79
+    GROUPBOX        "Defense:",IDC_STATIC,237,71,158,86
+    PUSHBUTTON      "Edit Graphic",IDC_EDITPIC,306,55,90,14
+END
+
+IDD_ATTACK DIALOG DISCARDABLE  0, 0, 236, 153
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Attacks"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Done",IDOK,93,132,44,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,185,132,44,14,WS_GROUP
+    PUSHBUTTON      "Save",IDC_SAVE,139,132,44,14,WS_GROUP
+    LISTBOX         IDC_ATTACKLIST,7,7,81,139,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_GROUP | 
+                    WS_TABSTOP
+    LTEXT           "Unknown:",IDC_STATIC,94,20,34,8
+    EDITTEXT        IDC_UNKNOWN,94,30,40,14,ES_AUTOHSCROLL | WS_GROUP
+    CONTROL         "Target the whole party",IDC_TARGET,"Button",
+                    BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,94,7,84,8
+    GROUPBOX        "Element:",IDC_STATIC,141,20,87,49,WS_GROUP
+    CONTROL         "Stun",IDC_ELEM1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,147,31,29,8
+    CONTROL         "Bane",IDC_ELEM2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,147,39,30,8
+    CONTROL         "Dark",IDC_ELEM3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,147,48,29,8
+    CONTROL         "Conf.",IDC_ELEM4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,147,58,30,8
+    CONTROL         "Fire",IDC_ELEM5,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,188,31,25,8
+    CONTROL         "Ice",IDC_ELEM6,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,188,39,24,8
+    CONTROL         "Lit",IDC_ELEM7,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,188,48,23,8
+    CONTROL         "Earth",IDC_ELEM8,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,188,58,31,8
+    CONTROL         "Damage",IDC_EFF_DAMAGE,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,93,79,41,8
+    CONTROL         "Neg. Effect",IDC_EFF_EFFECT,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,93,88,52,8
+    EDITTEXT        IDC_DAMAGE,151,89,40,14,ES_AUTOHSCROLL | WS_GROUP
+    GROUPBOX        "Effect:",IDC_EFFECTBOX,145,79,84,44,WS_GROUP
+    LTEXT           "Damage:",IDC_DAMAGETEXT,151,79,30,8
+    CONTROL         "Death",IDC_EFF1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,151,89,33,8
+    CONTROL         "Stone",IDC_EFF2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,151,99,33,8
+    CONTROL         "Poison",IDC_EFF3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,151,110,36,8
+    CONTROL         "Dark",IDC_EFF4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,196,89,30,8
+    CONTROL         "Stun",IDC_EFF5,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,196,99,29,8
+END
+
+IDD_MAGIC DIALOG DISCARDABLE  0, 0, 393, 234
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Magic"
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "Learned by:",IDC_STATIC,81,142,124,67
+    GROUPBOX        "Element:",IDC_STATIC,204,98,87,52,WS_GROUP
+    GROUPBOX        "Effect:",IDC_STATIC,81,7,162,86,WS_GROUP
+    GROUPBOX        "Effectivity:",IDC_DAMAGEBOX,242,7,53,30,WS_GROUP
+    GROUPBOX        "Effectivity:",IDC_EFFECTBOX,242,7,144,52,WS_GROUP
+    GROUPBOX        "Target",IDC_STATIC,242,54,144,39,WS_GROUP
+    CONTROL         "",IDC_EFFECT2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,249,26,59,8
+    CONTROL         "",IDC_EFFECT3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,249,34,59,8
+    DEFPUSHBUTTON   "Done",IDOK,184,213,99,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,287,213,99,14,WS_GROUP
+    PUSHBUTTON      "Save",IDC_SAVE,81,213,99,14,WS_GROUP
+    LISTBOX         IDC_MAGICLIST,7,7,65,220,LBS_SORT | LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    LTEXT           "Unknown:",IDC_STATIC,86,98,34,8
+    EDITTEXT        IDC_UNKNOWN,86,106,38,12,ES_AUTOHSCROLL | WS_GROUP
+    CONTROL         "No Effect",IDC_EFF1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,86,17,45,8
+    CONTROL         "Damage",IDC_EFF2,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
+                    86,25,41,8
+    CONTROL         "Damage Undead",IDC_EFF3,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,86,33,67,8
+    CONTROL         "Neg. Effect 1",IDC_EFF4,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,86,41,55,8
+    CONTROL         "Speed Down",IDC_EFF5,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,86,49,55,8
+    CONTROL         "Lower Morale",IDC_EFF6,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,86,57,56,8
+    CONTROL         "HP up",IDC_EFF7,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
+                    86,65,41,8
+    CONTROL         "Pos. Effect",IDC_EFF8,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,86,73,51,8
+    CONTROL         "Defense up",IDC_EFF9,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,86,81,50,8
+    CONTROL         "Resistance",IDC_EFF10,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,162,17,49,8
+    CONTROL         "# Hits up",IDC_EFF11,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,162,25,41,8
+    CONTROL         "Strength up",IDC_EFF12,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,162,33,50,8
+    CONTROL         "Evade Down",IDC_EFF13,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,162,41,55,8
+    CONTROL         "HP Max",IDC_EFF14,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,162,49,41,8
+    CONTROL         "Evade Up",IDC_EFF15,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,162,57,46,8
+    CONTROL         "Remove Resistance",IDC_EFF16,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP,162,65,78,8
+    CONTROL         "Neg. Effect 2",IDC_EFF17,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,162,73,56,8
+    CONTROL         "Stun",IDC_ELEM1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,210,108,29,8
+    CONTROL         "Bane",IDC_ELEM2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,210,118,30,8
+    CONTROL         "Dark",IDC_ELEM3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,210,127,29,8
+    CONTROL         "Conf.",IDC_ELEM4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,210,136,30,8
+    CONTROL         "Fire",IDC_ELEM5,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,252,108,25,8
+    CONTROL         "Ice",IDC_ELEM6,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,252,118,24,8
+    CONTROL         "Lit",IDC_ELEM7,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,252,127,23,8
+    CONTROL         "Earth",IDC_ELEM8,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,252,136,31,8
+    CONTROL         "Spell Caster",IDC_TARGET3,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,249,65,52,8
+    CONTROL         "One Party Member",IDC_TARGET5,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP,249,73,73,8
+    CONTROL         "Whole Party",IDC_TARGET4,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,249,81,52,8
+    CONTROL         "One Enemy",IDC_TARGET2,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,328,65,50,8
+    CONTROL         "All Enemies",IDC_TARGET1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,328,73,50,8
+    CONTROL         "",IDC_EFFECT1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,249,18,59,8
+    CONTROL         "",IDC_EFFECT4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,249,43,59,8
+    CONTROL         "",IDC_EFFECT5,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,320,18,59,8
+    CONTROL         "",IDC_EFFECT6,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,320,26,59,8
+    CONTROL         "",IDC_EFFECT7,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,320,34,59,8
+    CONTROL         "",IDC_EFFECT8,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,320,43,59,8
+    EDITTEXT        IDC_DAMAGE,249,18,40,14,ES_AUTOHSCROLL | WS_GROUP
+    COMBOBOX        IDC_GFX,210,156,89,88,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_GROUP | WS_TABSTOP
+    GROUPBOX        "Graphic:",IDC_STATIC,204,145,182,64,WS_GROUP
+    PUSHBUTTON      "Edit Label",IDC_EDITLABEL,210,171,89,10,WS_GROUP
+    LTEXT           "Price:",IDC_STATIC,128,98,19,8
+    EDITTEXT        IDC_PRICE,128,106,40,12,ES_AUTOHSCROLL
+    LTEXT           "Battle Message:",IDC_STATIC,86,120,52,8
+    COMBOBOX        IDC_BATTLEMESSAGE,86,128,107,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_USE1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,87,154,
+                    53,8
+    CONTROL         "",IDC_USE2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,87,163,
+                    53,8
+    CONTROL         "",IDC_USE3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,87,172,
+                    53,8
+    CONTROL         "",IDC_USE4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,87,181,
+                    53,8
+    CONTROL         "",IDC_USE5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,87,190,
+                    53,8
+    CONTROL         "",IDC_USE6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,87,199,
+                    53,8
+    CONTROL         "",IDC_USE7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,145,
+                    154,53,8
+    CONTROL         "",IDC_USE8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,145,
+                    163,53,8
+    CONTROL         "",IDC_USE9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,145,
+                    172,53,8
+    CONTROL         "",IDC_USE10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,145,
+                    181,53,8
+    CONTROL         "",IDC_USE11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,145,
+                    190,53,8
+    CONTROL         "",IDC_USE12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,145,
+                    199,53,8
+    PUSHBUTTON      "Edit Gfx",IDC_EDITGFX,303,156,41,12
+    GROUPBOX        "Outside of Battle",IDC_STATIC,290,98,96,52
+    COMBOBOX        IDC_OUTBATTLELIST,295,111,84,97,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Base:",IDC_STATIC,295,124,19,8
+    EDITTEXT        IDC_OUTMIN,295,134,19,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_OUTMAX,336,134,19,12,ES_AUTOHSCROLL
+    LTEXT           "+",IDC_STATIC,328,137,8,8
+    COMBOBOX        IDC_OUTMAXBOX,336,134,31,179,CBS_DROPDOWN | WS_VSCROLL | 
+                    WS_TABSTOP
+    COMBOBOX        IDC_OUTMINBOX,295,134,31,179,CBS_DROPDOWN | WS_VSCROLL | 
+                    WS_TABSTOP
+    LTEXT           "Range:",IDC_STATIC,335,124,24,8
+END
+
+IDD_SHOP DIALOG DISCARDABLE  0, 0, 350, 134
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Shops"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Done",IDOK,175,97,104,14
+    PUSHBUTTON      "Cancel",IDCANCEL,175,113,104,14
+    PUSHBUTTON      "Save",IDC_SAVE,175,81,104,14
+    LISTBOX         IDC_SHOPTYPE,7,7,50,59,LBS_SORT | LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_SHOP,58,7,83,83,LBS_SORT | LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_ITEM1,145,7,104,144,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    COMBOBOX        IDC_ITEM2,145,21,104,144,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    COMBOBOX        IDC_ITEM3,145,35,104,144,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    COMBOBOX        IDC_ITEM4,145,49,104,144,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    COMBOBOX        IDC_ITEM5,145,63,104,144,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "",IDC_REMOVE1,281,7,62,12
+    PUSHBUTTON      "",IDC_REMOVE2,281,21,62,12
+    PUSHBUTTON      "",IDC_REMOVE3,281,35,62,12
+    PUSHBUTTON      "",IDC_REMOVE4,281,49,62,12
+    PUSHBUTTON      "",IDC_REMOVE5,281,63,62,12
+    EDITTEXT        IDC_PRICE,145,16,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_POINTER,7,114,40,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Change Ptr",IDC_CHANGEPTR,50,114,52,12
+    LTEXT           "Pointer:",IDC_STATIC,7,106,25,8
+    LTEXT           "Price:",IDC_PRICETEXT,145,7,19,8
+    LTEXT           "KAB:",IDC_STATIC,16,71,17,8
+    LTEXT           "",IDC_KAB,36,71,11,8
+    PUSHBUTTON      "New Slot",IDC_NEWSLOT,113,94,50,14
+    PUSHBUTTON      "Delete Slot",IDC_DELETESLOT,113,113,50,14
+    EDITTEXT        IDC_PRICE1,251,7,26,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PRICE2,251,21,26,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PRICE3,251,35,26,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PRICE4,251,49,26,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PRICE5,251,63,26,12,ES_AUTOHSCROLL
+    LTEXT           "Starting Gold:",IDC_STATIC,290,105,44,8
+    EDITTEXT        IDC_STARTINGGOLD,290,115,53,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Edit Label",IDC_EDITLABEL,57,92,50,14
+END
+
+IDD_BATTLE DIALOG DISCARDABLE  0, 0, 462, 226
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Battle"
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "Pattern Tables",IDC_STATIC,272,7,183,41,WS_GROUP
+    GROUPBOX        "Palettes",IDC_STATIC,272,50,183,38,WS_GROUP
+    LISTBOX         IDC_BATTLELIST,7,7,122,195,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    GROUPBOX        "Enemy 1",IDC_STATIC,250,94,103,69,WS_GROUP
+    COMBOBOX        IDC_ENEMY1,258,104,91,104,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_GROUP | WS_TABSTOP
+    LTEXT           "Qty:",IDC_STATIC,258,122,13,8
+    EDITTEXT        IDC_QTYMIN_1,272,122,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_QTYMAX_1,298,122,13,12,ES_AUTOHSCROLL | WS_GROUP
+    LTEXT           "_",IDC_STATIC,290,120,8,8
+    CONTROL         "Pic 1",IDC_PICA_1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,316,120,30,8
+    CONTROL         "Pic 2",IDC_PICB_1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,316,128,30,8
+    CONTROL         "Pic 3",IDC_PICC_1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,316,136,30,8
+    CONTROL         "Pic 4",IDC_PICD_1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,316,144,30,8
+    CONTROL         "Palette 1",IDC_PALA_1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,258,136,41,8
+    CONTROL         "Palette 2",IDC_PALB_1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,258,144,41,8
+    GROUPBOX        "Enemy 2",IDC_STATIC,352,94,103,69,WS_GROUP
+    COMBOBOX        IDC_ENEMY2,360,104,91,104,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_GROUP | WS_TABSTOP
+    LTEXT           "Qty:",IDC_STATIC,360,122,13,8
+    EDITTEXT        IDC_QTYMIN_2,374,122,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_QTYMAX_2,400,122,13,12,ES_AUTOHSCROLL | WS_GROUP
+    LTEXT           "_",IDC_STATIC,392,120,8,8
+    CONTROL         "Pic 1",IDC_PICA_2,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,418,120,30,8
+    CONTROL         "Pic 2",IDC_PICB_2,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,418,128,30,8
+    CONTROL         "Pic 3",IDC_PICC_2,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,418,136,30,8
+    CONTROL         "Pic 4",IDC_PICD_2,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,418,144,30,8
+    CONTROL         "Palette 1",IDC_PALA_2,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,360,136,41,8
+    CONTROL         "Palette 2",IDC_PALB_2,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,360,144,41,8
+    GROUPBOX        "Enemy 3",IDC_STATIC,250,158,103,62,WS_GROUP
+    COMBOBOX        IDC_ENEMY3,258,167,91,104,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_GROUP | WS_TABSTOP
+    LTEXT           "Qty:",IDC_STATIC,258,185,13,8
+    EDITTEXT        IDC_QTYMIN_3,272,185,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_QTYMAX_3,298,185,13,12,ES_AUTOHSCROLL | WS_GROUP
+    LTEXT           "_",IDC_STATIC,290,183,8,8
+    CONTROL         "Pic 1",IDC_PICA_3,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,316,183,30,8
+    CONTROL         "Pic 2",IDC_PICB_3,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,316,191,30,8
+    CONTROL         "Pic 3",IDC_PICC_3,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,316,199,30,8
+    CONTROL         "Pic 4",IDC_PICD_3,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,316,207,30,8
+    CONTROL         "Palette 1",IDC_PALA_3,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,258,199,41,8
+    CONTROL         "Palette 2",IDC_PALB_3,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,258,207,41,8
+    GROUPBOX        "Enemy 4",IDC_STATIC,352,158,103,62,WS_GROUP
+    COMBOBOX        IDC_ENEMY4,360,167,91,104,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_GROUP | WS_TABSTOP
+    LTEXT           "Qty:",IDC_STATIC,360,185,13,8
+    EDITTEXT        IDC_QTYMIN_4,374,185,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_QTYMAX_4,400,185,13,12,ES_AUTOHSCROLL | WS_GROUP
+    LTEXT           "_",IDC_STATIC,392,183,8,8
+    CONTROL         "Pic 1",IDC_PICA_4,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,418,183,30,8
+    CONTROL         "Pic 2",IDC_PICB_4,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,418,191,30,8
+    CONTROL         "Pic 3",IDC_PICC_4,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,418,199,30,8
+    CONTROL         "Pic 4",IDC_PICD_4,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,418,207,30,8
+    CONTROL         "Palette 1",IDC_PALA_4,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,360,199,41,8
+    CONTROL         "Palette 2",IDC_PALB_4,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,360,207,41,8
+    LTEXT           "",IDC_PALETTE1,302,62,13,8
+    LTEXT           "",IDC_PALETTE2,302,73,13,8
+    LTEXT           "Pal 1:",IDC_STATIC,280,62,19,8
+    LTEXT           "Pal 2:",IDC_STATIC,280,73,19,8
+    PUSHBUTTON      "Change Palette",IDC_CHANGEPAL1,360,60,66,11,WS_GROUP
+    PUSHBUTTON      "Change Palette",IDC_CHANGEPAL2,360,72,66,11,WS_GROUP
+    GROUPBOX        "Setup",IDC_STATIC,219,7,54,81,WS_GROUP
+    CONTROL         "9 Small",IDC_TYPE1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,225,17,36,8
+    CONTROL         "4 Large",IDC_TYPE2,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,225,25,37,8
+    CONTROL         "Mix (2-6)",IDC_TYPE3,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,225,33,40,8
+    CONTROL         "Fiend",IDC_TYPE4,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
+                    225,41,32,8
+    CONTROL         "Chaos",IDC_TYPE5,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
+                    225,49,34,8
+    CONTROL         "Can't Run",IDC_NORUN,"Button",BS_AUTOCHECKBOX | 
+                    WS_GROUP | WS_TABSTOP,225,58,45,10
+    COMBOBOX        IDC_PATTERNTABLES,278,18,133,144,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    PUSHBUTTON      "Edit Label",IDC_EDITPATLABEL,414,18,39,12,WS_GROUP
+    PUSHBUTTON      "Edit Pattern Tables",IDC_EDITGRAPHIC,278,32,133,9,
+                    WS_GROUP
+    EDITTEXT        IDC_SUPRISED,225,69,17,12,ES_AUTOHSCROLL | WS_GROUP
+    LTEXT           "Suprise",IDC_STATIC,245,71,24,8
+    PUSHBUTTON      "Edit Label",IDC_EDITBATLABEL,7,206,122,13,WS_GROUP
+    CONTROL         "Formation 1",IDC_FORM1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,139,145,50,8
+    CONTROL         "Formation 2",IDC_FORM2,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,139,153,50,8
+    CONTROL         "View Min",IDC_VIEWMIN,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,139,104,49,8
+    CONTROL         "View Mean",IDC_VIEWMEAN,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,139,112,49,8
+    CONTROL         "View Max",IDC_VIEWMAX,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,139,120,49,8
+    GROUPBOX        "Preview",IDC_STATIC,133,7,87,75
+    GROUPBOX        "Formation",IDC_STATIC,133,135,92,32
+    GROUPBOX        "View",IDC_STATIC,133,94,92,38
+    DEFPUSHBUTTON   "Done",IDOK,133,173,111,14
+    PUSHBUTTON      "Cancel",IDCANCEL,133,205,111,14
+    PUSHBUTTON      "Save",IDC_SAVE,133,189,111,14
+END
+
+IDD_NESPALETTE DIALOG DISCARDABLE  0, 0, 186, 71
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "NES Palette"
+FONT 8, "MS Sans Serif"
+BEGIN
+    PUSHBUTTON      "Cancel",IDCANCEL,129,7,50,14
+    LTEXT           "Current Color:",IDC_STATIC,7,7,44,8
+END
+
+IDD_BATTLEPALETTES DIALOG DISCARDABLE  0, 0, 358, 132
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Battle Palettes"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,301,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,301,24,50,14
+    LTEXT           "Original Palette:",IDC_STATIC,7,7,50,8
+    LTEXT           "",IDC_ORIGPAL,59,7,13,8
+    LTEXT           "New Palette:",IDC_STATIC,15,20,42,8
+    LTEXT           "",IDC_NEWPAL,59,20,13,8
+END
+
+IDD_LOADING DIALOG DISCARDABLE  0, 0, 186, 28
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Loading..."
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Progress1",IDC_PROGRESS,"msctls_progress32",PBS_SMOOTH | 
+                    WS_BORDER,7,7,172,14
+END
+
+IDD_CUSTOMTOOL DIALOG DISCARDABLE  0, 0, 356, 150
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Customize Tool"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,7,129,69,14
+    PUSHBUTTON      "Cancel",IDCANCEL,280,129,69,14
+END
+
+IDD_MAPS DIALOG DISCARDABLE  0, 0, 509, 327
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Maps"
+MENU IDR_MAPMENU
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "Tile Data",IDC_STATIC,318,83,184,85
+    GROUPBOX        "Tiles",IDC_STATIC,318,163,184,93,WS_GROUP
+    DEFPUSHBUTTON   "Done",IDOK,385,7,37,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,465,7,37,14,WS_GROUP
+    GROUPBOX        "",IDC_STATIC,114,251,388,69,WS_GROUP
+    GROUPBOX        "Domain:",IDC_STATIC,114,251,193,69,WS_GROUP
+    GROUPBOX        "Map",IDC_STATIC,113,7,184,175,WS_GROUP
+    SCROLLBAR       IDC_HSCROLL,113,187,184,11,WS_GROUP
+    SCROLLBAR       IDC_VSCROLL,301,11,10,172,SBS_VERT | WS_GROUP
+    RTEXT           "1.",IDC_STATIC,120,264,8,8
+    RTEXT           "2.",IDC_STATIC,120,277,8,8
+    RTEXT           "3.",IDC_STATIC,120,290,8,8
+    RTEXT           "4.",IDC_STATIC,120,303,8,8
+    RTEXT           "5.",IDC_STATIC,314,264,8,8
+    RTEXT           "6.",IDC_STATIC,314,277,8,8
+    RTEXT           "7.",IDC_STATIC,314,290,8,8
+    RTEXT           "8.",IDC_STATIC,314,303,8,8
+    COMBOBOX        IDC_BATTLE1,131,262,113,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    COMBOBOX        IDC_BATTLE2,131,275,113,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    COMBOBOX        IDC_BATTLE3,131,288,113,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    COMBOBOX        IDC_BATTLE4,131,301,113,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    COMBOBOX        IDC_BATTLE5,325,262,113,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    COMBOBOX        IDC_BATTLE6,325,275,113,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    COMBOBOX        IDC_BATTLE7,325,288,113,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    COMBOBOX        IDC_BATTLE8,325,301,113,128,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    CONTROL         "F-2",IDC_FORMATION1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,246,264,24,8
+    CONTROL         "F-2",IDC_FORMATION4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,246,303,24,8
+    CONTROL         "F-2",IDC_FORMATION2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,246,277,24,8
+    CONTROL         "F-2",IDC_FORMATION3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,246,290,24,8
+    CONTROL         "F-2",IDC_FORMATION5,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,441,264,24,8
+    CONTROL         "F-2",IDC_FORMATION6,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,441,277,24,8
+    CONTROL         "F-2",IDC_FORMATION7,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,441,290,24,8
+    CONTROL         "F-2",IDC_FORMATION8,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,441,303,24,8
+    EDITTEXT        IDC_PROBABILITY1,274,262,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_PROBABILITY2,274,275,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_PROBABILITY3,274,288,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_PROBABILITY4,274,301,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_PROBABILITY5,468,262,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_PROBABILITY6,468,275,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_PROBABILITY7,468,288,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_PROBABILITY8,468,301,13,12,ES_AUTOHSCROLL | WS_GROUP
+    LTEXT           "/64",IDC_STATIC,483,264,12,8
+    LTEXT           "/64",IDC_STATIC,483,277,12,8
+    LTEXT           "/64",IDC_STATIC,483,290,12,8
+    LTEXT           "/64",IDC_STATIC,483,303,12,8
+    LTEXT           "/64",IDC_STATIC,291,264,12,8
+    LTEXT           "/64",IDC_STATIC,291,277,12,8
+    LTEXT           "/64",IDC_STATIC,291,303,12,8
+    LTEXT           "/64",IDC_STATIC,291,290,12,8
+    LISTBOX         IDC_MAPLIST,7,7,96,215,LBS_SORT | LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    CONTROL         "Show Rooms",IDC_SHOWROOMS,"Button",BS_AUTOCHECKBOX | 
+                    WS_GROUP | WS_TABSTOP,316,7,58,8
+    RTEXT           "Standard:",IDC_STATIC,106,203,32,8
+    RTEXT           "In Room:",IDC_STATIC,106,214,32,8
+    RTEXT           "Sprite:",IDC_STATIC,111,225,27,8
+    RTEXT           "Control:",IDC_STATIC,111,236,27,8
+    COMBOBOX        IDC_TILESET,318,27,111,104,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "Edit Label",IDC_TILESETLABEL,431,27,50,12
+    PUSHBUTTON      "Edit Label",IDC_MAPLABEL,7,226,96,14
+    CONTROL         "Move",IDC_MOVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    323,95,42,8
+    CONTROL         "Fight...",IDC_FIGHT,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,323,104,42,8
+    CONTROL         "Shop...",IDC_SHOP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    323,113,42,8
+    CONTROL         "Special...",IDC_SPECIAL,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,323,131,42,8
+    CONTROL         "Treasure...",IDC_TC,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,323,122,48,8
+    COMBOBOX        IDC_TEXT_LIST,379,106,113,112,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_FIGHT_LIST,379,106,113,112,CBS_DROPDOWNLIST | NOT 
+                    WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_SHOP_LIST,379,106,113,112,CBS_DROPDOWNLIST | NOT 
+                    WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_TC_LIST,379,106,113,112,CBS_DROPDOWNLIST | NOT 
+                    WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_SPECIAL_LIST,379,91,113,112,CBS_DROPDOWNLIST | NOT 
+                    WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Warp",IDC_WARP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    323,140,33,8
+    CONTROL         "Teleport...",IDC_TELEPORT,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,323,149,46,8
+    COMBOBOX        IDC_TELEPORT_LIST,379,132,113,112,CBS_DROPDOWNLIST | NOT 
+                    WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_TCITEM_LIST,397,132,66,112,CBS_DROPDOWNLIST | NOT 
+                    WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_TCITEM_PRICE,465,132,26,12,ES_AUTOHSCROLL | NOT 
+                    WS_VISIBLE
+    PUSHBUTTON      "Edit Label",IDC_EDITLABEL,379,120,113,10
+    GROUPBOX        "Sprites",IDC_STATIC,7,242,99,78
+    COMBOBOX        IDC_SPRITE_LIST,13,252,48,74,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_SPRITE,13,267,91,208,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "Edit Label",IDC_EDIT_SPRITE_LABEL,63,256,40,9
+    COMBOBOX        IDC_SPRITEGRAPHIC,13,282,48,120,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Edit Gfx",IDC_EDITSPRITEGFX,63,282,40,9
+    PUSHBUTTON      "Edit Lbl",IDC_EDITGFXLABEL,63,293,40,9
+    LTEXT           "X:",IDC_STATIC,47,308,8,8
+    LTEXT           "Y:",IDC_STATIC,77,308,8,8
+    EDITTEXT        IDC_SPRITECOORDX,55,305,16,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_SPRITECOORDY,85,305,16,12,ES_AUTOHSCROLL
+    CONTROL         "Room",IDC_INROOM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    12,299,33,8
+    CONTROL         "Still",IDC_STILL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    12,308,26,8
+    PUSHBUTTON      "Customize Tool",IDC_CUSTOMTOOL,392,43,67,14,WS_DISABLED
+    LTEXT           "Last Click:",IDC_STATIC,323,63,34,8
+    LTEXT           "Hovering:",IDC_STATIC,325,72,32,8
+    LTEXT           "",IDC_LASTCLICK,359,63,24,8
+    LTEXT           "",IDC_HOVERING,359,72,24,8
+    CONTROL         "Show Last Click",IDC_SHOWLASTCLICK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,316,16,64,8
+    LTEXT           "KAB:",IDC_STATIC,413,63,17,8
+    LTEXT           "",IDC_KAB,432,63,50,8
+    PUSHBUTTON      "Find KAB",IDC_FINDKAB,413,72,50,10
+    PUSHBUTTON      "Save",IDC_SAVE,425,7,37,14
+    CONTROL         "View Coords",IDC_VIEWCOORDS,"Button",BS_AUTOCHECKBOX | 
+                    BS_PUSHLIKE | WS_TABSTOP,379,149,113,10
+END
+
+IDD_TINT DIALOG DISCARDABLE  0, 0, 143, 87
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Tint Tile"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,86,7,50,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,86,25,50,14,WS_GROUP
+    CONTROL         "Do Not Tint",IDC_TINT0,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,7,7,76,8
+    CONTROL         "Tint Black (---)",IDC_TINT1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,7,15,76,8
+    CONTROL         "Tint Blue (--+)",IDC_TINT2,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,7,23,76,8
+    CONTROL         "Tint Green (-+-)",IDC_TINT3,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,7,31,76,8
+    CONTROL         "Tint Red (+--)",IDC_TINT4,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,7,39,76,8
+    CONTROL         "Tint Sky-Blue (-++)",IDC_TINT5,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP,7,47,76,8
+    CONTROL         "Tint Purple (+-+)",IDC_TINT6,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP,7,55,76,8
+    CONTROL         "Tint Yellow (++-)",IDC_TINT7,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP,7,63,76,8
+    CONTROL         "Tint White (+++)",IDC_TINT8,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,7,72,76,8
+    LTEXT           "Tint Variant:",IDC_STATIC,86,47,39,8
+    EDITTEXT        IDC_TINTVARIANT,86,56,40,14,ES_AUTOHSCROLL | ES_NUMBER
+END
+
+IDD_CLASSES DIALOG DISCARDABLE  0, 0, 377, 258
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Classes"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Done",IDOK,286,76,66,11,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,286,106,66,11,WS_GROUP
+    LISTBOX         IDC_CLASSLIST,7,7,66,99,LBS_SORT | LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    LTEXT           "Starting HP:",IDC_STATIC,82,17,39,8
+    LTEXT           "Unknown:",IDC_STATIC,127,17,34,8
+    LTEXT           "Mag Def:",IDC_STATIC,172,63,30,8
+    LTEXT           "Str.:",IDC_STATIC,82,40,14,8
+    LTEXT           "Luck:",IDC_STATIC,127,86,19,8
+    LTEXT           "Agility:",IDC_STATIC,82,86,21,8
+    LTEXT           "Damage:",IDC_STATIC,172,40,30,8
+    LTEXT           "Int:",IDC_STATIC,172,86,11,8
+    LTEXT           "Hit %:",IDC_STATIC,127,40,19,8
+    LTEXT           "Vit:",IDC_STATIC,82,63,11,8
+    LTEXT           "Evade %:",IDC_STATIC,127,63,31,8
+    EDITTEXT        IDC_STARTINGHP,82,26,22,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_UNKNOWN,127,26,22,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_MAGDEF,172,72,22,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_STR,82,49,22,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_LUCK,127,95,22,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_AGILITY,82,95,22,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_BASEDAMAGE,172,49,22,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_INT,172,95,22,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_HIT,127,49,22,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_VIT,82,72,22,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_EVADEPCT,127,72,22,12,ES_AUTOHSCROLL | WS_GROUP
+    GROUPBOX        "Starting Stats",IDC_STATIC,76,7,129,106,WS_GROUP
+    EDITTEXT        IDC_EXP1,24,130,32,12,ES_AUTOHSCROLL | WS_GROUP
+    CONTROL         "Strong",IDC_STRONG1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,61,132,34,8
+    CONTROL         "Str",IDC_STR1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,100,126,22,8
+    CONTROL         "Int",IDC_INT1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,100,134,22,8
+    CONTROL         "Vit",IDC_VIT1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,100,142,22,8
+    CONTROL         "Agi",IDC_AGI1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,125,126,23,8
+    CONTROL         "Luc",IDC_LUC1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,125,134,25,8
+    CONTROL         "1",IDC_1M1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,155,126,17,8
+    CONTROL         "2",IDC_2M1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,155,134,17,8
+    CONTROL         "3",IDC_3M1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,155,142,17,8
+    CONTROL         "7",IDC_7M1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,200,126,17,8
+    CONTROL         "4",IDC_4M1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,177,126,17,8
+    CONTROL         "5",IDC_5M1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,177,134,17,8
+    CONTROL         "6",IDC_6M1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,177,142,17,8
+    CONTROL         "8",IDC_8M1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,200,134,17,8
+    GROUPBOX        "Exp:",IDC_STATIC,21,116,38,136,WS_GROUP
+    GROUPBOX        "Strong",IDC_STATIC,58,116,39,136,WS_GROUP
+    GROUPBOX        "Stat",IDC_STATIC,96,116,57,136,WS_GROUP
+    GROUPBOX        "Magic",IDC_STATIC,152,116,71,136,WS_GROUP
+    GROUPBOX        "",IDC_STATIC,21,148,202,38,WS_GROUP
+    GROUPBOX        "",IDC_STATIC,21,215,202,37,WS_GROUP
+    SCROLLBAR       IDC_SCROLL,7,122,10,130,SBS_VERT | WS_GROUP
+    GROUPBOX        "Totals:",IDC_STATIC,226,116,144,136,WS_GROUP
+    GROUPBOX        "",IDC_STATIC,226,148,144,38,WS_GROUP
+    GROUPBOX        "",IDC_STATIC,226,215,144,37,WS_GROUP
+    LTEXT           "",IDC_LEVEL1,230,128,30,8
+    LTEXT           "",IDC_TOTALHP1,230,136,31,8
+    LTEXT           "",IDC_TOTALSTR1,265,126,26,8
+    LTEXT           "",IDC_TOTALINT1,265,134,25,8
+    LTEXT           "",IDC_TOTALVIT1,265,142,25,8
+    LTEXT           "",IDC_TOTALAGI1,294,126,27,8
+    LTEXT           "",IDC_TOTALLUC1,294,134,29,8
+    LTEXT           "",IDC_TOTALMAG1,332,128,35,16
+    EDITTEXT        IDC_EXP2,24,162,32,12,ES_AUTOHSCROLL | WS_GROUP
+    CONTROL         "Strong",IDC_STRONG2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,61,163,34,8
+    CONTROL         "Str",IDC_STR2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,100,158,22,8
+    CONTROL         "Int",IDC_INT2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,100,166,22,8
+    CONTROL         "Vit",IDC_VIT2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,100,174,22,8
+    CONTROL         "Agi",IDC_AGI2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,125,158,23,8
+    CONTROL         "Luc",IDC_LUC2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,125,166,25,8
+    CONTROL         "1",IDC_1M2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,155,158,17,8
+    CONTROL         "2",IDC_2M2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,155,166,17,8
+    CONTROL         "3",IDC_3M2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,155,174,17,8
+    CONTROL         "7",IDC_7M2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,200,158,17,8
+    CONTROL         "4",IDC_4M2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,177,158,17,8
+    CONTROL         "5",IDC_5M2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,177,166,17,8
+    CONTROL         "6",IDC_6M2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,177,174,17,8
+    CONTROL         "8",IDC_8M2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,200,166,17,8
+    LTEXT           "",IDC_LEVEL2,230,159,30,8
+    LTEXT           "",IDC_TOTALHP2,230,167,31,8
+    LTEXT           "",IDC_TOTALSTR2,265,158,26,8
+    LTEXT           "",IDC_TOTALINT2,265,166,25,8
+    LTEXT           "",IDC_TOTALVIT2,265,174,25,8
+    LTEXT           "",IDC_TOTALAGI2,294,158,27,8
+    LTEXT           "",IDC_TOTALLUC2,294,166,29,8
+    LTEXT           "",IDC_TOTALMAG2,332,159,35,16
+    EDITTEXT        IDC_EXP3,24,194,32,12,ES_AUTOHSCROLL | WS_GROUP
+    CONTROL         "Strong",IDC_STRONG3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,61,195,34,8
+    CONTROL         "Str",IDC_STR3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,100,190,22,8
+    CONTROL         "Int",IDC_INT3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,100,198,22,8
+    CONTROL         "Vit",IDC_VIT3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,100,206,22,8
+    CONTROL         "Agi",IDC_AGI3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,125,190,23,8
+    CONTROL         "Luc",IDC_LUC3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,125,198,25,8
+    CONTROL         "1",IDC_1M3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,155,190,17,8
+    CONTROL         "2",IDC_2M3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,155,198,17,8
+    CONTROL         "3",IDC_3M3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,155,206,17,8
+    CONTROL         "7",IDC_7M3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,200,190,17,8
+    CONTROL         "4",IDC_4M3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,177,190,17,8
+    CONTROL         "5",IDC_5M3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,177,198,17,8
+    CONTROL         "6",IDC_6M3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,177,206,17,8
+    CONTROL         "8",IDC_8M3,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,200,198,17,8
+    LTEXT           "",IDC_LEVEL3,230,191,30,8
+    LTEXT           "",IDC_TOTALHP3,230,199,31,8
+    LTEXT           "",IDC_TOTALSTR3,265,190,26,8
+    LTEXT           "",IDC_TOTALINT3,265,198,25,8
+    LTEXT           "",IDC_TOTALVIT3,265,206,25,8
+    LTEXT           "",IDC_TOTALAGI3,294,190,27,8
+    LTEXT           "",IDC_TOTALLUC3,294,198,29,8
+    LTEXT           "",IDC_TOTALMAG3,332,191,35,16
+    EDITTEXT        IDC_EXP4,24,227,32,12,ES_AUTOHSCROLL | WS_GROUP
+    CONTROL         "Strong",IDC_STRONG4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,62,230,34,8
+    CONTROL         "Str",IDC_STR4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,101,223,22,8
+    CONTROL         "Int",IDC_INT4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,101,231,22,8
+    CONTROL         "Vit",IDC_VIT4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,101,239,22,8
+    CONTROL         "Agi",IDC_AGI4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,126,223,23,8
+    CONTROL         "Luc",IDC_LUC4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,126,231,25,8
+    CONTROL         "1",IDC_1M4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,156,223,17,8
+    CONTROL         "2",IDC_2M4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,156,231,17,8
+    CONTROL         "3",IDC_3M4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,156,239,17,8
+    CONTROL         "7",IDC_7M4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,201,223,17,8
+    CONTROL         "4",IDC_4M4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,178,223,17,8
+    CONTROL         "5",IDC_5M4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,178,231,17,8
+    CONTROL         "6",IDC_6M4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,178,239,17,8
+    CONTROL         "8",IDC_8M4,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,201,231,17,8
+    LTEXT           "",IDC_LEVEL4,230,224,30,8
+    LTEXT           "",IDC_TOTALHP4,230,232,31,8
+    LTEXT           "",IDC_TOTALSTR4,265,223,26,8
+    LTEXT           "",IDC_TOTALINT4,265,231,25,8
+    LTEXT           "",IDC_TOTALVIT4,265,239,25,8
+    LTEXT           "",IDC_TOTALAGI4,294,223,27,8
+    LTEXT           "",IDC_TOTALLUC4,294,231,29,8
+    LTEXT           "",IDC_TOTALMAG4,332,224,35,16
+    CONTROL         "View Min",IDC_MIN,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,207,83,48,8
+    CONTROL         "View Max",IDC_MAX,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,207,101,48,8
+    GROUPBOX        "Hold MP",IDC_STATIC,204,7,69,40,WS_GROUP
+    EDITTEXT        IDC_MAGIC,208,55,13,12,ES_AUTOHSCROLL | WS_GROUP
+    CONTROL         "",IDC_CLASS1,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,209,19,51,8
+    CONTROL         "",IDC_CLASS2,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,209,27,51,8
+    EDITTEXT        IDC_MAGICRANGEMIN,231,55,13,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_MAGICRANGEMAX,255,55,13,12,ES_AUTOHSCROLL | WS_GROUP
+    LTEXT           "_",IDC_STATIC,246,53,8,8
+    GROUPBOX        "MP Range:",IDC_STATIC,226,42,47,31,WS_GROUP
+    GROUPBOX        "HP Range:",IDC_STATIC,272,42,55,31,WS_GROUP
+    EDITTEXT        IDC_HPRANGEMIN,276,55,18,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_HPRANGEMAX,305,55,18,12,ES_AUTOHSCROLL | WS_GROUP
+    LTEXT           "_",IDC_STATIC,297,53,8,8
+    GROUPBOX        "MP:",IDC_STATIC,204,42,23,31
+    PUSHBUTTON      "Save",IDC_SAVE,286,91,66,11
+    CONTROL         "View Mean",IDC_MEAN,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,207,92,48,8
+    LTEXT           "Hit % up:",IDC_STATIC,172,17,29,8
+    EDITTEXT        IDC_HITPCTUP,172,26,22,12,ES_AUTOHSCROLL | WS_GROUP
+    GROUPBOX        "View",IDC_STATIC,204,74,69,39
+    PUSHBUTTON      "Edit Battle Pic",IDC_BATTLEPIC,283,7,78,14
+    PUSHBUTTON      "Edit Mapman Pic",IDC_MAPMANPIC,283,24,78,14
+END
+
+IDD_WEPMAG_GRAPHIC DIALOG DISCARDABLE  0, 0, 113, 170
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Weapon/Magic Graphic Editor"
+MENU IDR_BITMAP
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "Palette",IDC_STATIC,7,40,45,35
+    GROUPBOX        "Close-up",IDC_STATIC,7,70,99,93
+    DEFPUSHBUTTON   "Done",IDOK,67,7,39,14
+    PUSHBUTTON      "Cancel",IDCANCEL,67,45,39,14
+    GROUPBOX        "Wep",IDC_WEAPON,7,6,33,34
+    GROUPBOX        "Magic",IDC_MAGIC,7,6,55,34
+    PUSHBUTTON      "Save",IDC_SAVE,67,26,39,14
+END
+
+IDD_BATTLEPIC DIALOG DISCARDABLE  0, 0, 163, 167
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Battle Pics"
+MENU IDR_BITMAP
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "Graphics",IDC_STATIC,7,7,149,44
+    GROUPBOX        "Close up",IDC_STATIC,7,46,97,96
+    DEFPUSHBUTTON   "Done",IDOK,7,146,47,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,109,146,47,14,WS_GROUP
+    CONTROL         "1",IDC_PALETTE1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
+                    107,82,46,8
+    CONTROL         "2",IDC_PALETTE2,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
+                    107,90,46,8
+    CONTROL         "3 - Varies",IDC_PALETTE3,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,107,98,46,8
+    CONTROL         "4 - Cursor",IDC_PALETTE4,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,107,106,46,8
+    GROUPBOX        "Palette",IDC_STATIC,103,46,53,34
+    PUSHBUTTON      "Save",IDC_SAVE,58,146,47,14
+END
+
+IDD_MAPMAN DIALOG DISCARDABLE  0, 0, 166, 142
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Mapman Graphics"
+MENU IDR_BITMAP
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Done",IDOK,109,86,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,109,120,50,14
+    PUSHBUTTON      "Save",IDC_SAVE,109,103,50,14
+    GROUPBOX        "Graphic",IDC_STATIC,7,7,97,36
+    GROUPBOX        "Palette",IDC_STATIC,103,7,48,49
+    GROUPBOX        "Close-up",IDC_STATIC,7,38,97,96
+END
+
+IDD_BACKDROPGRAPHIC DIALOG DISCARDABLE  0, 0, 166, 159
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "BackDrop graphic"
+MENU IDR_BITMAP
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Done",IDOK,109,101,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,109,138,50,14
+    GROUPBOX        "Graphic",IDC_STATIC,7,7,98,57
+    GROUPBOX        "Closeup",IDC_STATIC,7,59,98,94
+    GROUPBOX        "Palette",IDC_STATIC,104,7,44,36
+    PUSHBUTTON      "Save",IDC_SAVE,109,119,50,14
+END
+
+IDD_BATTLEPATTERNTABLES DIALOG DISCARDABLE  0, 0, 357, 215
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Battle Pattern Tables"
+MENU IDR_BITMAP
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "Raw Pattern Tables",IDC_STATIC,167,7,183,96,WS_GROUP
+    GROUPBOX        "Close-up",IDC_STATIC,167,98,101,95,WS_GROUP
+    DEFPUSHBUTTON   "Done",IDOK,273,108,77,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,273,154,77,14,WS_GROUP
+    CONTROL         "Re-shape",IDC_RESHAPE,"Button",BS_AUTOCHECKBOX | 
+                    BS_PUSHLIKE | WS_GROUP | WS_TABSTOP,7,194,50,14
+    CONTROL         "Re-palette",IDC_REPALETTE,"Button",BS_AUTOCHECKBOX | 
+                    BS_PUSHLIKE | WS_GROUP | WS_TABSTOP,7,178,50,14
+    GROUPBOX        "Graphics",IDC_STATIC,7,7,161,133,WS_GROUP
+    CONTROL         "BG Palette",IDC_PAL1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,7,144,49,8
+    CONTROL         "Palette 1",IDC_PAL2,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,7,152,49,8
+    CONTROL         "Palette 2",IDC_PAL3,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,7,160,49,8
+    CONTROL         "Border Pal.",IDC_PAL4,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,7,168,49,8
+    COMBOBOX        IDC_BACKDROP,109,143,55,96,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "Save",IDC_SAVE,273,131,77,14
+END
+
+IDD_TILEEDIT DIALOG DISCARDABLE  0, 0, 352, 186
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Tile Editor"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,7,119,92,14
+    PUSHBUTTON      "Cancel",IDCANCEL,7,153,92,14
+    CONTROL         "Show Rooms",IDC_SHOWROOM,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,63,106,56,8
+    PUSHBUTTON      "Save",IDC_SAVE,7,136,92,14
+    GROUPBOX        "Closeup",IDC_STATIC,63,7,96,95
+    GROUPBOX        "Pattern Tables",IDC_SMALL,163,7,182,95
+    GROUPBOX        "Pattern Tables",IDC_LARGE,163,7,182,173
+    GROUPBOX        "Palettes",IDC_STATIC,7,49,53,65
+    GROUPBOX        "Tile",IDC_STATIC,27,7,33,36
+END
+
+IDD_ABOUT DIALOG DISCARDABLE  0, 0, 275, 188
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About FFHackster"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Bad ass!  Let's start hackin",IDOK,7,160,261,21
+    ICON            IDR_MAINFRAME,IDC_STATIC,7,7,20,20
+    LTEXT           "FFHackster\nv1.0",IDC_STATIC,33,7,40,17
+    RTEXT           "Programmed by:\n\nBased off:\n\n\nMany additional offsets by:\n\n\nBeta Tested by:\n\n\nand a Special ""Rock on"" to:",
+                    IDC_STATIC,7,31,101,122
+    LTEXT           "disch_@yahoo.com\nhttp://hackster.opgaming.com",
+                    IDC_STATIC,78,7,98,17
+    LTEXT           "Disch\n\nFFBytes by Y Dienyddiwr Da\nhttp://bytes.jandar.net\n\nGoongyae, Grond, Zero Soul, Paulygon, The Wanderer, Decimal, and a million other people.",
+                    IDC_STATIC,120,31,148,57
+    LTEXT           "Tzar, Rubicant, zero soul, Riegs, Y Dienyddiwr Da, Kabucho\n\nTzar of Omniplay Gaming\nhttp://www.opgaming.com\nfor the webpage, much moral support, and just being one slick mofo",
+                    IDC_STATIC,120,96,148,57
+END
+
+IDD_MINIMAP DIALOG DISCARDABLE  0, 0, 171, 158
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Minimap"
+FONT 8, "MS Sans Serif"
+BEGIN
+END
+
+IDD_COORDS DIALOG DISCARDABLE  0, 0, 112, 87
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Coord Editor"
+FONT 8, "MS Sans Serif"
+BEGIN
+    COMBOBOX        IDC_TELEPORTLIST,7,7,98,168,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COORD_L,7,36,98,168,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "Edit Label",IDC_EDITLABEL,7,22,98,9
+    LTEXT           "X:",IDC_STATIC,7,55,8,8
+    LTEXT           "Y:",IDC_STATIC,39,55,8,8
+    EDITTEXT        IDC_COORD_X,17,51,16,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_COORD_Y,49,51,16,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Followup",IDC_FOLLOWUP,40,66,33,14
+    PUSHBUTTON      "<< Back",IDC_FOLLOWUP_BACK,7,66,32,14
+    PUSHBUTTON      "Fwd >>",IDC_FOLLOWUP_FORWARD,74,66,31,14
+    CONTROL         "Click",IDC_MOUSECLICK,"Button",BS_AUTOCHECKBOX | 
+                    BS_PUSHLIKE | WS_TABSTOP,74,51,31,14
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "\0"
+            VALUE "FileDescription", "FFHackster MFC Application\0"
+            VALUE "FileVersion", "1, 0, 0, 1\0"
+            VALUE "InternalName", "FFHackster\0"
+            VALUE "LegalCopyright", "Copyright (C) 2001\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "FFHackster.EXE\0"
+            VALUE "ProductName", "FFHackster Application\0"
+            VALUE "ProductVersion", "1, 0, 0, 1\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_FFHACKSTER_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 230
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 203
+    END
+
+    IDD_OVERWORLDMAP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 396
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 336
+    END
+
+    IDD_TEXT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 211
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 199
+    END
+
+    IDD_NEWLABEL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 134
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 61
+    END
+
+    IDD_ARMOR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 366
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 115
+    END
+
+    IDD_WEAPON, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 399
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 170
+    END
+
+    IDD_ENEMY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 396
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 227
+    END
+
+    IDD_ATTACK, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 229
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 146
+    END
+
+    IDD_MAGIC, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 386
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 227
+    END
+
+    IDD_SHOP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 343
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 127
+    END
+
+    IDD_BATTLE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 455
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 219
+    END
+
+    IDD_NESPALETTE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 64
+    END
+
+    IDD_BATTLEPALETTES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 351
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 125
+    END
+
+    IDD_LOADING, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 21
+    END
+
+    IDD_CUSTOMTOOL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 349
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+
+    IDD_MAPS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 502
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 320
+    END
+
+    IDD_TINT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 136
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 80
+    END
+
+    IDD_CLASSES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 370
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 251
+    END
+
+    IDD_WEPMAG_GRAPHIC, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 106
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 163
+    END
+
+    IDD_BATTLEPIC, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 156
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 160
+    END
+
+    IDD_MAPMAN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 159
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 135
+    END
+
+    IDD_BACKDROPGRAPHIC, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 159
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 152
+    END
+
+    IDD_BATTLEPATTERNTABLES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 350
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 208
+    END
+
+    IDD_TILEEDIT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 345
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 179
+    END
+
+    IDD_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 268
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 181
+    END
+
+    IDD_MINIMAP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 164
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 151
+    END
+
+    IDD_COORDS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 105
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 80
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDC_CHAOSPIC            BITMAP  DISCARDABLE     "res\\chaospic.bmp"
+IDB_HACKSTER            BITMAP  DISCARDABLE     "res\\hackster.bmp"
+IDB_DRAWINGTOOLS        BITMAP  DISCARDABLE     "res\\drawingtools.bmp"
+IDB_ADVDRAWINGTOOLS     BITMAP  DISCARDABLE     "res\\advdrawi.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Open new ROM...",            IDMENU_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       IDCANCEL
+    END
+END
+
+IDR_BITMAP MENU DISCARDABLE 
+BEGIN
+    POPUP "&Bitmap"
+    BEGIN
+        MENUITEM "&Export Bitmap...",           ID_EXPORTBITMAP
+        MENUITEM "&Import Bitmap...",           ID_IMPORTBITMAP
+    END
+END
+
+IDR_MAPMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "&Map Import/export"
+    BEGIN
+        MENUITEM "&Export Map...",              ID_MAP_EXPORT
+        MENUITEM "&Import Map...",              ID_MAP_IMPORT
+    END
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\FFHackster.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

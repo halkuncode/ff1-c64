@@ -1,0 +1,21 @@
+; After a battle, the game sorts the warriors by status. Each warrior is
+; "tagged" with the starting slot number plus a "priority" number based on the
+; status: 0x40 for dead, 0x20 for stoned, 0x10 for poisoned, and 0x00 for
+; normal. Then it bubble sorts by the tags.
+;
+; The problem is that it swaps based on the original slot number rather than
+; the current slot number.
+
+;;; BANK 12
+;;; PART 1
+acc3: 84 88        STY $88
+acc5: c8           INY
+acc6: 84 89        STY $89
+acc8: d0 07        BNE +$07  [$acd1]
+acca: ea           NOP
+accb: ea           NOP
+accc: ea           NOP
+accd: ea           NOP
+acce: ea           NOP
+accf: ea           NOP
+acd0: ea           NOP

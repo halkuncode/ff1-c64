@@ -1,0 +1,116 @@
+* House saves before restoring MP. Also, correct message to reflect the fix.
++ house-magic-bug.ips
+
+* Ribbon's name has an extra space
++ ribbon-name-bug.ips
+
+* BB Armor bug, it looks at whether a weapon is equipped instead of checking
+  armor.
++ bb-armor-bug.ips
+
+* The airship can land on the caravan.
++ caravan-landing-bug.ips
+
+* HEL2 effectivity should be 0x18. Or should it, now that we have heal-doubling
+  in the INT patch?
++ HEL2-bug.ips
+
+* Running looks in the in-battle data instead of the permanent data.
++ running-bug.ips
+
+* In the Ice Cave, you can use WARP to get back up holes.
++ ice-cave-warp-bug.ips
+
+* Weapon category/element attack values are never loaded.
+* Weapon index is used for critical value.
++ weapon-data-bugs.ips
+
+* Enemies use their category/element as a category/element attack, and the
+  warrior's category/element attack as the category/element to attack.
+* Weapon elemental attack is used as elemental weakness when magic is cast.
+* The player class is used as the creature type when magic is cast.
+  Fortunately, only HARM uses it and no class has bit 4 set.
+! Apply this patch before magic-bugs.2.ips.
++ enemy-attack-bugs.ips
+
+* Target-dark and evade should not be applied when the target is asleep/stopped.
+* Hit% should be applied even if asleep.
+* Hit chance should not clamped until after evade is subtracted.
++ evade-bugs.ips
+
+* Status attacks are attempted on misses after the first successful hit
++ status-attack-bug.ips
+
+* Enemies always wake from sleep.
++ enemy-waking-bug.ips
+
+* Enemy-cast all-allies spells (e.g. AFIR) don't hit the caster.
++ enemy-magic-all-allies-bug.ips
+
+* Poison doesn't work on enemies.
++ enemy-poison-bug.ips
+
+* After battle, your warriors might be sorted incorrectly
++ sort-bug.ips
+
+* MUTE status prevents Item and Drink as well.
++ mute-bug (allow drink & item).ips
++ mute-bug (allow drink only).ips
+
+* If you stand on a door, enter a menu, exit the menu, then step down, the door
+  will usually end up elsewhere on the screen.
++ door-bug.ips
+
+* There are a number of sprites that start out in non-walkable areas.
+  Sometimes, they can even end up outside the bounds of the dungeons.
++ lost-sprites.ips
+
+* The Fire and Wind alters say "Nothing here" instead of their proper message.
++ silent-altars-bug.ips
+
+* If you gain enough experience for 2 levels at once, you only get one at the
+  time (you get the second after the next battle) and the "for next level"
+  number on the status screen is wrong.
++ multiple-level-up-bug.ips
+
+* If you enter a map (by teleporting, exiting a shop, or exiting a menu) in the
+  top/left 7 rows/columns, sprites will walk through you until you step
+  verically/horizontally.
++ people-walk-through-you-bug.ips
+
+* In the 2-large-6-small enemy formation, the game shifts one too far so the
+  third enemy uses the palette selection bit for the second enemy.
++ third-enemy-palette-bug.ips
+
+* The game has two canoes, one that is usable and one that shows in the item
+  list. This gives both canoes.
+! Conflicts with one-canoe-does-all.ips
++ give-both-canoes.ips
+
+* The game has two canoes, one that is usable and one that shows in the item
+  list. This combines the two.
+! Conflicts with give-both-canoes.ips
++ one-canoe-does-all.ips
+
+* LOK2 should use effect 0E instead of 10.
+* LOCK (and fixed LOK2) always misses.
+* TMPR should probably be using effect 0B instead of 0D.
+* For warrior targets, Damage and Hit% are never loaded/saved for use by magic.
+  Thus, TMPR and SABR.
+* Absorb for enemy targets is loaded from ROM instead of RAM for magic, making
+  FOG not work.
+* For enemy targets, Hit% is never loaded/saved for use by magic.
+* Enemy elemental resistance is not stored in the in-RAM data, so spells like
+  AFIR and XFER don't work.
+* Several caster bytes are loaded for magic, with wrong values. But none are
+  actually used.
+* Spells causing multiple status ailments will claim "Ineffective" if the
+  target has any of the ailments (all will still be applied though).
+* Int is never used. It should probably be added to spell effectivity.
+* Int should allow healing spells to double
+! Apply this patch after enemy-attack-bugs.ips
++ magic-bugs.2.ips
+
+* The existing turn-order algorithm is not particularly good, and may actually
+  be unfair. This fixes it.
++ more-random-battle-order.ips

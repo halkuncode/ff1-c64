@@ -1,0 +1,26 @@
+;;; BANK 12
+;;; PART 1
+; Overload EXIT. All this could easily be changed.
+8328: 00 00 00 04 06 e0 29
+
+;;; PART 2
+; Use Effect 06. This could easily be changed (just be sure to change the
+; 'Effect' byte in PART 1).
+b813: 78 ba        .DW $ba78   ; Effect 06: unused
+
+;;; PART 3
+; Effect routine. Fully reloactable, so feel free to move it elsewhere (just
+; adjust the pointer in PART 2).
+ba78: ad 91 6d     LDA $6d91   ; can't run flag -> never run
+ba7b: 29 01        AND #$01
+ba7d: f0 05        BEQ +$05  [$ba84]
+ba7f: a9 24        LDA #$24
+ba81: 4c 07 aa     JMP $aa07   ; Display message indicated in A ("Can't run")
+ba84: 20 f2 b0     JSR $b0f2   ; Display battle message in A ("Run away")
+ba87: a2 03        LDX #$03    ; set flag and return five levels
+ba89: 8e 86 6b     STX $6b86
+ba8c: 68           PLA
+ba8d: 68           PLA
+ba8e: ca           DEX
+ba8f: 10 fb        BPL +$fb  [$ba8c]
+ba91: 60           RTS

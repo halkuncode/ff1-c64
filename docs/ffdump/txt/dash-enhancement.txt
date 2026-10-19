@@ -1,0 +1,13 @@
+;;; BANK 15
+;;; PART 1
+d077: 4a           LSR
+d078: 25 2d        AND $2d
+d07a: d0 02        BNE +$02  [$d07e]
+d07c: a5 42        LDA $42
+d07e: 24 20        BIT $20
+d080: 50 02        BVC +$02  [$d084]
+d082: a9 08        LDA #$08
+d084: 4a           LSR
+d085: 69 00        ADC #$00
+d087: 85 34        STA $34
+d089: 60           RTS

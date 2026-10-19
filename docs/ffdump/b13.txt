@@ -1,0 +1,2936 @@
+;;; ROM offsets 034010 - 03800f
+
+; Music pointers
+;; #41 Prelude music
+8000: c0 80        .DW $80c0  ; Channel S1 song data
+8002: bd 81        .DW $81bd  ; Channel S2 song data
+8004: bc 82        .DW $82bc  ; Channel T song data
+8006: 00 00        .DW $0000  ; padding
+
+;; #42 Bridge/Ship Game music
+8008: c1 82        .DW $82c1
+800a: 0b 83        .DW $830b
+800c: 57 83        .DW $8357
+800e: 00 00        .DW $0000
+
+;; #43 Ending music
+8010: 4e 9b        .DW $9b4e
+8012: 1b 9c        .DW $9c1b
+8014: b7 9c        .DW $9cb7
+8016: 00 00        .DW $0000
+
+;; #44 World map music
+8018: 3c 88        .DW $883c
+801a: 8c 88        .DW $888c
+801c: 03 89        .DW $8903
+801e: 00 00        .DW $0000
+
+;; #45 Ship music (but no wave sounds)
+8020: ff 89        .DW $89ff
+8022: 6b 8a        .DW $8a6b
+8024: 3d 8b        .DW $8b3d
+8026: 00 00        .DW $0000
+
+;; #46 Airship music (but no propeller sounds)
+8028: 0f 8c        .DW $8c0f
+802a: 90 8c        .DW $8c90
+802c: de 8c        .DW $8cde
+802e: 00 00        .DW $0000
+
+;; #47 Town music
+8030: 3a 8f        .DW $8f3a
+8032: 6d 8f        .DW $8f6d
+8034: b0 8f        .DW $8fb0
+8036: 00 00        .DW $0000
+
+;; #48 Castle music
+8038: 54 8d        .DW $8d54
+803a: 84 8d        .DW $8d84
+803c: e4 8d        .DW $8de4
+803e: 00 00        .DW $0000
+
+;; #49 Earth Cave/Volcano/Titan music
+8040: f3 90        .DW $90f3
+8042: f4 91        .DW $91f4
+8044: 7b 92        .DW $927b
+8046: 00 00        .DW $0000
+
+;; #4a Ice Cave/Cardia/Waterfall/Dwarf/Matoya/Sarda music
+8048: 85 83        .DW $8385
+804a: 1c 84        .DW $841c
+804c: e7 84        .DW $84e7
+804e: 00 00        .DW $0000
+
+;; #4b Marsh Cave/Mirage Tower music
+8050: c0 85        .DW $85c0
+8052: 28 86        .DW $8628
+8054: 6a 86        .DW $866a
+8056: 00 00        .DW $0000
+
+;; #4c ToF/Sea Shrine music
+8058: 04 93        .DW $9304
+805a: 40 93        .DW $9340
+805c: 10 94        .DW $9410
+805e: 00 00        .DW $0000
+
+;; #4d Sky Castle music
+8060: e4 8f        .DW $8fe4
+8062: 45 90        .DW $9045
+8064: b8 90        .DW $90b8
+8066: 00 00        .DW $0000
+
+;; #4e ToFR music
+8068: c5 86        .DW $86c5
+806a: 0d 87        .DW $870d
+806c: d5 87        .DW $87d5
+806e: 00 00        .DW $0000
+
+;; #4f Shop music
+8070: 01 8e        .DW $8e01
+8072: 5d 8e        .DW $8e5d
+8074: a3 8e        .DW $8ea3
+8076: 00 00        .DW $0000
+
+;; #50 Battle music
+8078: 8c 94        .DW $948c
+807a: 9f 95        .DW $959f
+807c: be 96        .DW $96be
+807e: 00 00        .DW $0000
+
+;; #51 Menu music
+8080: cc 97        .DW $97cc
+8082: 01 98        .DW $9801
+8084: 36 98        .DW $9836
+8086: 00 00        .DW $0000
+
+;; #52 Slain music
+8088: 8d 98        .DW $988d
+808a: cb 98        .DW $98cb
+808c: f3 98        .DW $98f3
+808e: 00 00        .DW $0000
+
+;; #53 Victory music
+8090: 19 99        .DW $9919
+8092: 7e 99        .DW $997e
+8094: db 99        .DW $99db
+8096: 00 00        .DW $0000
+
+;; #54 "Win" music (e.g. got plot item, won ship game)
+8098: 63 9a        .DW $9a63
+809a: 7d 9a        .DW $9a7d
+809c: 95 9a        .DW $9a95
+809e: 00 00        .DW $0000
+
+;; #55 Prelude music (again)
+80a0: c0 80        .DW $80c0
+80a2: bd 81        .DW $81bd
+80a4: bc 82        .DW $82bc
+80a6: 00 00        .DW $0000
+
+;; #56 Save music
+80a8: aa 9a        .DW $9aaa
+80aa: c4 9a        .DW $9ac4
+80ac: d1 9a        .DW $9ad1
+80ae: 00 00        .DW $0000
+
+;; #57 Potion music
+80b0: e3 9a        .DW $9ae3
+80b2: fa 9a        .DW $9afa
+80b4: 12 9b        .DW $9b12
+80b6: 00 00        .DW $0000
+
+;; #58 Chest music
+80b8: 2b 9b        .DW $9b2b
+80ba: 37 9b        .DW $9b37
+80bc: 44 9b        .DW $9b44
+80be: 00 00        .DW $0000
+
+; Song data. See music.txt for the format.
+80c0: fd f8 05 e0 d8 a7 d8 07 27 57 a7 d9 07 27 57 a7
+80d0: da 07 27 57 a7 db 07 27 57 a7 57 27 07 da a7 57
+80e0: 27 07 d9 a7 57 27 07 d8 a7 57 27 07 d8 77 97 a7
+80f0: d8 27 77 97 a7 d9 27 77 97 a7 da 27 77 97 a7 db
+8100: 27 77 27 da a7 97 77 27 d9 a7 97 77 27 d8 a7 97
+8110: 77 27 d8 a7 97 d1 c4 80 d8 77 a7 d8 37 57 77 a7
+8120: d9 37 57 77 a7 da 37 57 77 a7 db 37 57 77 57 37
+8130: da a7 77 57 37 d9 a7 77 57 37 d8 a7 77 57 37 d8
+8140: a7 d8 97 d8 07 57 77 97 d9 07 57 77 97 da 07 57
+8150: 77 97 db 07 57 77 97 77 57 07 da 97 77 57 07 d9
+8160: 97 77 57 07 d8 97 77 57 07 d8 67 a7 d8 17 57 67
+8170: a7 d9 17 57 67 a7 da 17 57 67 a7 db 17 57 67 57
+8180: 17 da a7 67 57 17 d9 a7 67 57 17 d8 a7 67 57 17
+8190: d8 a7 d8 87 d8 07 37 77 87 d9 07 37 77 87 da 07
+81a0: 37 77 87 db 07 37 77 87 77 37 07 da 87 77 37 07
+81b0: d9 87 77 37 07 d8 87 77 37 07 d0 c4 80
+
+81bd: fd f8 05 e2 c7 c7 d8 a7 d8 07 27 57 a7 d9 07 27
+81cd: 57 a7 da 07 27 57 a7 db 07 27 57 a7 57 27 07 da
+81dd: a7 57 27 07 d9 a7 57 27 07 d8 a7 57 27 07 d8 77
+81ed: 97 a7 d8 27 77 97 a7 d9 27 77 97 a7 da 27 77 97
+81fd: a7 db 27 77 27 da a7 97 77 27 d9 a7 97 77 27 d8
+820d: a7 97 77 27 d8 a7 97 d1 c3 81 d8 77 a7 d8 37 57
+821d: 77 a7 d9 37 57 77 a7 da 37 57 77 a7 db 37 57 77
+822d: 57 37 da a7 77 57 37 d9 a7 77 57 37 d8 a7 77 57
+823d: 37 d8 a7 d8 97 d8 07 57 77 97 d9 07 57 77 97 da
+824d: 07 57 77 97 db 07 57 77 97 77 57 07 da 97 77 57
+825d: 07 d9 97 77 57 07 d8 97 77 57 07 d8 67 a7 d8 17
+826d: 57 67 a7 d9 17 57 67 a7 da 17 57 67 a7 db 17 57
+827d: 67 57 17 da a7 67 57 17 d9 a7 67 57 17 d8 a7 67
+828d: 57 17 d8 a7 d8 87 d8 07 37 77 87 d9 07 37 77 87
+829d: da 07 37 77 87 db 07 37 77 87 77 37 07 da 87 77
+82ad: 37 07 d9 87 77 37 07 d8 87 77 37 07 d0 c3 81
+
+82bc: fd c7 d0 bd 82
+
+82c1: fb f8 07 ee da 05 55 75 05 a3 95 75 55 47 57 75
+82d1: 55 53 43 25 75 95 25 db 03 da a5 95 75 67 97 75
+82e1: 25 93 73 d1 c2 82 db 22 25 02 da 95 a5 a7 97 75
+82f1: 65 75 95 a5 db 05 32 35 22 da a5 db 05 07 17 05
+8301: 07 17 05 da a5 95 75 d0 c2 82
+
+830b: fb f8 07 ea d9 02 27 47 55 25 45 75 25 47 57 75
+831b: 77 97 a3 73 73 65 77 97 a5 75 65 da 05 d9 a3 b3
+832b: da 03 d9 a3 d1 0c 83 a7 97 77 97 a7 c7 45 97 77
+833b: 57 77 97 c7 55 75 35 25 05 23 75 95 da 03 d9 83
+834b: a3 73 53 57 77 87 57 73 43 d0 0c 83
+
+8357: fb f8 08 ec d9 53 43 23 03 d8 a3 b3 d9 01 a3 93
+8367: 73 63 73 53 43 03 d1 58 83 a2 a5 52 55 33 23 73
+8377: 53 83 33 23 73 83 da 13 03 d9 a3 d0 58 83
+
+8385: fb f8 08 ec d9 b7 da 27 67 d9 b7 da 75 67 47 25
+8395: 47 27 f8 08 ee 13 f8 08 ec 27 67 97 27 b5 97 77
+83a5: 65 77 67 45 67 77 f8 08 ee 93 15 45 2c cc 1c cc
+83b5: 2c cc d9 b3 da 77 97 b3 25 75 6c cc 7c cc 6c cc
+83c5: 43 97 b7 db 13 c7 da 97 b7 db 17 49 29 19 29 da
+83d5: b4 97 77 67 43 c7 07 27 47 23 15 d9 95 f8 08 ee
+83e5: da 20 c5 f8 04 e1 29 19 d9 b9 da 19 f8 08 ee 20
+83f5: c5 f8 04 e1 69 49 29 49 f8 08 ee 60 c5 f8 04 e1
+8405: 99 79 69 79 f8 08 ee 90 f8 04 e1 69 49 29 19 49
+8415: 29 19 d9 a9 d0 86 83
+
+841c: fb f8 07 e2 d8 b9 c9 d9 69 c9 d8 b9 c9 d9 69 c9
+842c: d8 b9 c9 d9 79 c9 d8 b9 c9 d9 79 c9 d8 b9 c9 d9
+843c: 79 c9 d8 b9 c9 d9 79 c9 19 c9 99 c9 19 c9 99 c9
+844c: 29 c9 99 c9 29 c9 99 c9 29 c9 b9 c9 29 c9 b9 c9
+845c: 29 c9 b9 c9 29 c9 b9 c9 19 c9 99 c9 19 c9 99 c9
+846c: 99 c9 99 c9 c5 99 c9 99 c9 c5 69 c9 69 c9 c5 69
+847c: c9 69 c9 c5 b9 c9 b9 c9 c5 b9 c9 b9 c9 c5 da 19
+848c: c9 19 c9 c5 19 c9 19 c9 c5 d9 99 c9 99 c9 c5 99
+849c: c9 99 c9 c5 69 c9 69 c9 c5 69 c9 69 c9 c5 49 c9
+84ac: 79 c9 49 c9 79 c9 49 c9 79 c9 49 c9 79 c9 49 c9
+84bc: 79 c9 49 c9 79 c9 99 79 69 49 69 49 29 19 f8 08
+84cc: ee 65 25 75 25 97 97 27 97 75 45 d2 ca 84 65 25
+84dc: 75 25 97 97 27 97 65 45 d0 1d 84
+
+84e7: fb f8 08 ec d8 b3 d9 43 73 95 75 23 73 b3 97 49
+84f7: c9 19 c9 d8 99 c9 c7 67 d9 19 c9 69 c9 c7 d8 69
+8507: c9 d9 67 19 c9 c7 d8 b7 d9 69 c9 b9 c9 c7 d8 b9
+8517: c9 d9 b7 69 c9 c7 d8 77 d9 29 c9 79 c9 c7 d8 79
+8527: c9 d9 77 29 c9 c7 d8 97 d9 49 c9 99 c9 c7 d8 99
+8537: c9 d9 97 49 c9 c7 d8 67 d9 19 c9 69 c9 c7 d8 69
+8547: c9 d9 67 19 c9 c7 d8 b7 d9 69 c9 b9 c9 c7 d8 b9
+8557: c9 d9 b7 69 c9 07 da 09 c9 d9 07 da 09 c9 d9 07
+8567: da 09 c9 d9 07 da 09 c9 d8 97 d9 99 c9 d8 97 d9
+8577: 99 c9 d8 97 d9 99 c9 d8 97 d9 99 c9 27 99 c9 c7
+8587: 99 c9 27 b9 c9 c7 b9 c9 27 da 19 c9 c7 19 c9 d9
+8597: 27 b9 c9 c7 b9 c9 d2 83 85 27 99 c9 c7 99 c9 27
+85a7: b9 c9 c7 b9 c9 27 da 19 c9 c7 19 c9 d9 67 da 19
+85b7: c9 d9 67 da 19 c9 d0 e8 84
+
+85c0: fb f8 08 e1 d9 69 79 89 79 69 79 89 a9 89 79 39
+85d0: 09 69 79 89 79 69 79 89 a9 89 79 39 09 39 49 79
+85e0: a9 b9 da 09 19 09 d9 b9 da 09 19 39 19 09 d9 89
+85f0: 59 b9 da 09 19 09 d9 b9 da 09 19 39 19 09 d9 89
+8600: 59 da 09 d9 a9 89 59 d1 c4 85 f8 07 ee da 79 89
+8610: 72 c7 c5 a5 95 85 d1 0a 86 db 09 19 02 c7 c5 35
+8620: 25 15 d1 19 86 d0 c1 85
+
+8628: fb f8 06 e1 d8 77 c5 77 c5 c5 77 c7 77 c7 77 c7
+8638: d9 07 c5 07 c5 07 c5 07 c5 07 c7 d1 2c 86 f8 08
+8648: eb 25 07 55 27 73 57 57 47 47 37 37 d1 46 86 75
+8658: 57 a5 77 da 03 d9 a7 a7 97 97 87 87 d1 57 86 d0
+8668: 29 86
+
+866a: fb f8 08 ec d9 07 c5 07 c5 c5 07 c7 07 c7 07 c7
+867a: 57 c5 57 c5 57 c5 57 c5 57 c7 d1 6e 86 77 6c 5c
+868a: 4c 57 67 77 6c 5c 4c 57 67 77 6c 5c 4c a7 da 07
+869a: d9 97 b7 87 a7 d1 87 86 da 07 d9 bc ac 9c a7 b7
+86aa: da 07 d9 bc ac 9c a7 b7 da 07 d9 bc ac 9c da 37
+86ba: 57 27 47 17 37 d1 a2 86 d0 6b 86
+
+86c5: fb f8 08 ee d9 b3 85 b5 a5 85 65 a5 80 c3 b3 da
+86d5: 15 d9 b5 a5 85 65 da 45 30 f8 08 e2 c5 d9 3c 5c
+86e5: 6c 7c 8c 9c f8 08 ec a3 b5 da 15 d9 b5 a5 85 da
+86f5: 35 13 35 45 33 d9 b3 c3 da 35 15 d9 b5 a5 85 b5
+8705: f8 08 ee a0 c3 d0 c6 86
+
+870d: fb f8 03 eb d8 b7 d9 37 17 37 d8 b7 d9 37 17 37
+871d: d8 a7 d9 37 17 37 d8 a7 d9 37 17 37 d8 87 d9 37
+872d: 17 37 d8 87 d9 37 17 37 d8 a7 d9 37 17 37 d8 a7
+873d: d9 37 17 37 d8 b7 d9 37 17 37 d8 b7 d9 37 17 37
+874d: d8 a7 d9 37 17 37 d8 a7 d9 37 17 37 d8 87 d9 37
+875d: 17 37 d8 87 d9 37 17 37 d8 87 d9 17 d8 b7 d9 17
+876d: d8 87 d9 17 d8 b7 d9 17 f8 03 e2 37 37 c7 d8 a7
+877d: d9 37 37 c7 d8 a7 d9 37 37 c7 d8 b7 d9 37 37 c7
+878d: d8 b7 d9 47 47 c7 17 47 47 c7 17 67 67 c7 37 67
+879d: 67 c7 37 f8 08 ee 83 c7 f8 03 eb d8 b7 d9 47 87
+87ad: f8 08 ee 43 c7 f8 03 eb d8 87 d9 17 47 f8 08 ee
+87bd: 73 c7 f8 03 eb d8 a7 d9 37 77 d8 77 a7 d9 17 47
+87cd: 77 47 17 d8 a7 d0 0e 87
+
+87d5: fb f8 08 ec d9 89 c9 89 c9 c5 c3 69 c9 69 c9 c5
+87e5: c3 49 c9 49 c9 c5 c3 69 c9 69 c9 c5 c3 89 c9 89
+87f5: c9 c5 c3 69 c9 69 c9 c5 c3 49 c9 49 c9 c5 c3 59
+8805: c9 59 c9 c5 c3 79 c9 79 c9 c7 c5 da 37 77 37 d9
+8815: 89 c9 89 c9 c7 c5 da 37 87 37 d9 a9 c9 a9 c9 c7
+8825: c5 da 67 a7 67 d9 b9 c9 b9 c9 c7 c5 da 67 b7 67
+8835: 41 11 31 41 d0 d6 87
+
+883c: fb f8 08 ec c5 d9 b5 95 b5 da 05 d9 b5 95 b5 f8
+884c: 0a da 23 d9 90 f8 08 c5 da 05 d9 b5 da 05 25 05
+885c: d9 b5 da 05 f8 0a 43 d9 b0 f8 08 c5 da 45 65 75
+886c: 65 45 25 05 25 d9 95 b5 da 05 d9 b3 c7 87 97 b7
+887c: da 02 25 05 d9 b5 95 75 f8 0a da 20 c3 d0 3d 88
+
+888c: fb f8 08 ee c5 d9 25 05 25 45 25 05 d8 b5 91 d9
+889c: 65 45 25 05 d8 95 d9 45 25 45 65 45 25 05 d8 b1
+88ac: d9 85 65 45 25 f8 06 e1 c7 47 77 47 c7 47 77 47
+88bc: c7 67 97 67 c7 67 97 67 c7 27 57 27 c7 27 57 27
+88cc: c7 d8 b7 d9 47 d8 b7 c7 b7 d9 47 d8 b7 c7 d9 07
+88dc: 47 07 c7 07 47 07 c7 d8 97 d9 07 d8 97 c7 97 d9
+88ec: 07 d8 97 d9 27 57 27 57 27 57 27 57 27 67 27 67
+88fc: 27 67 27 67 d0 8d 88
+
+8903: fb f8 08 ec d9 79 c9 79 c6 29 c9 79 c9 79 c6 29
+8913: c9 79 c9 79 c6 29 c9 79 c9 79 c6 29 c9 69 c9 69
+8923: c6 29 c9 69 c9 69 c6 29 c9 69 c9 69 c6 29 c9 69
+8933: c9 69 c6 29 c9 99 c9 99 c6 49 c9 99 c9 99 c6 49
+8943: c9 99 c9 99 c6 49 c9 99 c9 99 c6 49 c9 89 c9 89
+8953: c6 49 c9 89 c9 89 c6 49 c9 89 c9 89 c6 49 c9 89
+8963: c9 89 c6 49 c9 da 09 c9 d9 79 c9 da 09 c9 d9 79
+8973: c9 da 09 c9 d9 79 c9 da 09 c9 d9 79 c9 da 29 c9
+8983: d9 99 c9 da 29 c9 d9 99 c9 da 29 c9 d9 99 c9 da
+8993: 29 c9 d9 99 c9 b9 c9 59 c9 b9 c9 59 c9 b9 c9 59
+89a3: c9 b9 c9 59 c9 da 49 c9 d9 b9 c9 da 49 c9 d9 b9
+89b3: c9 da 49 c9 d9 b9 c9 da 49 c9 d9 b9 c9 99 c9 99
+89c3: c6 da 49 c9 d9 99 c9 99 c6 da 49 c9 d9 59 c9 59
+89d3: c6 da 59 c9 d9 59 c9 59 c6 da 59 c9 d9 a9 c9 da
+89e3: a9 c9 d9 a9 c9 da a9 c9 d9 a9 c9 da a9 c9 d9 a9
+89f3: c9 da a9 c9 25 05 d9 b5 95 d0 04 89
+
+89ff: fb f8 08 ee d9 95 a5 da 01 c3 77 57 47 57 22 d9
+8a0f: a5 73 da 57 47 27 47 02 d9 95 63 da 27 07 d9 a7
+8a1f: 97 a3 c7 77 97 a7 da 03 d9 95 a5 da 01 03 77 57
+8a2f: 47 57 22 d9 a5 73 da 57 47 27 47 02 d9 95 63 da
+8a3f: 27 07 d9 a7 97 a3 a7 77 97 a7 da 01 c5 05 25 45
+8a4f: 75 55 45 55 43 05 d9 95 da 21 c5 25 45 55 75 55
+8a5f: 45 55 73 25 95 73 d9 95 a5 d0 06 8a
+
+8a6b: fb f8 08 e2 c3 f8 03 e2 c7 d9 59 c9 47 59 c6 59
+8a7b: c9 47 59 c9 c7 59 c9 47 59 c6 59 c9 47 59 c9 c7
+8a8b: 29 c9 07 29 c6 29 c9 07 29 c9 c7 09 c9 d8 a7 d9
+8a9b: 09 c6 09 c9 d8 a7 d9 09 c9 c7 09 c9 d8 97 d9 09
+8aab: c6 09 c9 d8 97 d9 09 c9 c7 29 c9 07 29 c6 29 c9
+8abb: 07 29 c9 c7 39 c9 27 39 c6 39 c9 27 39 c9 c7 49
+8acb: c9 27 49 c6 49 c9 27 49 c9 d1 70 8a f8 04 e2 09
+8adb: c9 49 c9 29 c9 49 c9 09 09 49 c9 29 c9 49 c9 29
+8aeb: c9 59 c9 49 c9 59 c9 29 29 59 c9 49 c9 59 c9 09
+8afb: c9 49 c9 29 c9 49 c9 09 09 49 c9 29 c9 49 c9 29
+8b0b: c9 59 c9 49 c9 59 c9 29 29 59 c9 49 c9 59 c9 29
+8b1b: c9 59 c9 49 c9 59 c9 29 29 59 c9 49 c9 59 c9 d2
+8b2b: 1a 8b 79 c9 79 c9 c7 79 c9 c7 79 c9 c7 79 c9 d0
+8b3b: 70 8a
+
+8b3d: fb f8 08 ec c3 d9 57 da 09 c9 d9 57 da 09 c9 d9
+8b4d: 57 da 09 c9 d9 57 da 09 c9 d9 27 99 c9 27 99 c9
+8b5d: 27 99 c9 27 99 c9 d8 a7 d9 59 c9 d8 a7 d9 59 c9
+8b6d: d8 a7 d9 59 c9 d8 a7 d9 59 c9 07 79 c9 07 79 c9
+8b7d: 07 79 c9 07 79 c9 d8 97 d9 49 c9 d8 97 d9 49 c9
+8b8d: d8 97 d9 49 c9 d8 97 d9 49 c9 27 99 c9 27 99 c9
+8b9d: 27 99 c9 27 99 c9 37 a9 c9 37 a9 c9 37 a9 c9 37
+8bad: a9 c9 07 79 c9 07 79 c9 07 79 c9 07 79 c9 d1 42
+8bbd: 8b d8 99 c9 99 c9 c4 d9 49 c9 99 c9 49 c9 29 c9
+8bcd: 29 c9 c4 59 c9 99 c9 59 c9 d1 be 8b d8 a9 c9 a9
+8bdd: c9 c4 d9 59 c9 a9 c9 59 c9 d8 79 c9 79 c9 c4 d9
+8bed: 29 c9 79 c9 29 c9 d8 b9 c9 b9 c9 c4 d9 29 c9 79
+8bfd: c9 29 c9 07 79 c9 27 79 c9 37 a9 c9 47 a9 c9 d0
+8c0d: 42 8b
+
+8c0f: fc f8 04 eb da 05 55 75 a5 97 77 57 97 75 07 27
+8c1f: 34 f8 09 eb 01 c7 c3 f8 04 eb 05 55 75 a5 97 77
+8c2f: 57 97 75 37 57 74 f8 09 eb db 01 f8 03 e1 c7 d9
+8c3f: a9 da 09 29 39 59 79 89 99 f8 04 e1 a7 87 57 a7
+8c4f: 87 c7 37 57 a7 87 57 a7 87 c4 a7 87 57 a7 87 c7
+8c5f: 37 57 a7 87 57 a7 87 c4 77 57 27 77 57 c7 07 37
+8c6f: 57 27 d9 a7 da 57 37 c7 d9 a7 da 17 f8 09 eb 03
+8c7f: f8 03 e1 47 09 49 77 49 79 f8 08 ee db 01 d0 10
+8c8f: 8c
+
+8c90: fc f8 07 eb d9 93 73 d7 94 8c da 23 03 23 f8 04
+8ca0: e2 d9 09 29 39 89 da 09 29 39 89 f8 07 eb 23 03
+8cb0: 23 f8 04 e2 d9 09 79 da 29 99 d9 29 99 da 49 b9
+8cc0: f8 07 eb d9 b3 83 53 83 f8 04 e2 a7 a7 97 a7 c7
+8cd0: a7 97 a7 77 77 47 77 c7 77 47 77 d0 91 8c
+
+8cde: fc f8 08 ec d9 57 da 07 d9 57 da 07 d9 37 a7 37
+8cee: a7 57 da 07 d9 57 da 07 d9 37 a7 37 a7 57 da 07
+8cfe: d9 57 da 07 d9 37 a7 37 a7 57 da 07 d9 57 da 07
+8d0e: d9 37 a7 37 a7 d1 e2 8c a7 da 57 d9 a7 da 57 d9
+8d1e: 87 da 37 d9 87 da 37 d9 a7 da 57 d9 a7 da 57 d9
+8d2e: 87 c4 d1 16 8d 77 da 27 c7 27 d9 87 da 37 c7 37
+8d3e: d9 a7 da 27 c7 27 17 57 c7 57 75 55 45 25 05 d9
+8d4e: a5 95 75 d0 df 8c
+
+8d54: fd f8 08 ee da 62 65 75 65 45 25 43 d9 90 da 22
+8d64: 25 45 25 15 d9 b5 da 13 d9 60 b2 da 15 23 43 63
+8d74: 73 93 75 65 43 d9 b2 b5 da 15 25 61 41 d0 55 8d
+
+8d84: fd f8 08 eb d8 95 d9 65 25 65 d8 95 d9 65 25 65
+8d94: 15 45 d8 95 d9 45 d8 b5 d9 45 15 45 d8 b5 d9 65
+8da4: 25 65 d8 b5 d9 65 25 65 d8 a5 d9 15 d8 65 d9 15
+8db4: d8 85 d9 15 d8 a5 d9 15 d8 b5 d9 75 25 75 d8 a5
+8dc4: d9 75 25 75 25 95 45 95 35 b5 d8 b5 d9 35 b5 95
+8dd4: 75 65 41 25 da 25 15 d9 b5 95 75 65 45 d0 85 8d
+
+8de4: fd f8 08 ec da 21 21 11 11 d9 b1 b1 a1 a1 71 71
+8df4: da 21 d9 b1 da 41 41 d9 91 91 d0 e5 8d
+
+8e01: fd f8 09 ec da 73 65 73 95 72 43 55 75 db 05 da
+8e11: b5 db 25 05 da 95 73 85 93 45 51 c3 c3 65 73 25
+8e21: 41 c3 c3 85 93 45 55 25 45 65 b5 95 75 65 75 85
+8e31: db 05 da b5 95 b5 db 05 25 05 da 85 f8 04 e1 77
+8e41: c7 db 07 c7 47 c7 27 c7 c3 f8 09 ec da b5 75 b5
+8e51: 95 55 95 75 25 75 55 25 55 d0 02 8e
+
+8e5d: fd f8 08 ea d9 43 35 43 55 42 03 25 43 45 53 55
+8e6d: 43 45 13 15 21 c3 c2 03 d8 b5 d9 02 d8 b5 d9 05
+8e7d: d8 b5 a2 d9 13 15 02 32 42 22 53 55 85 75 55 f8
+8e8d: 04 e2 47 c7 57 c7 77 c7 b7 c7 c3 f8 08 ea 22 02
+8e9d: d8 b2 72 d0 5e 8e
+
+8ea3: fd f8 08 ec d9 05 77 c7 77 c7 05 77 c7 77 c7 05
+8eb3: 77 c7 77 c7 05 77 c7 77 c7 05 77 c7 77 c7 05 97
+8ec3: c7 97 c7 05 77 c7 77 c7 d8 95 d9 47 c7 47 c7 25
+8ed3: 97 c7 97 c7 25 a7 c7 a7 c7 25 b7 c7 b7 c7 d8 75
+8ee3: d9 77 c7 77 c7 05 77 c7 77 c7 d8 b5 d9 77 c7 77
+8ef3: c7 d8 a5 d9 47 c7 47 c7 d8 95 d9 47 c7 47 c7 25
+8f03: 97 c7 97 c7 35 97 c7 97 c7 45 b7 c7 b7 c7 45 87
+8f13: c7 87 c7 55 da 07 c7 07 c7 d9 55 da 07 c7 07 c7
+8f23: d9 07 c7 27 c7 47 c7 77 c7 c3 c2 c2 c2 d8 77 c7
+8f33: 97 c7 b7 c7 d0 a4 8e
+
+8f3a: fc f8 08 ee da 43 73 23 45 55 45 25 01 03 92 95
+8f4a: 75 25 45 55 40 43 db 02 05 03 da b5 95 75 25 45
+8f5a: 55 43 03 21 25 d9 a5 da 05 25 01 d9 b3 da 05 25
+8f6a: d0 3b 8f
+
+8f6d: fc f8 04 e2 d9 45 da 05 d9 75 45 25 75 b5 25 05
+8f7d: 95 45 05 45 75 da 05 d9 45 05 95 55 05 d8 b5 d9
+8f8d: 25 75 b5 45 da 05 d9 75 45 25 45 85 b5 f8 08 ee
+8f9d: da 41 63 23 d9 b1 da 05 d9 b5 95 75 51 c1 70 53
+8fad: d0 6e 8f
+
+8fb0: fc f8 08 ec da 01 d9 b1 91 71 51 51 da 01 d9 41
+8fc0: 95 da 45 95 45 23 63 d9 75 da 25 75 25 03 d9 03
+8fd0: d8 a5 d9 55 a5 da 05 21 d8 75 d9 25 75 95 b5 95
+8fe0: 73 d0 b1 8f
+
+8fe4: fd f8 06 ec f8 05 ec da a7 c7 c2 f8 08 ee 43 ec
+8ff4: 65 a5 ee 81 21 c3 ec a5 45 ee 63 ec 85 a5 ee db
+9004: 32 da c7 b7 a2 c7 97 d1 e8 8f f8 06 ec a7 c4 f8
+9014: 08 a7 b7 a7 87 ee a1 f8 06 ec 37 c4 f8 08 37 47
+9024: 37 17 ee 31 d1 0e 90 da f8 05 e1 37 37 37 37 27
+9034: 27 27 27 17 17 17 17 07 fc 07 fb 07 fa 07 d0 e4
+9044: 8f
+
+9045: fd f8 06 ec f8 05 ec d9 a7 c7 c2 f8 08 ee 43 ec
+9055: 65 a5 ee 81 21 c3 ec a5 45 ee 63 ec 85 a5 ee da
+9065: 32 d9 b5 a2 c7 97 d1 49 90 f8 06 ec da 37 c7 27
+9075: c7 f8 08 ee 13 f8 06 ec 07 c7 d9 b7 c7 f8 08 ee
+9085: a3 f8 06 ec 97 c7 87 c7 f8 08 ee 73 f8 06 ec 67
+9095: c7 57 c7 f8 08 ee 43 d1 6e 90 f8 05 e1 37 37 37
+90a5: 37 27 27 27 27 17 17 17 17 07 fc 07 fb 07 fa 07
+90b5: d0 45 90
+
+90b8: fd f8 08 ec d8 a7 c7 d9 47 c7 a7 c7 da 37 c7 d8
+90c8: 87 c7 d9 27 c7 87 c7 da 17 c7 d7 bc 90 d9 37 c7
+90d8: a7 c7 da 13 d9 17 c7 15 87 c7 b7 c7 d3 d5 90 c1
+90e8: c3 c7 fc c7 fb c7 fa c7 d0 b8 90
+
+90f3: fb f8 03 e0 d9 29 c9 29 c9 59 c9 29 c9 09 c9 f8
+9103: 07 45 25 f8 03 29 c9 59 c9 29 c9 49 c9 f8 07 75
+9113: f8 03 79 c9 d1 f7 90 f8 05 17 29 c9 59 c9 99 c9
+9123: f8 08 ee da 21 c7 f8 03 e0 d9 bc da 0c d9 bc 99
+9133: c9 b9 c9 f8 05 da 07 d9 b9 c9 99 c9 79 c9 57 79
+9143: c9 99 c9 59 c9 f8 08 ee 21 f8 05 e0 17 29 c9 59
+9153: c9 99 c9 f8 08 ee da 21 f8 03 e0 c7 d9 bc da 0c
+9163: d9 bc 99 c9 b9 c9 f8 05 da 07 d9 99 c9 59 c9 99
+9173: c9 da 47 59 c9 49 c9 09 c9 f8 08 ee 21 f8 05 e0
+9183: 07 d9 97 57 97 b7 da 07 d9 b7 97 f8 08 b4 f8 08
+9193: b9 b9 f8 08 b4 f8 08 b9 b9 f8 05 da 07 d9 97 57
+91a3: 97 b7 da 07 d9 b7 97 f8 08 da 24 f8 08 29 29 f8
+91b3: 08 da 24 f8 08 29 29 f8 05 37 07 d9 87 da 07 27
+91c3: 37 27 07 f8 08 d9 a4 f8 08 a9 a9 f8 08 d9 a4 f8
+91d3: 08 a9 a9 f8 05 da 37 07 d9 87 da 07 27 37 27 07
+91e3: f8 08 54 f8 08 59 59 f8 08 54 f8 08 59 59 d0 f4
+91f3: 90
+
+91f4: fb f8 05 e1 d8 99 c9 99 c9 c4 f8 05 75 f8 05 99
+9204: c9 c3 79 c9 f8 05 75 f8 05 79 c9 d1 f8 91 f8 08
+9214: ee 93 f8 03 e1 c7 57 79 c9 99 c9 f8 08 ee b3 f8
+9224: 03 e1 c7 77 99 c9 b9 c9 f8 08 ee d9 03 f8 03 e1
+9234: c7 d8 97 b9 c9 d9 09 c9 f8 08 ee d8 b3 f8 03 e1
+9244: c7 77 99 c9 b9 c9 d1 12 92 f8 05 d9 57 c7 07 c7
+9254: d8 97 c7 d9 07 c7 57 27 57 27 57 27 57 27 d1 4d
+9264: 92 87 c7 37 c7 07 c7 37 c7 87 57 87 57 87 57 87
+9274: 57 d1 65 92 d0 f5 91
+
+927b: fb f8 08 ec da 29 c9 29 c9 c4 05 29 c9 c3 09 c9
+928b: d9 b5 b9 c9 d1 7f 92 da 29 c9 29 c9 59 c9 59 c9
+929b: 29 c9 c5 09 c9 29 c9 29 c9 79 c9 79 c9 29 c9 c5
+92ab: 09 c9 29 c9 29 c9 99 c9 99 c9 29 c9 c5 09 c9 29
+92bb: c9 29 c9 79 c9 79 c9 29 c9 c5 09 c9 d1 92 92 d9
+92cb: 59 c9 59 c9 da 59 c9 59 c6 d9 59 c9 da 59 c9 09
+92db: c9 d9 74 79 c9 74 79 c9 d1 ca 92 89 c9 89 c9 da
+92eb: 89 c9 89 c6 d9 89 c9 da 89 c9 39 c9 d9 a4 a9 c9
+92fb: a4 a9 c9 d1 e6 92 d0 7c 92
+
+9304: fb f8 08 ee da 43 d9 b5 da b5 95 75 65 45 73 41
+9314: c3 c5 45 d9 b5 da b5 db 25 05 da b5 95 b1 c3 75
+9324: 95 b3 25 75 65 45 65 75 43 d9 b3 da 22 d9 b5 da
+9334: 05 45 b5 95 53 75 95 71 61 d0 05 93
+
+9340: fb f8 03 eb d8 b7 d9 77 67 77 47 77 27 77 d8 97
+9350: d9 67 47 67 27 67 07 67 d8 77 d9 47 27 47 07 47
+9360: d8 b7 d9 47 d8 97 d9 47 d8 77 d9 47 d8 97 d9 67
+9370: 27 67 d8 b7 d9 77 67 77 47 77 27 77 d8 97 d9 67
+9380: 47 67 27 67 07 67 d8 97 d9 47 27 47 17 47 d8 b7
+9390: d9 47 d8 77 d9 47 07 47 d8 77 d9 47 07 47 f8 03
+93a0: e2 77 b7 97 b7 c7 b7 97 b7 67 97 77 97 c7 97 77
+93b0: 97 47 77 67 77 c7 77 67 77 27 67 47 67 c7 67 47
+93c0: 67 47 77 67 77 c7 77 67 77 97 da 07 d9 b7 da 07
+93d0: c7 07 d9 b7 da 07 f8 03 e6 d8 97 f8 03 e2 d9 99
+93e0: c9 79 c9 d8 99 c9 d9 99 c9 f8 05 e6 75 f8 03 e2
+93f0: 99 c9 f8 03 e6 27 f8 03 e2 da 29 c9 09 c9 d9 29
+9400: c9 da 29 f8 05 e6 c9 05 f8 03 e2 29 c9 d0 41 93
+
+9410: fb f8 08 ec d9 41 21 01 03 23 41 21 11 01 d8 77
+9420: d9 79 c6 79 c9 d8 77 d9 79 c6 79 c9 27 99 c6 99
+9430: c9 27 99 c6 99 c9 47 b9 c6 b9 c9 47 b9 c6 b9 c9
+9440: d8 b7 d9 b9 c6 b9 c9 d8 b7 d9 b9 c6 b9 c9 07 da
+9450: 09 c6 09 c9 d9 07 da 09 c6 09 c9 d9 57 da 09 c6
+9460: 09 c9 d9 57 da 09 c6 09 c9 d9 27 da 29 c9 09 c9
+9470: d9 29 c9 da 29 c9 05 29 c9 d9 97 da 69 c9 49 c9
+9480: d9 99 c9 da 69 c9 45 69 c9 d0 11 94
+
+948c: fb f8 08 e1 d8 3c 6c 9c d9 0c 3c 6c 9c da 0c 3c
+949c: 6c 9c db 0c c1 c3 c5 c7 f8 08 e0 d9 57 f8 05 e0
+94ac: 79 c9 da 29 c9 f8 08 ee 13 f8 08 e0 d9 a7 97 75
+94bc: 77 97 a5 97 f8 08 57 f8 05 79 c9 da 29 c9 f8 08
+94cc: ee 14 f8 08 e0 d9 97 f8 05 a9 c9 da 59 c9 f8 08
+94dc: ee 42 f8 08 e0 c7 d9 57 f8 05 79 c9 da 29 c9 f8
+94ec: 08 ee 13 f8 08 e0 d9 a7 97 75 77 97 a5 97 f8 08
+94fc: e0 57 f8 05 79 c9 da 29 c9 f8 08 ee 14 d9 f8 08
+950c: e0 97 f8 05 a9 c9 da 59 c9 f8 09 ec 41 f8 08 e0
+951c: c5 74 74 f8 08 e0 67 c7 c5 c5 c5 d1 19 95 f8 08
+952c: e0 c5 24 34 54 34 25 c5 d9 94 a4 da 04 d9 a4 95
+953c: c5 da 24 34 54 34 25 c5 d9 94 a4 da 04 d9 a4 95
+954c: 75 65 75 95 a5 95 a5 da 05 f8 05 e0 29 c9 29 c9
+955c: 29 c9 29 c9 c7 f8 04 ee 35 f8 05 e0 59 c9 29 c9
+956c: c7 f8 04 ee d9 95 da 25 65 f8 05 e0 39 c9 39 c9
+957c: 39 c9 39 c9 c7 f8 04 ee 55 f8 05 e0 79 c9 29 c9
+958c: c7 29 09 d9 a9 99 da 09 d9 a9 99 79 a9 99 79 69
+959c: d0 a9 94
+
+959f: fb f8 08 e2 cc cc d8 3c 6c 9c d8 0c 3c 6c 9c d9
+95af: 0c 3c 6c 9c da 0c cc c7 c5 c5 c5 c1 f8 06 ec d8
+95bf: 29 c9 29 c9 45 59 c9 59 c9 45 29 c9 29 c9 45 59
+95cf: c9 59 c9 05 29 c9 29 c9 45 59 c9 59 c9 45 29 c9
+95df: 29 c9 45 59 29 49 79 59 49 29 09 d1 bb 95 d8 a9
+95ef: c9 a9 c9 d9 f8 08 e1 34 34 f8 08 e1 27 c7 d8 27
+95ff: 27 67 67 97 97 d8 a9 c9 a9 c9 d9 f8 08 e1 34 34
+960f: f8 08 e1 27 c7 c7 69 79 69 39 29 09 d8 a9 99 79
+961f: 69 f8 03 eb d8 29 c9 29 c9 d8 a7 77 27 d9 07 d8
+962f: 77 37 d9 27 d8 a7 77 d9 07 d8 77 37 a7 27 d8 99
+963f: c9 99 c9 d8 67 27 d8 97 d8 77 27 d8 a7 d8 97 67
+964f: 27 77 27 d8 a7 d8 67 d8 97 d1 20 96 f8 05 e1 a9
+965f: c9 d8 29 c9 d8 99 c9 d8 29 c9 d8 a9 c9 d8 29 c9
+966f: 09 c9 39 c9 29 c9 59 c9 09 c9 59 c9 29 c9 59 c9
+967f: 39 c9 79 c9 69 c9 69 c9 69 c9 69 c9 c7 f8 04 ee
+968f: 75 f8 05 e1 99 c9 69 c9 c7 f8 04 ee 25 95 d9 25
+969f: f8 05 e1 d8 79 c9 79 c9 79 c9 79 c9 c7 f8 04 ee
+96af: 95 f8 05 e1 a9 c9 69 c9 c7 c5 c5 c5 d0 bb 95
+
+96be: fb f8 08 e0 c3 d8 79 c9 79 c9 79 c9 79 c9 79 c9
+96ce: 79 c9 59 c9 59 c9 d1 c3 96 77 d9 79 c9 d8 97 d9
+96de: 99 c9 d8 a7 d9 a9 c9 07 da 09 c9 d8 77 d9 79 c9
+96ee: d8 97 d9 99 c9 d8 a7 d9 a9 c9 d8 97 d9 99 c9 d3
+96fe: d7 96 39 c9 39 c9 da a9 99 79 69 39 29 09 d9 a9
+970e: 99 79 69 39 27 c7 69 c9 69 c9 99 c9 99 c9 da 29
+971e: c9 29 c9 d9 39 c9 39 c9 da a9 99 79 69 39 29 09
+972e: d9 a9 99 79 69 39 27 c7 c7 db 29 39 29 09 da a9
+973e: 99 79 69 39 29 d8 79 c9 79 c9 d9 77 d8 79 c9 79
+974e: c9 d9 77 d8 79 c9 79 c9 d9 77 d8 79 c9 79 c9 d9
+975e: 77 d8 79 c9 79 c9 d9 77 d8 79 c9 29 c9 29 c9 d9
+976e: 27 d8 29 c9 29 c9 d9 27 d8 29 c9 29 c9 d9 27 d8
+977e: 29 c9 29 c9 d9 27 d8 29 c9 29 c9 d9 27 d8 29 c9
+978e: d1 43 97 75 d9 25 d8 a5 d9 55 d8 a5 d9 55 d8 a5
+979e: d9 05 29 c9 29 c9 29 c9 29 c9 c7 07 c7 09 c9 29
+97ae: c9 c7 da 05 75 db 05 d9 39 c9 39 c9 39 c9 39 c9
+97be: c7 37 c7 39 c9 29 c9 c7 25 45 65 d0 d7 96
+
+97cc: fc f8 08 ee d9 a3 da a5 93 35 23 75 53 d9 a5 b1
+97dc: c5 da 25 03 d9 71 71 95 b5 da 07 d9 77 97 b7 da
+97ec: 07 27 37 57 77 87 a7 db 07 da a1 c5 97 77 91 d9
+97fc: 75 95 d0 cd 97
+
+9801: fc f8 08 e3 d9 a3 da a5 93 35 23 75 53 d9 a5 b1
+9811: c5 da 25 03 d9 71 71 95 b5 da 07 d9 77 97 b7 da
+9821: 07 27 37 57 77 87 a7 db 07 da a1 c5 97 77 91 d9
+9831: 75 95 d0 02 98
+
+9836: fc f8 08 ec d9 a5 da 25 55 d9 a5 da 35 95 d9 a5
+9846: da 25 55 d9 95 da 25 55 d9 85 b5 da 25 d9 75 b5
+9856: da 25 d9 75 da 05 35 d9 b5 da 25 55 d9 75 da 05
+9866: 35 d9 75 da 25 55 d9 75 da 35 75 d9 85 da 05 35
+9876: d9 55 da 05 55 d9 55 da 05 75 d9 55 da 05 55 d9
+9886: 35 da 05 35 d0 37 98
+
+988d: fc f8 07 e5 d9 95 da 15 25 45 52 d9 95 a3 da 75
+989d: 55 45 55 45 d9 75 91 da 22 d9 55 43 b5 da 25 25
+98ad: 15 42 15 25 45 52 d9 95 a3 da 75 55 45 55 45 d9
+98bd: 75 93 a5 da 05 22 45 23 13 21 c1 d0 97 98
+
+98cb: fc f8 07 e6 c1 d9 93 53 73 a3 73 43 53 03 53 23
+98db: d8 b3 d9 83 91 71 d9 93 53 73 a3 73 43 53 03 53
+98eb: 93 73 43 51 c1 d0 d0 98
+
+98f3: fc f8 08 ec c1 da 21 71 01 51 d9 a1 da 41 d9 91
+9903: da 93 43 da 21 71 01 51 d9 b1 91 db 25 da 95 75
+9913: 95 22 c5 d0 f8 98
+
+9919: fb f8 08 e1 d8 3c 7c ac d8 3c 7c ac d9 3c 7c ac
+9929: da 3c 7c ac f8 08 ec db 3c cc 3c cc 3c cc 35 da
+9939: b5 db 15 f8 05 3c cc cc cc 1c cc f8 08 ee 32 f8
+9949: 08 ec d9 a5 85 a5 87 da 15 da 17 05 17 05 07 d9
+9959: a5 85 75 87 f8 08 ee 51 c7 f8 08 ec a5 85 a5 87
+9969: da 15 17 05 17 05 07 d9 a5 85 a5 da 17 f8 08 ee
+9979: 31 c7 d0 48 99
+
+997e: fb f8 08 e2 cc cc d8 3c 7c ac d8 3c 7c ac d9 3c
+998e: 7c ac da 3c f8 08 ec 7c cc 7c cc 7c cc 75 35 55
+999e: f8 05 7c cc cc cc 5c cc f8 08 ee 72 f8 08 ec d9
+99ae: 75 55 75 57 55 57 35 57 35 37 75 55 35 57 f8 08
+99be: ee 11 c7 f8 08 ec d9 75 55 75 57 55 57 35 57 35
+99ce: 37 75 55 75 a7 f8 08 ee b1 c7 d0 aa 99
+
+99db: fb f8 08 ec c3 da 3c cc d9 ac cc 7c cc 35 65 85
+99eb: 3c cc cc cc 3c cc 37 c7 37 c7 37 c7 d9 37 a9 c9
+99fb: 37 a9 c9 37 a9 c9 37 a9 c9 17 89 c9 17 89 c9 17
+9a0b: 89 c9 17 89 c9 37 a9 c9 37 a9 c9 37 a9 c9 37 a9
+9a1b: c9 17 89 c9 17 89 c9 17 89 c9 17 89 c9 37 a9 c9
+9a2b: 37 a9 c9 37 a9 c9 37 a9 c9 17 89 c9 17 89 c9 17
+9a3b: 89 c9 17 89 c9 37 a9 c9 37 a9 c9 37 a9 c9 37 a9
+9a4b: c9 d8 b7 d9 69 c9 d8 b7 d9 69 c9 d8 b7 d9 69 c9
+9a5b: d8 b7 d9 69 c9 d0 f7 99
+
+9a63: fb f8 06 ec d9 bc da 0c 1c f8 08 ec fd 24 27 27
+9a73: 27 f8 08 ee fc 34 fb 54 72 ff
+
+9a7d: fb f8 08 ec cc cc cc fd d9 74 b7 97 77 f8 08 ee
+9a8d: fc 74 fb da 04 d9 b2 ff
+
+9a95: fb f8 08 ec cc cc cc fd d9 b4 da 27 07 d9 b7 fc
+9aa5: a4 fb 94 73 ff
+
+9aaa: fd f8 08 ec da 45 25 15 45 25 15 d9 b5 da 25 f8
+9aba: 08 ee fc d9 93 fb b3 da 12 ff
+
+9ac4: fd f8 08 ee d9 91 71 fc 03 fb 23 42 ff
+
+9ad1: fd f8 08 ec da 13 43 d9 b3 da 23 fc d9 53 fb 73
+9ae1: 92 ff
+
+9ae3: fb f8 08 e1 d8 ac d8 2c 5c ac d9 2c 5c ac da 2c
+9af3: 5c ac db 2c 5c ac ff
+
+9afa: fb f8 08 e2 c7 d8 ac d8 2c 5c ac d9 2c 5c ac da
+9b0a: 2c 5c ac db 2c 5c ac ff
+
+9b12: fb f8 08 ec c7 c7 d8 cc cc d9 cc cc cc da cc cc
+9b22: cc db cc cc cc dc cc cc ff
+
+9b2b: fc f8 07 e0 da 79 b9 db 39 79 b9 ff
+
+9b37: fc f8 07 e1 d9 b9 da 39 79 b9 db 39 ff
+
+9b44: fc f8 08 e0 c9 c9 c9 c9 c9 ff
+
+9b4e: fc f8 08 ee d8 05 25 75 95 d9 05 25 75 95 b5 da
+9b5e: 25 75 d9 b5 da 05 45 75 05 25 65 95 25 05 45 75
+9b6e: 05 d9 b5 da 25 75 d9 b5 da 05 45 75 05 25 65 95
+9b7e: 25 05 fb 45 fd 74 fa 05 fc d9 b3 da 23 d9 93 b5
+9b8e: da 05 d9 b5 95 71 73 da 02 05 d9 73 93 b1 91 b3
+9b9e: da 23 d9 93 b5 da 05 d9 b5 95 71 73 da 02 05 d9
+9bae: 73 93 71 65 b5 da 35 65 73 65 45 21 43 25 05 d9
+9bbe: b1 da 03 d9 b5 95 75 95 b5 45 73 95 75 61 da 73
+9bce: 65 45 21 43 25 05 d9 b3 da 05 25 41 c5 05 25 45
+9bde: 41 21 c7 d4 86 9b fc d9 b3 da 23 d9 93 b5 da 05
+9bee: d9 b5 95 71 73 da 02 05 d9 73 93 b1 91 b3 da 23
+9bfe: d9 93 b5 da 05 d9 b5 95 71 73 da 02 05 d9 73 93
+9c0e: 71 da 21 fb 02 05 fc d9 72 92 70 c1 ff
+
+9c1b: fc f8 08 ee c1 c1 d9 25 75 b5 25 45 75 da 05 d9
+9c2b: 45 65 95 da 25 d9 65 45 75 da 05 d9 45 25 75 b5
+9c3b: 25 45 75 da 05 d9 45 65 95 da 25 d9 65 45 fb 75
+9c4b: da fd 04 d9 fa 75 fc 21 01 20 01 33 03 63 21 01
+9c5b: 21 01 20 01 33 03 63 21 33 d8 b3 d9 41 63 45 25
+9c6b: 01 23 05 d8 b5 93 d9 43 23 d8 b3 d9 13 d8 b5 d9
+9c7b: 15 33 d8 b3 d9 41 63 45 25 01 23 05 d8 b5 93 d9
+9c8b: 43 03 93 71 61 c7 d4 51 9c fc 21 01 20 01 33 03
+9c9b: 63 21 01 21 01 20 01 33 03 63 21 53 23 fb 35 55
+9cab: 75 35 fc 24 04 d8 b4 94 b2 92 70 ff
+
+9cb7: fc f8 08 ee c1 c1 d9 71 71 71 71 71 71 71 da 05
+9cc7: fb d9 b5 fd 94 fa 75 fc 71 61 51 41 31 23 03 71
+9cd7: 23 03 71 61 51 41 31 23 03 d8 b1 d9 61 71 61 41
+9ce7: 71 51 41 41 61 71 61 41 71 51 51 91 21 c7 d4 ce
+9cf7: 9c fc 71 61 51 41 31 23 03 71 23 03 71 61 51 41
+9d07: 31 23 03 d8 b1 d9 73 53 fb 75 95 a5 da 05 fc d9
+9d17: 92 62 72 22 d8 70 ff
+
+; Garbage (seems to be a copy of the data at b359-b3da)
+9d1e: 30 18 0c 90 48 24 c0 60 30 18 0c 90 48 24 78 3c
+9d2e: 1e 0f 07 5a 28 14 78 3c 1e 0f 07 5a 28 14 90 60
+9d3e: 48 30 24 18 12 0c 09 06 03 03 04 10 08 08 78 50
+9d4e: 3c 28 1e 14 0f 0a 07 05 03 02 0e 0d 07 06 6c 48
+9d5e: 36 24 1b 12 0e 09 07 04 03 03 0e 60 40 30 60 40
+9d6e: 30 20 18 10 0c 08 06 04 02 02 0b 0a 06 05 80 60
+9d7e: 40 30 20 18 10 0c 08 06 04 03 02 01 00 00 0f 0f
+9d8e: 0e 0e 0d 0d 0c 0c 0b 0b 0a 0a 09 09 08 08 07 07
+9d9e: 06 06
+
+; Shuffle the tiles for the ship game? Just does 128 moves, rather than
+; shuffling then checking parity.
+9da0: a2 80        LDX #$80
+9da2: ca           DEX
+9da3: d0 01        BNE +$01  [$9da6]
+9da5: 60           RTS
+9da6: e6 f0        INC $f0     ; Uses the PRNG #2 table, but a different counter
+9da8: a4 f0        LDY $f0
+9daa: b9 00 f1     LDA $f100,Y
+9dad: 29 03        AND #$03    ; get movement direction
+9daf: a8           TAY
+9db0: b9 f5 9d     LDA $9df5,Y
+9db3: 85 10        STA $10
+9db5: a0 10        LDY #$10    ; find the empty square, store index in $11
+9db7: 88           DEY
+9db8: b9 00 03     LDA $0300,Y
+9dbb: d0 fa        BNE +$fa  [$9db7]
+9dbd: 84 11        STY $11
+9dbf: 98           TYA
+9dc0: 18           CLC
+9dc1: 65 10        ADC $10
+9dc3: 30 dd        BMI +$dd  [$9da2] ; move off the edge, do nothing
+9dc5: c9 10        CMP #$10
+9dc7: b0 d9        BCS +$d9  [$9da2]
+9dc9: a4 10        LDY $10           ; Y = dir, $10 = index of square to move to
+9dcb: 85 10        STA $10
+9dcd: c0 01        CPY #$01          ; moving right and got to column 0 => off edge
+9dcf: d0 06        BNE +$06  [$9dd7]
+9dd1: 29 03        AND #$03
+9dd3: f0 cd        BEQ +$cd  [$9da2]
+9dd5: d0 0a        BNE +$0a  [$9de1]
+9dd7: c0 ff        CPY #$ff          ; moving left and got to column 3 => off edge
+9dd9: d0 06        BNE +$06  [$9de1]
+9ddb: 29 03        AND #$03
+9ddd: c9 03        CMP #$03
+9ddf: f0 c1        BEQ +$c1  [$9da2]
+9de1: a4 10        LDY $10           ; do the move!
+9de3: b9 00 03     LDA $0300,Y
+9de6: a4 11        LDY $11
+9de8: 99 00 03     STA $0300,Y
+9deb: a4 10        LDY $10
+9ded: a9 00        LDA #$00
+9def: 99 00 03     STA $0300,Y
+9df2: 4c a2 9d     JMP $9da2
+
+9df5: 01 ff 04 fc  .DB $01, $ff, $04, $fc
+9df9: 03           .DB $03
+9dfa: 03           .DB $03
+9dfb: 03           .DB $03
+9dfc: 03           .DB $03
+9dfd: 03           .DB $03
+9dfe: 03           .DB $03
+9dff: 03           .DB $03
+
+; Ship game tiles (2x2, but only 1 plane)
+9e00: 7f c0 9f bf bf bf bf bf fc 06 f2 fa fa fa fa fa
+9e10: bf bf bf bf 9f c0 7f 00 fa fa fa fa f2 06 fc 00
+9e20: 7f c0 9f bf be bc be be fc 06 f2 fa 7a 7a 7a 7a
+9e30: be be bc bf 9f c0 7f 00 7a 7a 3a fa f2 06 fc 00
+9e40: 7f c0 9f bf bc bb bf be fc 06 f2 fa 7a 3a 3a 7a
+9e50: bc b8 b8 bf 9f c0 7f 00 fa 3a 3a fa f2 06 fc 00
+9e60: 7f c0 9f bf bc bb bf bc fc 06 f2 fa 7a 3a 3a 7a
+9e70: bf bb bc bf 9f c0 7f 00 3a 3a 7a fa f2 06 fc 00
+9e80: 7f c0 9f bf bf be bc b9 fc 06 f2 fa 3a 3a 3a 3a
+9e90: b8 bf bf bf 9f c0 7f 00 3a 3a 3a fa f2 06 fc 00
+9ea0: 7f c0 9f bf b8 b9 b8 bf fc 06 f2 fa 3a fa 7a 3a
+9eb0: bf bb bc bf 9f c0 7f 00 3a 3a 7a fa f2 06 fc 00
+9ec0: 7f c0 9f bf bc b9 b8 b9 fc 06 f2 fa 7a ba 7a 3a
+9ed0: b9 b9 bc bf 9f c0 7f 00 3a 3a 7a fa f2 06 fc 00
+9ee0: 7f c0 9f bf bc bb bf be fc 06 f2 fa 3a 3a 3a 7a
+9ef0: bc bc bc bf 9f c0 7f 00 fa fa fa fa f2 06 fc 00
+9f00: 7f c0 9f bf bc b9 b9 bc fc 06 f2 fa 7a 3a 3a 7a
+9f10: b9 b9 bc bf 9f c0 7f 00 3a 3a 7a fa f2 06 fc 00
+9f20: 7f c0 9f bf bc b9 b9 b9 fc 06 f2 fa 7a 3a 3a 3a
+9f30: bc bb bc bf 9f c0 7f 00 3a 3a 7a fa f2 06 fc 00
+9f40: 7f c0 9f bf b3 a2 b2 b2 fc 06 f2 fa 1a 4a 4a 4a
+9f50: b2 b2 b3 bf 9f c0 7f 00 4a 4a 1a fa f2 06 fc 00
+9f60: 7f c0 9f bf b9 b1 b9 b9 fc 06 f2 fa 9a 1a 9a 9a
+9f70: b9 b9 b9 bf 9f c0 7f 00 9a 9a 9a fa f2 06 fc 00
+9f80: 7f c0 9f bf b3 a2 b3 b3 fc 06 f2 fa 1a ca ca 9a
+9f90: b3 b2 b2 bf 9f c0 7f 00 3a 0a 0a fa f2 06 fc 00
+9fa0: 7f c0 9f bf b3 a2 b3 b3 fc 06 f2 fa 1a ca ca 1a
+9fb0: b3 b2 b3 bf 9f c0 7f 00 ca ca 1a fa f2 06 fc 00
+9fc0: 7f c0 9f bf b3 a3 b3 b2 fc 06 f2 fa ca 8a 4a 0a
+9fd0: b2 b3 b3 bf 9f c0 7f 00 0a ca ca fa f2 06 fc 00
+9fe0: 7f c0 9f bf b2 a2 b2 b3 fc 06 f2 fa 0a 7a 1a ca
+9ff0: b3 b2 b3 bf 9f c0 7f 00 ca ca 1a fa f2 06 fc 00
+
+; Pen movement data for "The End" fancyness
+a000: 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
+a010: 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
+a020: 01 01 01 03 02 07 07 05 07 05 05 07 07 03 01 0b
+a030: 01 01 0b 01 03 02 02 02 07 02 02 02 07 02 02 07
+a040: 02 02 01 01 0b 01 01 0b 0b 01 01 01 01 03 03 03
+a050: 01 01 03 07 07 05 07 02 07 02 02 02 07 02 02 07
+a060: 02 02 07 02 07 07 07 02 02 03 01 0b 0a 0b 0b 0b
+a070: 0a 0b 0a 0a 0b 0a 0a 0b 0a 0a 0a 0b 01 01 0b 01
+a080: 01 0b 01 01 01 0b 01 01 01 01 01 03 02 03 02 03
+a090: 02 02 07 07 05 07 05 07 05 07 05 05 05 0f 0b 01
+a0a0: 0b 0b 0a 0f 0a 0f 05 07 02 07 02 07 02 02 02 02
+a0b0: 07 02 07 02 03 01 01 01 01 01 01 03 07 05 05 07
+a0c0: 05 07 02 03 01 01 01 03 03 02 03 03 03 02 03 02
+a0d0: 03 03 03 02 02 02 02 02 02 07 02 02 07 02 02 07
+a0e0: 02 02 07 02 07 05 05 05 05 07 05 05 07 05 05 05
+a0f0: 05 05 05 05 05 05 05 05 05 05 0a 0b 0b 0b 0a 0a
+a100: 0a 0a 0a 0a 0b 0a 0a 0a 0b 0a 0a 0f 0f 07 07 02
+a110: 02 07 02 02 02 07 02 02 02 03 03 07 07 05 07 05
+a120: 07 05 05 0f 0f 0a 0a 0a 0a 0a 0b 0a 0a 0b 0a 0a
+a130: 0a 0b 0a 0f 0f 05 07 05 07 07 07 07 02 02 02 02
+a140: 02 02 02 03 03 02 07 05 07 07 05 05 05 05 0f 0f
+a150: 0f 05 07 02 07 05 07 05 05 0f 05 05 05 05 05 05
+a160: 05 05 05 05 05 05 05 05 05 07 05 05 05 05 0a 01
+a170: 0a 0a 0b 01 0a 0a 0a 0a 0b 0a 0a 0a 0b 0a 0a 0f
+a180: 07 07 05 0f 0a 0a 0b 0a 0b 0b 01 01 01 0b 01 0b
+a190: 0b 0b 0b 0a 0f 05 05 05 05 05 07 07 0f 0a 0a 0a
+a1a0: 0b 0b 01 0b 01 01 01 01 01 01 01 01 01 01 01 01
+a1b0: 03 07 07 07 07 07 07 02 02 07 02 02 07 02 02 07
+a1c0: 02 02 07 02 02 07 02 07 07 07 07 03 01 0b 01 0b
+a1d0: 0b 0b 0a 0a 0b 0a 0a 0b 0a 0a 0b 0a 0a 0a 0a 0b
+a1e0: 0a 0a 0b 0b 0b 0b 0b 0b 0b 0b 01 01 01 01 01 01
+a1f0: 01 01 01 01 01 01 02 01 03 02 07 07 05 07 05 05
+a200: 05 05 05 0f 05 05 05 05 07 05 07 07 02 07 07 02
+a210: 03 01 01 01 01 01 01 01 03 03 03 07 07 05 07 05
+a220: 07 05 0f 0f 05 07 05 07 02 07 07 02 02 03 03 01
+a230: 01 01 01 01 01 01 01 01 01 01 0b 01 0b 0a 0b 0a
+a240: 0a 0a 0b 0a 0a 0a 0a 0f 0f 0a 0b 0b 01 0b 01 01
+a250: 01 03 02 02 03 01 0b 01 01 0b 01 01 0b 0b 01 01
+a260: 01 03 03 03 01 01 03 03 01 0b 01 01 01 01 03 03
+a270: 07 05 07 02 02 02 07 02 02 07 02 02 02 02 03 01
+a280: 03 01 01 0b 01 0b 0a 0a 0a 0b 0a 0a 0a 0b 0a 0a
+a290: 0a 0f 0f 0f 0f 0f 0f 0f 0f 0f 0f 0a 0a 0a 0b 0b
+a2a0: 0a 0f 05 05 05 0f 05 0f 05 07 05 07 05 05 05 05
+a2b0: 05 05 0f 0f 0a 0a 0a 0a 0b 0a 0b 0b 0a 0b 0a 0b
+a2c0: 0a 0a 0b 0a 0a 0a 0b 0a 0f 0f 05 07 05 05 07 07
+a2d0: 02 07 02 02 07 02 02 02 07 02 03 01 03 07 07 05
+a2e0: 07 05 07 05 05 05 05 0f 0f 0f 0f 0b 0b 0b 0a 0b
+a2f0: 0b 0a 0b 0a 0b 0a 0a 0b 0a 0a 0a 0b 0a 0a 0a 0b
+a300: 0a 0a 0a 0a 0a 0f 07 02 02 07 02 02 07 02 02 07
+a310: 02 02 02 07 02 07 02 07 02 07 07 02 07 02 07 05
+a320: 07 07 05 07 05 05 07 05 05 05 05 05 05 05 05 0f
+a330: 05 05 0f 0f 0a 0a 0f 0a 0a 0a 0a 0a 0a 0a 0a 0b
+a340: 0a 0b 0a 0b 0a 0b 0b 0b 0b 0b 0b 01 01 02 07 07
+a350: 07 07 02 07 02 07 02 02 02 03 02 03 02 03 01 0b
+a360: 0a 0b 0a 0b 0b 0a 0b 0a 0b 0a 0b 0a 0b 0a 0b 0a
+a370: 0b 0a 0b 0b 03 02 02 02 02 02 07 02 02 07 02 07
+a380: 02 07 02 07 07 07 07 07 07 03 01 01 01 01 01 0b
+a390: 01 0b 0b 0b 0b 0a 0b 0a 0b 0a 0a 0a 0b 0a 0a 0b
+a3a0: 0a 0a 0b 0a 0a 0b 0a 0a 05 05 05 05 05 05 0f 05
+a3b0: 05 05 05 05 05 0f 05 05 05 05 05 07 05 07 07 07
+a3c0: 05 07 02 03 02 07 05 0f 0f 0f 0a 0a 0a 0a 0b 0b
+a3d0: 0b 0b 0b 0b 01 00 00 00 00 00 00 00 00 00 00 00
+a3e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+a3f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+; Display the end fancyness!!
+a400: a9 00        LDA #$00
+a402: 85 ff        STA $ff
+a404: 85 61        STA $61
+a406: a9 08        LDA #$08
+a408: 85 62        STA $62
+a40a: 20 00 fe     JSR $fe00   ; wait for V-blank
+a40d: a5 62        LDA $62     ; Clear out the tiles used for the fancyness
+a40f: 8d 06 20     STA $2006
+a412: a5 61        LDA $61
+a414: 8d 06 20     STA $2006
+a417: a2 80        LDX #$80
+a419: a9 00        LDA #$00
+a41b: 8d 07 20     STA $2007
+a41e: ca           DEX
+a41f: d0 fa        BNE +$fa  [$a41b]
+a421: a9 00        LDA #$00
+a423: 8d 06 20     STA $2006
+a426: 8d 06 20     STA $2006
+a429: 20 f4 a5     JSR $a5f4   ; No scrolling, some sound thing
+a42c: a5 61        LDA $61
+a42e: 18           CLC
+a42f: 69 80        ADC #$80
+a431: 85 61        STA $61
+a433: d0 d5        BNE +$d5  [$a40a]
+a435: e6 62        INC $62
+a437: a5 62        LDA $62
+a439: c9 0f        CMP #$0f
+a43b: 90 cd        BCC +$cd  [$a40a]
+a43d: a9 a8        LDA #$a8    ; Put the fancyness tiles in the window
+a43f: 85 61        STA $61
+a441: a9 20        LDA #$20
+a443: 85 62        STA $62
+a445: a9 80        LDA #$80
+a447: 85 63        STA $63
+a449: a9 0a        LDA #$0a
+a44b: 85 64        STA $64
+a44d: 20 00 fe     JSR $fe00   ; wait for V-blank
+a450: a5 62        LDA $62
+a452: 8d 06 20     STA $2006
+a455: a5 61        LDA $61
+a457: 8d 06 20     STA $2006
+a45a: a2 0a        LDX #$0a
+a45c: a5 63        LDA $63
+a45e: 8d 07 20     STA $2007
+a461: e6 63        INC $63
+a463: ca           DEX
+a464: d0 f6        BNE +$f6  [$a45c]
+a466: a9 00        LDA #$00
+a468: 8d 06 20     STA $2006
+a46b: 8d 06 20     STA $2006
+a46e: 20 f4 a5     JSR $a5f4   ; No scrolling, some sound thing
+a471: a5 61        LDA $61
+a473: 18           CLC
+a474: 69 20        ADC #$20
+a476: 85 61        STA $61
+a478: a5 62        LDA $62
+a47a: 69 00        ADC #$00
+a47c: 85 62        STA $62
+a47e: c6 64        DEC $64
+a480: d0 cb        BNE +$cb  [$a44d]
+a482: 20 00 fe     JSR $fe00   ; wait for V-blank
+a485: a9 23        LDA #$23    ; set palette map for the fancyness
+a487: 8d 06 20     STA $2006
+a48a: a9 ca        LDA #$ca
+a48c: 8d 06 20     STA $2006
+a48f: a2 00        LDX #$00
+a491: bd 39 a6     LDA $a639,X
+a494: 8d 07 20     STA $2007
+a497: e8           INX
+a498: e0 13        CPX #$13
+a49a: 90 f5        BCC +$f5  [$a491]
+a49c: 20 f4 a5     JSR $a5f4   ; No scrolling, some sound thing
+a49f: a9 30        LDA #$30    ; Set palette for fancyness
+a4a1: 8d c1 03     STA $03c1
+a4a4: a9 16        LDA #$16
+a4a6: 8d c2 03     STA $03c2
+a4a9: 20 00 fe     JSR $fe00   ; wait for V-blank
+a4ac: 20 0f c0     JSR $c00f   ; Upload palettes: BG at $03c0, sprite at $03d0
+a4af: 20 f4 a5     JSR $a5f4   ; No scrolling, some sound thing
+a4b2: a2 00        LDX #$00    ; Clear working buffer
+a4b4: a9 00        LDA #$00
+a4b6: 9d 00 68     STA $6800,X
+a4b9: 9d 00 69     STA $6900,X
+a4bc: 9d 00 6a     STA $6a00,X
+a4bf: 9d 00 6b     STA $6b00,X
+a4c2: 9d 00 6c     STA $6c00,X
+a4c5: 9d 00 6d     STA $6d00,X
+a4c8: 9d 00 6e     STA $6e00,X
+a4cb: e8           INX
+a4cc: d0 e8        BNE +$e8  [$a4b6]
+a4ce: 20 00 fe     JSR $fe00   ; wait for V-blank
+a4d1: 20 f4 a5     JSR $a5f4   ; No scrolling, some sound thing
+a4d4: a9 0c        LDA #$0c    ;; Phase 1: draw outline
+a4d6: 85 38        STA $38     ; Initial pen position (12,0)
+a4d8: a9 00        LDA #$00
+a4da: 85 39        STA $39
+a4dc: a9 00        LDA #$00    ; Pen movement data
+a4de: 85 62        STA $62
+a4e0: a9 a0        LDA #$a0
+a4e2: 85 63        STA $63
+a4e4: a0 00        LDY #$00
+a4e6: b1 62        LDA ($62),Y
+a4e8: f0 13        BEQ +$13  [$a4fd]
+a4ea: 20 e4 a5     JSR $a5e4   ; Move the pen according to A (RDLU) and set the new pixel
+a4ed: a5 62        LDA $62
+a4ef: 18           CLC
+a4f0: 69 01        ADC #$01
+a4f2: 85 62        STA $62
+a4f4: a5 63        LDA $63
+a4f6: 69 00        ADC #$00
+a4f8: 85 63        STA $63
+a4fa: 4c e4 a4     JMP $a4e4
+a4fd: a9 0c        LDA #$0c    ;; Phase 2: fill outline
+a4ff: 85 38        STA $38     ; Initial pen position: (12,0)
+a501: a9 00        LDA #$00
+a503: 85 39        STA $39
+a505: a9 00        LDA #$00    ; pen movement data
+a507: 85 62        STA $62
+a509: a9 a0        LDA #$a0
+a50b: 85 63        STA $63
+a50d: a0 00        LDY #$00
+a50f: b1 62        LDA ($62),Y
+a511: d0 01        BNE +$01  [$a514]
+a513: 60           RTS
+a514: c9 02        CMP #$02    ;; D, DR, or DL+R triggers filling
+a516: f0 1b        BEQ +$1b  [$a533]
+a518: c9 03        CMP #$03
+a51a: f0 17        BEQ +$17  [$a533]
+a51c: c9 07        CMP #$07
+a51e: f0 13        BEQ +$13  [$a533]
+a520: 20 04 a6     JSR $a604   ; Move 'pen' according to A (RDLU)
+a523: a5 62        LDA $62
+a525: 18           CLC
+a526: 69 01        ADC #$01
+a528: 85 62        STA $62
+a52a: a5 63        LDA $63
+a52c: 69 00        ADC #$00
+a52e: 85 63        STA $63
+a530: 4c 0d a5     JMP $a50d
+a533: a6 39        LDX $39
+a535: 86 65        STX $65
+a537: a6 38        LDX $38
+a539: 86 64        STX $64
+a53b: 20 04 a6     JSR $a604   ; Move 'pen' according to A (RDLU)
+a53e: a6 65        LDX $65     ; Fill this row?
+a540: bd 94 a5     LDA $a594,X
+a543: f0 de        BEQ +$de  [$a523]
+a545: a5 64        LDA $64     ; Move left (abort if we hit the edge of the thing)
+a547: 38           SEC
+a548: e9 01        SBC #$01
+a54a: 30 d7        BMI +$d7  [$a523]
+a54c: 85 64        STA $64
+a54e: a6 64        LDX $64     ; Calculate pixel...
+a550: a4 65        LDY $65
+a552: bd 21 a7     LDA $a721,X
+a555: 18           CLC
+a556: 79 81 a6     ADC $a681,Y
+a559: 85 3e        STA $3e
+a55b: 85 66        STA $66
+a55d: b9 d1 a6     LDA $a6d1,Y
+a560: 69 00        ADC #$00
+a562: 85 3f        STA $3f
+a564: 18           CLC
+a565: 69 60        ADC #$60
+a567: 85 67        STA $67
+a569: 8a           TXA
+a56a: 29 07        AND #$07
+a56c: aa           TAX
+a56d: bd 71 a7     LDA $a771,X
+a570: a0 00        LDY #$00
+a572: 31 66        AND ($66),Y ; hit a set pixel -> end fill
+a574: d0 ad        BNE +$ad  [$a523]
+a576: 20 00 fe     JSR $fe00   ; wait for V-blank
+a579: bd 71 a7     LDA $a771,X ; Set pixel and go move left again
+a57c: 11 66        ORA ($66),Y
+a57e: 91 66        STA ($66),Y
+a580: a6 3f        LDX $3f
+a582: 8e 06 20     STX $2006
+a585: a6 3e        LDX $3e
+a587: 8e 06 20     STX $2006
+a58a: 8d 07 20     STA $2007
+a58d: 20 f4 a5     JSR $a5f4   ; No scrolling, some sound thing
+a590: 4c 45 a5     JMP $a545
+
+a593: 60           RTS
+
+; Whether to fill each row of pixels for the fancyness
+a594: 00 00 01 00 01 00 01 00 01 00 00 01 00 00 01 00
+a5a4: 00 01 00 01 00 01 01 01 01 01 01 01 01 01 01 01
+a5b4: 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
+a5c4: 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
+a5d4: 01 01 00 01 00 01 00 01 00 01 00 01 00 01 00 01
+
+; Move the pen according to A (RDLU) and set the new pixel
+a5e4: 20 04 a6     JSR $a604   ; Move pen according to A (RDLU)
+a5e7: 20 00 fe     JSR $fe00   ; wait for V-blank
+a5ea: a6 38        LDX $38
+a5ec: a4 39        LDY $39
+a5ee: 20 4c a6     JSR $a64c   ; Set bit (X,Y) in the bitmap
+a5f1: 4c f4 a5     JMP $a5f4   ; No scrolling, some sound thing
+
+; No scrolling, some sound thing
+a5f4: a5 ff        LDA $ff
+a5f6: 8d 00 20     STA $2000
+a5f9: a9 00        LDA #$00
+a5fb: 8d 05 20     STA $2005
+a5fe: 8d 05 20     STA $2005
+a601: 4c 00 b0     JMP $b000  ; Start music or play current notes
+
+; Move 'pen' according to A: 
+;  1 = right
+;  2 = down
+;  4 = left
+;  8 = up
+a604: 85 10        STA $10
+a606: 29 05        AND #$05
+a608: f0 15        BEQ +$15  [$a61f]
+a60a: 29 04        AND #$04
+a60c: d0 0a        BNE +$0a  [$a618]
+a60e: a5 38        LDA $38
+a610: 18           CLC
+a611: 69 01        ADC #$01
+a613: 85 38        STA $38
+a615: 4c 1f a6     JMP $a61f
+a618: a5 38        LDA $38
+a61a: 38           SEC
+a61b: e9 01        SBC #$01
+a61d: 85 38        STA $38
+a61f: a5 10        LDA $10
+a621: 29 0a        AND #$0a
+a623: f0 13        BEQ +$13  [$a638]
+a625: 29 08        AND #$08
+a627: d0 08        BNE +$08  [$a631]
+a629: a5 39        LDA $39
+a62b: 18           CLC
+a62c: 69 01        ADC #$01
+a62e: 85 39        STA $39
+a630: 60           RTS
+a631: a5 39        LDA $39
+a633: 38           SEC
+a634: e9 01        SBC #$01
+a636: 85 39        STA $39
+a638: 60           RTS
+
+; Ending fancyness palette map
+a639:       0f 0f cf 77 55 55
+a63f: 55 ff 00 00 cc 77 55 55
+a647: 55 ff f0 f0 fc
+
+; Set bit (X,Y) in the bitmap
+a64c: bd 21 a7     LDA $a721,X
+a64f: 18           CLC
+a650: 79 81 a6     ADC $a681,Y
+a653: 85 3e        STA $3e
+a655: 85 66        STA $66
+a657: b9 d1 a6     LDA $a6d1,Y
+a65a: 69 00        ADC #$00
+a65c: 85 3f        STA $3f
+a65e: 18           CLC
+a65f: 69 60        ADC #$60
+a661: 85 67        STA $67
+a663: 8a           TXA
+a664: 29 07        AND #$07
+a666: aa           TAX
+a667: bd 71 a7     LDA $a771,X
+a66a: a0 00        LDY #$00
+a66c: 11 66        ORA ($66),Y
+a66e: 91 66        STA ($66),Y
+a670: ae 02 20     LDX $2002
+a673: a6 3f        LDX $3f
+a675: 8e 06 20     STX $2006
+a678: a6 3e        LDX $3e
+a67a: 8e 06 20     STX $2006
+a67d: 8d 07 20     STA $2007
+a680: 60           RTS
+
+; The tables below translate an X,Y position into a byte index for the pixel
+a681: 00 01 02 03 04 05 06 07 a0 a1 a2 a3 a4 a5 a6 a7  ; Y low byte
+a691: 40 41 42 43 44 45 46 47 e0 e1 e2 e3 e4 e5 e6 e7
+a6a1: 80 81 82 83 84 85 86 87 20 21 22 23 24 25 26 27
+a6b1: c0 c1 c2 c3 c4 c5 c6 c7 60 61 62 63 64 65 66 67
+a6c1: 00 01 02 03 04 05 06 07 a0 a1 a2 a3 a4 a5 a6 a7
+
+a6d1: 08 08 08 08 08 08 08 08 08 08 08 08 08 08 08 08  ; Y high byte
+a6e1: 09 09 09 09 09 09 09 09 09 09 09 09 09 09 09 09
+a6f1: 0a 0a 0a 0a 0a 0a 0a 0a 0b 0b 0b 0b 0b 0b 0b 0b
+a701: 0b 0b 0b 0b 0b 0b 0b 0b 0c 0c 0c 0c 0c 0c 0c 0c
+a711: 0d 0d 0d 0d 0d 0d 0d 0d 0d 0d 0d 0d 0d 0d 0d 0d
+
+a721: 00 00 00 00 00 00 00 00 10 10 10 10 10 10 10 10  ; X
+a731: 20 20 20 20 20 20 20 20 30 30 30 30 30 30 30 30
+a741: 40 40 40 40 40 40 40 40 50 50 50 50 50 50 50 50
+a751: 60 60 60 60 60 60 60 60 70 70 70 70 70 70 70 70
+a761: 80 80 80 80 80 80 80 80 90 90 90 90 90 90 90 90
+
+a771: 80 40 20 10 08 04 02 01  ; Bits for the pixel
+
+a779: 1f 3f 7f 7f 7c 78 78
+
+a780: a5 10        LDA $10
+a782: c5 11        CMP $11
+a784: 90 2e        BCC +$2e  [$a7b4]
+a786: e5 11        SBC $11
+a788: 4a           LSR
+a789: 4a           LSR
+a78a: 85 12        STA $12
+a78c: a6 11        LDX $11
+a78e: bd 04 03     LDA $0304,X
+a791: 9d 00 03     STA $0300,X
+a794: e8           INX
+a795: e8           INX
+a796: e8           INX
+a797: e8           INX
+a798: e4 10        CPX $10
+a79a: 90 f2        BCC +$f2  [$a78e]
+a79c: a9 00        LDA #$00
+a79e: 9d 00 03     STA $0300,X
+a7a1: a9 03        LDA #$03
+a7a3: 85 33        STA $33
+a7a5: a5 10        LDA $10
+a7a7: a6 12        LDX $12
+a7a9: 95 63        STA $63,X
+a7ab: 38           SEC
+a7ac: e9 04        SBC #$04
+a7ae: ca           DEX
+a7af: d0 f8        BNE +$f8  [$a7a9]
+a7b1: 4c 9e be     JMP $be9e
+a7b4: a5 11        LDA $11
+a7b6: 38           SEC
+a7b7: e5 10        SBC $10
+a7b9: 4a           LSR
+a7ba: 4a           LSR
+a7bb: 85 12        STA $12
+a7bd: a6 11        LDX $11
+a7bf: bd fc 02     LDA $02fc,X
+a7c2: 9d 00 03     STA $0300,X
+a7c5: ca           DEX
+a7c6: ca           DEX
+a7c7: ca           DEX
+a7c8: ca           DEX
+a7c9: e4 10        CPX $10
+a7cb: d0 f2        BNE +$f2  [$a7bf]
+a7cd: a9 00        LDA #$00
+a7cf: 9d 00 03     STA $0300,X
+a7d2: a9 02        LDA #$02
+a7d4: 85 33        STA $33
+a7d6: a5 10        LDA $10
+a7d8: a6 12        LDX $12
+a7da: 95 63        STA $63,X
+a7dc: 18           CLC
+a7dd: 69 04        ADC #$04
+a7df: ca           DEX
+a7e0: d0 f8        BNE +$f8  [$a7da]
+a7e2: 4c 9e be     JMP $be9e
+
+a7e5: 00 00 00 1e 1e 3e fe fe fc f8 00
+a7f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+; Pointers to the prologue text
+a800: 32 a8        .DW $a832
+a802: 49 a8        .DW $a849
+a804: 65 a8        .DW $a865
+a806: af a8        .DW $a8af
+
+; Pointers to the ending text
+a808: e3 a8        .DW $a8e3
+a80a: 21 a9        .DW $a921
+a80c: 6f a9        .DW $a96f
+a80e: b2 a9        .DW $a9b2
+a810: cd a9        .DW $a9cd
+a812: f3 a9        .DW $a9f3
+a814: 16 aa        .DW $aa16
+a816: 5b aa        .DW $aa5b
+a818: 88 aa        .DW $aa88
+a81a: a1 aa        .DW $aaa1
+a81c: d7 aa        .DW $aad7
+a81e: 27 ab        .DW $ab27
+a820: 75 ab        .DW $ab75
+a822: b3 ab        .DW $abb3
+a824: dd ab        .DW $abdd
+a826: 17 ac        .DW $ac17
+a828: 49 ac        .DW $ac49
+a82a: 63 ac        .DW $ac63
+a82c: 85 ac        .DW $ac85
+a82e: ad ac        .DW $acad
+a830: fa ac        .DW $acfa
+
+; Prologue text
+a832: 01 8a 3b 24 b2 bf 1b 1d ac b5 05 ad b2 55 5a bc 31 a8 aa 1f b6 69 00 ; \\And so, their\journey begins....
+a849: a0 ab 39 20 5d 5b b6 1b 1d 05 8f b2 55 bf 1b 1d 4b a7 b2 05 b1 b2 21 ae b1 46 c0 00 ; What awaits the\Four, they do\not know.
+a865: 8e a4 a6 ab 59 b2 af a7 1f aa 20 b1 05 98 9b 8b bf 1b 41 21 82 80 80 80 05 bc a8 2f 1e a4 aa b2 24 ab 1f 40 05 ba ac 1c 31 2b b8 b7 bc 43 b5 49 05 ba ac 1c 1f c0 ff 8b b8 21 b1 46 bf 05 b2 b1 af 4b a7 2f ae b1 2c b6 c0 00 ; Each holding an\ORB, that 2000\years ago shined\with beauty from\within. But now,\only darkness.
+a8af: 8c b2 34 c4 c4 05 9c b7 2f 21 bc 26 b5 05 ad b2 55 5a bc c4 05 9b a8 b7 55 b1 1b ab 1a 68 aa ab b7 05 b2 a9 4f 2b a6 1a 28 ff 26 b5 05 ba b2 b5 af a7 c0 00 ; Come!!\Start your\journey!\Return the light\of peace to our\world.
+
+; Ending text
+a8e3: 9d ab 1a 9d ac 34 c2 95 b2 b2 b3 05 ac b6 ff b1 46 31 4d ae 3a c4 05 9d ab 1a 82 80 80 80 50 2b b5 05 af b2 2a 31 39 b7 af 1a 30 05 b2 b9 25 c0 ff 99 2b 48 05 b3 b5 a8 b9 a4 61 b6 c0 00 ; The Time-Loop\is now broken!\The 2000 year\long battle is\over. Peace\prevails.
+a921: 8c b2 b1 b7 4d af 36 a9 1b 1d 05 a9 b2 b8 44 a8 45 34 b1 b7 b6 bf 05 b7 ab 1a 8e 2f b7 ab bf 1b 1d 05 a0 ac 3b bf 1b ab 1a 8f ac 23 bf 05 a4 b1 a7 1b ab 1a a0 39 25 bf 05 a4 aa a4 1f 31 a8 af b2 2a b6 05 b7 b2 1b ab 1a 2b b5 1c c0 00 ; Control of the\four elements,\the Earth, the\Wind, the Fire,\and the Water,\again belongs\to the earth.
+a96f: 90 a4 b5 af 22 a7 be 1e ab 39 23 a7 05 a5 b8 b5 5a 27 a9 35 ff 82 80 80 80 05 bc a8 2f b6 c0 ff 9d ab 39 05 ab a4 b7 23 27 af 40 1b 1d 05 8f b2 b8 44 99 46 25 b6 1b b2 05 b7 ab ac 1e ba 35 af a7 c0 00 ; Garland's hatred\burned for 2000\years. That\hatred led the\Four Powers to\this world.
+a9b2: 8c 91 8a 98 9c 33 3f 05 a6 b5 2b 53 27 a9 b5 49 05 b7 ab b2 b6 1a 8f 26 b5 c0 00 ; CHAOS was\created from\those Four.
+a9cd: 8e b9 ac 58 a7 49 1f 39 40 05 b7 ab 1a ba 35 af a7 20 3b 05 a6 b2 32 23 27 ac 21 1f 05 a7 a4 b5 ae b1 2c b6 c0 00 ; Evil dominated\the world and\covered it in\darkness.
+a9f3: 8b b8 b7 bf 2d 21 ac 1e b2 b9 25 05 b1 b2 ba bf 33 4d 2a 59 3f 05 a5 a8 3a 24 a8 21 5c aa ab b7 c4 c4 00 ; But, it is over\now, wrong has\been set right!!
+aa16: 9d ab 1a 95 92 90 91 9d 05 a0 8a 9b 9b 92 98 9b 9c 20 23 05 b5 a8 b7 55 b1 1f aa 69 05 8a b6 1b 1d bc 1b b5 a4 32 af 05 ac b1 1b ac 34 bf 1b 1d 05 ba b2 b5 af 27 23 b7 55 b1 b6 05 b7 b2 ff b1 35 b0 5f c0 00 ; The LIGHT\WARRIORS are\returning....\As they travel\in time, the\world returns\to normal.
+aa5b: 9c a4 b5 a4 20 b1 27 93 22 a8 05 ba a4 ac 21 a9 35 1b 1d b0 69 05 98 a9 38 26 b5 3e bf 05 90 a4 b5 af 22 27 a7 b2 2c 05 b7 b2 b2 c0 00 ; Sara and Jane\wait for them....\Of course,\Garland does\too.
+aa88: 01 05 8b b8 b7 bf 33 1d 29 a7 ac 27 5b 05 a8 b9 25 ff 41 b3 b3 3a c5 69 00 ; \\\But, when did it\ever happen?....
+aaa1: 8e b9 25 bc 1c 1f aa 33 3a b7 05 b0 a4 27 1f 20 67 a4 bc c0 05 9d ab 1a 23 3f b2 29 68 2c 05 ac b1 1b ab 1a 82 80 80 80 50 2b b5 05 9d ac 34 c2 95 b2 b2 b3 c0 00 ; Everything went\mad in a day.\The reason lies\in the 2000 year\Time-Loop.
+aad7: 9d ab 1a 8f 26 b5 38 ab b2 3e 05 b7 b2 31 a8 a6 49 1a 3c a8 05 a9 b2 b5 48 bf 20 b1 27 a9 ac aa ab b7 05 a4 aa a4 1f 37 1b ab 1a a9 26 b5 05 a8 b9 61 43 35 a6 2c 1b ab 39 05 b6 a8 21 a7 2f ae b1 2c b6 05 b8 b3 3c 1b ab 1a ba 35 af a7 c0 00 ; The Four chose\to become one\force, and fight\against the four\evil forces that\set darkness\upon the world.
+ab27: a0 ab 3a 1b ab 1a 8f 26 b5 05 b5 a8 b7 55 b1 bf 2d 21 ba ac 4e 05 a5 a8 1b 2e 1c a8 ac b5 05 b3 a4 37 c0 ff 8a 4e 05 b6 ac aa b1 1e 4c 1b 1d 05 a5 a4 b7 b7 af 1a ba ac 1c 1b 1d 05 8f b2 b5 48 1e ba ac 4e 31 a8 05 a8 b5 a4 3e a7 c0 00 ; When the Four\return, it will\be to their\past. All\signs of the\battle with the\Forces will be\erased.
+ab75: 8b b8 b7 1b ab 1a 45 aa 3a a7 05 ba ac 4e 65 ac b9 1a 3c c0 05 99 a4 b6 3e 27 a7 46 29 a5 bc 05 b7 ab 1a 8d ba 2f b9 2c bf 1b 1d 05 8e af b9 2c bf 20 3b 1b 1d 05 8d b5 a4 aa 3c b6 69 00 ; But the legend\will live on.\Passed down by\the Dwarves, the\Elves, and the\Dragons....
+abb3: 99 a4 b6 3e 27 b2 29 a5 bc 05 b3 a8 b2 b3 45 1e b8 b1 b6 b8 23 05 ba ab 25 1a 1c 1a b6 28 b5 bc 05 a6 a4 b0 1a a9 b5 49 c0 00 ; Passed on by\peoples unsure\where the story\came from.
+abdd: 01 9d 1d 05 95 92 90 91 9d ff a0 8a 9b 9b 92 98 9b 9c 05 b5 a8 b7 55 29 a9 b5 49 05 b7 ab a8 ac 44 ad 26 b5 5a bc 05 a5 a4 a6 ae ff 1f 1b ac 34 05 82 80 80 80 50 2b 63 c0 00 ; \\The\LIGHT WARRIORS\return from\their journey\back in time\2000 years.
+ac17: 9d ab 1a 34 b0 35 ac 2c 05 b6 b7 b2 23 27 a7 a8 a8 b3 ff 1f 05 b7 ab a8 ac 44 ab 2b b5 b7 b6 05 ba ac 4e 4f 4d 53 a6 b7 1b 1d 05 ba b2 b5 af a7 c0 00 ; The memories\stored deep in\their hearts\will protect the\world.
+ac49: 01 97 a8 b9 25 43 35 66 b7 05 b7 ab 1a aa b2 b2 a7 20 3b 05 b7 b5 b8 a8 69 00 ; \\Never forget\the good and\true....
+ac63: 01 97 a8 b9 25 1b 55 b1 1b 1d 05 8f b2 b8 44 99 46 25 b6 1b b2 05 b7 ab 1a a7 2f ae 24 ac a7 a8 69 00 ; \\Never turn the\Four Powers to\the dark side....
+ac85: 01 8a 3b 1b b5 b8 1c 33 ac 4e 05 a4 af 5d bc 1e 68 b9 1a 1f 05 b7 ab 1a 1d 2f b7 1e 4c 05 b7 ab 1a b3 a8 b2 b3 45 c0 00 ; \\And truth will\always live in\the hearts of\the people.
+acad: 01 9d ab 1a a0 2f 5c 35 33 ab b2 05 a5 b5 b2 ae 1a 1c 1a 82 80 80 80 05 bc a8 2f ff 9d ac 34 c2 95 b2 b2 b3 05 ac b6 1b b5 b8 af bc 20 05 95 92 90 91 9d ff a0 8a 9b 9b 92 98 9b 69 05 9d ab a4 21 ba 2f 5c 35 33 3f 05 a2 98 9e c4 00 ; \\The Warrior who\broke the 2000\year Time-Loop\is truly a\LIGHT WARRIOR....\That warrior was\YOU!
+acfa: 01 96 a4 bc 1b ab 1a 98 9b 8b 9c 05 a4 af 5d bc 1e b6 ab 1f a8 c4 c4 69 00 ; \\May the ORBS\always shine!!....
+
+; garbage text?
+ad13: 1b 55 b1 1b 1d 05 84 ff b3 46 25 b6 1b 2e 1c a8 05 a7 a4 b5 ae 24 ac a7 a8 c0 00 ; " turn the\4 powers to the\dark side."
+ad2e: 8a b1 a7 1b ab 1a b7 b5 b8 a8 05 a6 b5 bc 37 5f 1e a4 af 5d bc b6 05 af ac b9 1a ba ac 1c 1f 05 b3 a8 b2 b3 45 be 1e 1d 2f b7 b6 c0 00 ; And the true\crystals always\live within\people's hearts.
+ad5b: 9d ab 1a a0 2f 5c 35 1b ab 39 05 a9 b2 b8 aa ab 21 b3 a4 37 05 82 80 80 80 bc 2b b5 1e 4c 05 b7 ac b0 1a 5d 1e bc 26 c4 00 ; The Warrior that\fought past\2000years of\time was you!
+ad84: 01 96 a4 bc 20 4e 1b ab 1f aa b6 05 ff a6 26 b1 b7 1f b8 1a 28 05 ff ff 24 ab 1f a8 69 00 ; \\May all things\ countinue to\   shine....
+
+; completely garbage text?
+ada2: 69 00                                                  ; ....
+ada4: c3 00                                                  ; ..
+ada6: bc 5a c0 00                                            ; yne.
+adaa: 01 96 a4 bc ff a4 af 51 b7 43 b1 3f 05 bf 0a a6 b2 b8 b1 b7 47 b8 37 b7 5c b6 43 57 69 00 ; \\May alcat fnas\,<0a>countg usttris fti....
+
+; unused?
+adc8: 00           BRK
+adc9: 00           BRK
+adca: 00           BRK
+adcb: 00           BRK
+adcc: 00           BRK
+adcd: 00           BRK
+adce: 00           BRK
+adcf: 00           BRK
+add0: 00           BRK
+add1: 00           BRK
+add2: 00           BRK
+add3: 00           BRK
+add4: 00           BRK
+add5: 00           BRK
+add6: 00           BRK
+add7: 00           BRK
+add8: 00           BRK
+add9: 00           BRK
+adda: 00           BRK
+addb: 00           BRK
+addc: 00           BRK
+addd: 00           BRK
+adde: 00           BRK
+addf: 00           BRK
+ade0: 00           BRK
+ade1: 00           BRK
+ade2: 00           BRK
+ade3: 00           BRK
+ade4: 00           BRK
+ade5: 00           BRK
+ade6: 00           BRK
+ade7: 00           BRK
+ade8: 00           BRK
+ade9: 00           BRK
+adea: 00           BRK
+adeb: 00           BRK
+adec: 00           BRK
+aded: 00           BRK
+adee: 00           BRK
+adef: 00           BRK
+adf0: 00           BRK
+adf1: 00           BRK
+adf2: 00           BRK
+adf3: 00           BRK
+adf4: 00           BRK
+adf5: 00           BRK
+adf6: 00           BRK
+adf7: 00           BRK
+adf8: 00           BRK
+adf9: 00           BRK
+adfa: 00           BRK
+adfb: 00           BRK
+adfc: 00           BRK
+adfd: 00           BRK
+adfe: 00           BRK
+adff: 00           BRK
+
+ae00: 04           .DB $04   ; end index of prologe text "lines"
+ae01: 19           .DB $19   ; end index of ending text "lines"
+
+ae02: a5 4b 10 12 c9 80 d0 0d a9 70 8d 00 40 8d
+
+; SHIP GAME!
+ae10: a9 00        LDA #$00
+ae12: 85 37        STA $37
+ae14: 8d 01 20     STA $2001   ; turn off BG/sprites
+ae17: 8d 15 40     STA $4015
+ae1a: a9 08        LDA #$08
+ae1c: 85 ff        STA $ff
+ae1e: a9 0d        LDA #$0d
+ae20: 85 57        STA $57
+ae22: a9 05        LDA #$05
+ae24: 85 39        STA $39
+ae26: a9 08        LDA #$08
+ae28: 85 38        STA $38
+ae2a: a9 0a        LDA #$0a
+ae2c: 85 3c        STA $3c
+ae2e: 85 3d        STA $3d
+ae30: 20 06 c0     JSR $c006   ; Draw $3c by $3d window at ($38,$39), slowly if $37, and ($3a,$3b)=($38,$39)+(1,2)
+ae33: a9 9e        LDA #$9e
+ae35: 85 11        STA $11
+ae37: 85 13        STA $13
+ae39: ad 02 20     LDA $2002   ; clear v-blank flag
+ae3c: a9 10        LDA #$10    ; upload ship game tiles to VRAM
+ae3e: 8d 06 20     STA $2006
+ae41: a9 00        LDA #$00
+ae43: 8d 06 20     STA $2006
+ae46: 85 10        STA $10
+ae48: a0 00        LDY #$00
+ae4a: b1 10        LDA ($10),Y
+ae4c: 8d 07 20     STA $2007
+ae4f: c8           INY
+ae50: c0 08        CPY #$08
+ae52: 90 f6        BCC +$f6  [$ae4a]
+ae54: a5 10        LDA $10
+ae56: 29 1f        AND #$1f
+ae58: 85 12        STA $12
+ae5a: a0 00        LDY #$00
+ae5c: b1 12        LDA ($12),Y
+ae5e: 8d 07 20     STA $2007
+ae61: c8           INY
+ae62: c0 08        CPY #$08
+ae64: 90 f6        BCC +$f6  [$ae5c]
+ae66: a5 10        LDA $10
+ae68: 18           CLC
+ae69: 69 08        ADC #$08
+ae6b: 85 10        STA $10
+ae6d: d0 d9        BNE +$d9  [$ae48]
+ae6f: e6 11        INC $11
+ae71: a5 11        LDA $11
+ae73: c9 a0        CMP #$a0
+ae75: 90 d1        BCC +$d1  [$ae48]
+ae77: a2 0f        LDX #$0f    ; copy ship game tile initial positions
+ae79: bd b8 af     LDA $afb8,X
+ae7c: 9d 00 03     STA $0300,X
+ae7f: ca           DEX
+ae80: 10 f7        BPL +$f7  [$ae79]
+ae82: 20 a0 9d     JSR $9da0   ; Shuffle tiles
+ae85: a9 42        LDA #$42    ; Set music
+ae87: 85 4b        STA $4b
+ae89: a2 0f        LDX #$0f
+ae8b: bd 00 bf     LDA $bf00,X ; Load ship game palettes
+ae8e: 9d c0 03     STA $03c0,X
+ae91: ca           DEX
+ae92: 10 f7        BPL +$f7  [$ae8b]
+ae94: a9 30        LDA #$30
+ae96: 8d d3 03     STA $03d3
+ae99: a9 15        LDA #$15
+ae9b: 8d d2 03     STA $03d2
+ae9e: 20 ab af     JSR $afab   ; $0200-02ff = #$f8
+aea1: 20 00 fe     JSR $fe00   ; wait for V-blank
+aea4: a9 02        LDA #$02    ; upload sprites
+aea6: 8d 14 40     STA $4014
+aea9: 20 0f c0     JSR $c00f   ; Upload palettes: BG at $03c0, sprite at $03d0
+aeac: a5 ff        LDA $ff     ; enable display
+aeae: 8d 00 20     STA $2000
+aeb1: a9 1e        LDA #$1e
+aeb3: 8d 01 20     STA $2001
+aeb6: a9 00        LDA #$00
+aeb8: 8d 05 20     STA $2005
+aebb: 8d 05 20     STA $2005
+aebe: 85 24        STA $24
+aec0: 85 25        STA $25
+aec2: 85 61        STA $61
+aec4: 85 20        STA $20
+aec6: 85 62        STA $62
+aec8: ad 00 03     LDA $0300
+aecb: d0 02        BNE +$02  [$aecf]
+aecd: e6 62        INC $62
+aecf: e6 f0        INC $f0
+aed1: 20 00 fe     JSR $fe00   ; wait for V-blank
+aed4: a9 02        LDA #$02    ; upload sprites
+aed6: 8d 14 40     STA $4014
+aed9: 20 00 b0     JSR $b000   ; Start music or play current notes
+aedc: 20 00 be     JSR $be00
+aedf: 20 c8 af     JSR $afc8
+aee2: a5 25        LDA $25
+aee4: d0 0a        BNE +$0a  [$aef0]
+aee6: a5 24        LDA $24
+aee8: d0 08        BNE +$08  [$aef2]
+aeea: 20 5b af     JSR $af5b   ; check if won
+aeed: 90 e0        BCC +$e0  [$aecf]
+aeef: 60           RTS
+aef0: 18           CLC
+aef1: 60           RTS
+aef2: a9 00        LDA #$00
+aef4: aa           TAX
+aef5: 85 24        STA $24
+aef7: 85 f0        STA $f0
+aef9: a9 80        LDA #$80
+aefb: 85 64        STA $64
+aefd: 85 65        STA $65
+aeff: 85 66        STA $66
+af01: a5 62        LDA $62
+af03: 85 10        STA $10
+af05: bd 00 03     LDA $0300,X
+af08: f0 03        BEQ +$03  [$af0d]
+af0a: e8           INX
+af0b: d0 f8        BNE +$f8  [$af05]
+af0d: 8a           TXA
+af0e: 85 11        STA $11
+af10: a5 10        LDA $10
+af12: 29 03        AND #$03
+af14: 85 12        STA $12
+af16: a5 11        LDA $11
+af18: 29 03        AND #$03
+af1a: c5 12        CMP $12
+af1c: f0 29        BEQ +$29  [$af47]
+af1e: a5 10        LDA $10
+af20: 29 0c        AND #$0c
+af22: 85 12        STA $12
+af24: a5 11        LDA $11
+af26: 29 0c        AND #$0c
+af28: c5 12        CMP $12
+af2a: f0 21        BEQ +$21  [$af4d]
+af2c: a9 3c        LDA #$3c
+af2e: 8d 04 40     STA $4004
+af31: a9 8c        LDA #$8c
+af33: 8d 05 40     STA $4005
+af36: a9 70        LDA #$70
+af38: 8d 06 40     STA $4006
+af3b: a9 00        LDA #$00
+af3d: 8d 07 40     STA $4007
+af40: a9 14        LDA #$14
+af42: 85 7e        STA $7e
+af44: 4c cf ae     JMP $aecf
+af47: 20 00 be     JSR $be00
+af4a: 4c 80 a7     JMP $a780
+af4d: 20 00 be     JSR $be00
+af50: 4c a0 ba     JMP $baa0
+
+af53: 00           BRK
+af54: 00           BRK
+af55: 01 ff        ORA ($ff,X)
+af57: 01 ff        ORA ($ff,X)
+af59: 00           BRK
+af5a: 00           BRK
+
+; check if ship game won
+af5b: a2 01        LDX #$01
+af5d: ad 00 03     LDA $0300
+af60: 18           CLC
+af61: 69 01        ADC #$01
+af63: dd 00 03     CMP $0300,X
+af66: d0 41        BNE +$41  [$afa9]
+af68: e8           INX
+af69: e0 0f        CPX #$0f
+af6b: 90 f3        BCC +$f3  [$af60]
+af6d: a9 54        LDA #$54     ; Play "Won" music
+af6f: 85 4b        STA $4b
+af71: a9 12        LDA #$12
+af73: 85 62        STA $62
+af75: 20 00 be     JSR $be00
+af78: a9 00        LDA #$00
+af7a: 85 24        STA $24
+af7c: 85 25        STA $25
+af7e: 20 00 fe     JSR $fe00   ; wait for V-blank
+af81: a9 02        LDA #$02    ; upload sprites
+af83: 8d 14 40     STA $4014
+af86: 20 0f c0     JSR $c00f   ; Upload palettes: BG at $03c0, sprite at $03d0
+af89: 20 00 b0     JSR $b000   ; Start music or play current notes
+af8c: a9 00        LDA #$00
+af8e: 8d 05 20     STA $2005
+af91: 8d 05 20     STA $2005
+af94: e6 f0        INC $f0
+af96: a5 f0        LDA $f0
+af98: 0a           ASL
+af99: 29 30        AND #$30
+af9b: 8d d3 03     STA $03d3
+af9e: 20 c8 af     JSR $afc8
+afa1: a5 24        LDA $24
+afa3: 05 25        ORA $25
+afa5: f0 d7        BEQ +$d7  [$af7e]
+afa7: 38           SEC
+afa8: 60           RTS
+afa9: 18           CLC
+afaa: 60           RTS
+
+; $0200-02ff = #$f8
+afab: a2 00        LDX #$00
+afad: 86 26        STX $26
+afaf: a9 f8        LDA #$f8
+afb1: 9d 00 02     STA $0200,X
+afb4: e8           INX
+afb5: d0 fa        BNE +$fa  [$afb1]
+afb7: 60           RTS
+
+; initial positions of the ship game tiles
+afb8: 0f 04 0c 08 01 06 0d 09 00 05 0b 03 07 0e 02 0a
+
+afc8: 20 0c c0     JSR $c00c   ; Get button presses in $20-$25
+afcb: a5 20        LDA $20
+afcd: 29 0f        AND #$0f
+afcf: c5 61        CMP $61
+afd1: f0 2a        BEQ +$2a  [$affd]
+afd3: 85 61        STA $61
+afd5: c9 00        CMP #$00
+afd7: f0 24        BEQ +$24  [$affd]
+afd9: c9 04        CMP #$04
+afdb: b0 0a        BCS +$0a  [$afe7]
+afdd: a2 01        LDX #$01
+afdf: c9 01        CMP #$01
+afe1: f0 0c        BEQ +$0c  [$afef]
+afe3: a2 ff        LDX #$ff
+afe5: d0 08        BNE +$08  [$afef]
+afe7: a2 04        LDX #$04
+afe9: c9 04        CMP #$04
+afeb: f0 02        BEQ +$02  [$afef]
+afed: a2 fc        LDX #$fc
+afef: 8a           TXA
+aff0: 18           CLC
+aff1: 65 62        ADC $62
+aff3: 29 0f        AND #$0f
+aff5: 85 62        STA $62
+aff7: a8           TAY
+aff8: b9 00 03     LDA $0300,Y
+affb: f0 f2        BEQ +$f2  [$afef]
+affd: 60           RTS
+affe: 60           RTS
+
+afff: 00
+
+; Start music or play current notes
+b000: 4c 99 b0     JMP $b099
+
+; Start music in A if A>=0x40, w[$18] = pointer to next music track
+b003: c9 40        CMP #$40     ; Starting new music?
+b005: 90 2f        BCC +$2f  [$b036]
+b007: 29 3f        AND #$3f     ; Yes, set up variables
+b009: 85 4b        STA $4b
+b00b: a9 00        LDA #$00
+b00d: 85 4c        STA $4c
+b00f: a9 00        LDA #$00
+b011: 85 7e        STA $7e
+b013: 8d 02 40     STA $4002    ; Reset all channels
+b016: 8d 03 40     STA $4003
+b019: 8d 06 40     STA $4006
+b01c: 8d 07 40     STA $4007
+b01f: 8d 0a 40     STA $400a
+b022: 8d 0b 40     STA $400b
+b025: 8d 0e 40     STA $400e
+b028: a9 30        LDA #$30
+b02a: 8d 00 40     STA $4000
+b02d: 8d 04 40     STA $4004
+b030: 8d 08 40     STA $4008
+b033: 8d 0c 40     STA $400c
+b036: a5 4b        LDA $4b    ; Load current music
+b038: 38           SEC
+b039: e9 01        SBC #$01
+b03b: 0a           ASL
+b03c: 0a           ASL
+b03d: 0a           ASL
+b03e: 05 4c        ORA $4c
+b040: 85 10        STA $10    ; w[$10] = pointer to channel pointers for current song
+b042: a9 80        LDA #$80
+b044: 85 11        STA $11
+b046: a6 4c        LDX $4c
+b048: bd 91 b0     LDA $b091,X ; load location of song data for this channel
+b04b: 85 4d        STA $4d
+b04d: aa           TAX
+b04e: a0 00        LDY #$00
+b050: b1 10        LDA ($10),Y ; w[X] = start of song data
+b052: 95 00        STA $00,X
+b054: c8           INY
+b055: b1 10        LDA ($10),Y
+b057: 95 01        STA $01,X
+b059: 20 89 b1     JSR $b189   ; Process sound commands for channel X
+b05c: a5 4c        LDA $4c     ; prepare to process next channel on the next call
+b05e: 18           CLC
+b05f: 69 02        ADC #$02
+b061: 85 4c        STA $4c
+b063: c9 06        CMP #$06
+b065: 90 29        BCC +$29  [$b090]
+b067: a9 00        LDA #$00     ; All channels set up => begin music?
+b069: 85 4b        STA $4b
+b06b: a9 00        LDA #$00
+b06d: 85 bd        STA $bd
+b06f: 85 cd        STA $cd
+b071: 85 dd        STA $dd
+b073: 85 ed        STA $ed
+b075: a9 0f        LDA #$0f     ; Stop DMC
+b077: 8d 15 40     STA $4015
+b07a: a9 00        LDA #$00
+b07c: 85 7e        STA $7e
+b07e: 8d 02 40     STA $4002    ; S1/S2/T period=0
+b081: 8d 03 40     STA $4003
+b084: 8d 06 40     STA $4006
+b087: 8d 07 40     STA $4007
+b08a: 8d 0a 40     STA $400a
+b08d: 8d 0b 40     STA $400b
+b090: 60           RTS
+
+; Offsets of channel data structs
+b091: b0 b0 c0 c0 d0 d0 e0 e0
+
+b099: a5 4b        LDA $4b
+b09b: 10 12        BPL +$12  [$b0af]
+b09d: c9 80        CMP #$80
+b09f: d0 0d        BNE +$0d  [$b0ae]
+b0a1: a9 70        LDA #$70     ; Silence S1/S2/T
+b0a3: 8d 00 40     STA $4000
+b0a6: 8d 04 40     STA $4004
+b0a9: 8d 08 40     STA $4008
+b0ac: e6 4b        INC $4b
+b0ae: 60           RTS
+b0af: f0 03        BEQ +$03  [$b0b4]
+b0b1: 4c 03 b0     JMP $b003    ; Start music in A if A>=0x40, w[$18] = pointer to next music channel
+b0b4: a5 bf        LDA $bf      ;; S1: new note, or just change volume?
+b0b6: 30 1d        BMI +$1d  [$b0d5]
+b0b8: a5 bc        LDA $bc      ; NEW NOTE: volume, 25% duty cycle
+b0ba: 09 70        ORA #$70
+b0bc: 8d 00 40     STA $4000
+b0bf: a9 7f        LDA #$7f     ; shifter off
+b0c1: 8d 01 40     STA $4001
+b0c4: a5 be        LDA $be      ; period (low 8 bits)
+b0c6: 8d 02 40     STA $4002
+b0c9: a5 bf        LDA $bf      ; period (high 3 bits)
+b0cb: 8d 03 40     STA $4003
+b0ce: a9 80        LDA #$80
+b0d0: 85 bf        STA $bf
+b0d2: 4c e1 b0     JMP $b0e1
+b0d5: a5 bc        LDA $bc      ; CHANGE VOLUME: colume, 25% duty cycle
+b0d7: 09 70        ORA #$70
+b0d9: 8d 00 40     STA $4000
+b0dc: a9 7f        LDA #$7f     ; shifter off
+b0de: 8d 01 40     STA $4001
+b0e1: a5 7e        LDA $7e      ;; S2: Silence
+b0e3: f0 06        BEQ +$06  [$b0eb]
+b0e5: c6 7e        DEC $7e
+b0e7: d0 31        BNE +$31  [$b11a]
+b0e9: f0 04        BEQ +$04  [$b0ef]
+b0eb: a5 cf        LDA $cf
+b0ed: 30 1f        BMI +$1f  [$b10e]
+b0ef: a5 cc        LDA $cc     ; As with S1, start new note
+b0f1: 09 30        ORA #$30
+b0f3: 8d 04 40     STA $4004
+b0f6: a9 7f        LDA #$7f
+b0f8: 8d 05 40     STA $4005
+b0fb: a5 ce        LDA $ce
+b0fd: 8d 06 40     STA $4006
+b100: a5 cf        LDA $cf
+b102: 29 0f        AND #$0f
+b104: 8d 07 40     STA $4007
+b107: 09 80        ORA #$80
+b109: 85 cf        STA $cf
+b10b: 4c 1a b1     JMP $b11a
+b10e: a5 cc        LDA $cc    ; As with S1, set volume
+b110: 09 30        ORA #$30
+b112: 8d 04 40     STA $4004
+b115: a9 7f        LDA #$7f
+b117: 8d 05 40     STA $4005
+b11a: a5 df        LDA $df      ;; T: start new note, or just set volume?
+b11c: 30 16        BMI +$16  [$b134]
+b11e: a9 8f        LDA #$8f     ; ??
+b120: 8d 08 40     STA $4008
+b123: a5 de        LDA $de      ; Set period
+b125: 8d 0a 40     STA $400a
+b128: a5 df        LDA $df
+b12a: 8d 0b 40     STA $400b
+b12d: a9 80        LDA #$80
+b12f: 85 df        STA $df
+b131: 4c 3d b1     JMP $b13d
+b134: c9 ff        CMP #$ff
+b136: d0 05        BNE +$05  [$b13d]
+b138: a9 80        LDA #$80     ; Turn off?
+b13a: 8d 08 40     STA $4008
+b13d: a9 b0        LDA #$b0     ;; For each channel, set up the next note (either incrementing the instrument or processing a new command)
+b13f: 85 4d        STA $4d
+b141: a6 4d        LDX $4d
+b143: d6 05        DEC $05,X
+b145: d0 08        BNE +$08  [$b14f]
+b147: 20 89 b1     JSR $b189    ; Process sound commands for channel X
+b14a: b5 04        LDA $04,X
+b14c: 4c 68 b1     JMP $b168
+b14f: b5 0a        LDA $0a,X    ;; Increment instrument index
+b151: 18           CLC
+b152: 75 0b        ADC $0b,X
+b154: 95 0b        STA $0b,X
+b156: c9 08        CMP #$08
+b158: 90 23        BCC +$23  [$b17d]
+b15a: 85 10        STA $10
+b15c: 29 07        AND #$07
+b15e: 95 0b        STA $0b,X
+b160: a5 10        LDA $10
+b162: 4a           LSR
+b163: 4a           LSR
+b164: 4a           LSR
+b165: 18           CLC
+b166: 75 04        ADC $04,X
+b168: c9 20        CMP #$20     ; Queue up next volume adjustment from the instrument.
+b16a: 90 02        BCC +$02  [$b16e]
+b16c: a9 1f        LDA #$1f
+b16e: 95 04        STA $04,X
+b170: a8           TAY
+b171: b5 02        LDA $02,X
+b173: 85 10        STA $10
+b175: b5 03        LDA $03,X
+b177: 85 11        STA $11
+b179: b1 10        LDA ($10),Y
+b17b: 95 0c        STA $0c,X
+b17d: a5 4d        LDA $4d
+b17f: 18           CLC
+b180: 69 10        ADC #$10
+b182: 85 4d        STA $4d
+b184: c9 e0        CMP #$e0
+b186: 90 b9        BCC +$b9  [$b141]
+b188: 60           RTS
+
+; Process song commands for channel X
+b189: b5 00        LDA $00,X    ; w[$18] = pointer to song data
+b18b: 85 18        STA $18
+b18d: b5 01        LDA $01,X
+b18f: 85 19        STA $19
+b191: 4c a3 b1     JMP $b1a3
+b194: 18           CLC          ; Loop back point: add A to song pointer
+b195: 75 00        ADC $00,X
+b197: 95 00        STA $00,X
+b199: 85 18        STA $18
+b19b: b5 01        LDA $01,X
+b19d: 69 00        ADC #$00
+b19f: 95 01        STA $01,X
+b1a1: 85 19        STA $19
+b1a3: a0 00        LDY #$00     ; load next command
+b1a5: b1 18        LDA ($18),Y
+b1a7: c9 c0        CMP #$c0     ;; 00-BF are normal notes
+b1a9: b0 11        BCS +$11  [$b1bc]
+b1ab: 20 50 b2     JSR $b250    ; Load period and duration for note A into channel X struct
+b1ae: b5 00        LDA $00,X    ; inc pointer and return
+b1b0: 18           CLC
+b1b1: 69 01        ADC #$01
+b1b3: 95 00        STA $00,X
+b1b5: b5 01        LDA $01,X
+b1b7: 69 00        ADC #$00
+b1b9: 95 01        STA $01,X
+b1bb: 60           RTS
+b1bc: c9 d0        CMP #$d0     ;; C0-CF are rests (but some instruments will continue playing?)
+b1be: b0 06        BCS +$06  [$b1c6]
+b1c0: 20 5a b2     JSR $b25a    ; 5,X = p[X+8],(A&15), and $df=0xff if channel T
+b1c3: 4c ae b1     JMP $b1ae
+b1c6: c9 d8        CMP #$d8     ;; D0-D7 are loops
+b1c8: b0 06        BCS +$06  [$b1d0]
+b1ca: 20 17 b2     JSR $b217    ; Handle music looping
+b1cd: 4c a3 b1     JMP $b1a3
+b1d0: c9 e0        CMP #$e0     ;; D8-DF are octave selection
+b1d2: b0 08        BCS +$08  [$b1dc]
+b1d4: 20 cd b2     JSR $b2cd    ; w[X+6] = pointer to octave indicated by (A&7)
+b1d7: a9 01        LDA #$01
+b1d9: 4c 94 b1     JMP $b194
+b1dc: c9 f0        CMP #$f0     ;; E0-EF are instrument selection
+b1de: b0 08        BCS +$08  [$b1e8]
+b1e0: 20 df b2     JSR $b2df    ; w[X+2] = pointer to "Instrument" number (Y<<4)+A
+b1e3: a9 01        LDA #$01
+b1e5: 4c 94 b1     JMP $b194
+b1e8: c9 ff        CMP #$ff     ;; FF is end music.
+b1ea: d0 05        BNE +$05  [$b1f1]
+b1ec: a9 80        LDA #$80
+b1ee: 85 4b        STA $4b
+b1f0: 60           RTS
+b1f1: c9 f8        CMP #$f8     ;; F8 sets the envelope adjustment speed, next byte 0-F selects
+b1f3: d0 11        BNE +$11  [$b206]
+b1f5: a0 01        LDY #$01
+b1f7: b1 18        LDA ($18),Y
+b1f9: 29 0f        AND #$0f
+b1fb: a8           TAY
+b1fc: b9 b9 b3     LDA $b3b9,Y
+b1ff: 95 0a        STA $0a,X
+b201: a9 02        LDA #$02
+b203: 4c 94 b1     JMP $b194
+b206: c9 f9        CMP #$f9     ;; F9-FE are 
+b208: 90 08        BCC +$08  [$b212]
+b20a: 20 b8 b2     JSR $b2b8    ; w[X+8] = pointer to note length set A
+b20d: a9 01        LDA #$01
+b20f: 4c 94 b1     JMP $b194
+b212: a9 01        LDA #$01     ;; F0-F7 are NOPs
+b214: 4c 94 b1     JMP $b194
+
+; Handle music looping
+b217: 29 0f        AND #$0f
+b219: 85 10        STA $10
+b21b: b5 0d        LDA $0d,X    ; Not currently looping? Start loop
+b21d: f0 2a        BEQ +$2a  [$b249]
+b21f: d6 0d        DEC $0d,X    ; Currently looping, dec counter
+b221: d0 12        BNE +$12  [$b235]
+b223: b5 00        LDA $00,X    ; Counter 0, point to after the loop command
+b225: 18           CLC
+b226: 69 03        ADC #$03
+b228: 95 00        STA $00,X
+b22a: 85 18        STA $18
+b22c: b5 01        LDA $01,X
+b22e: 69 00        ADC #$00
+b230: 95 01        STA $01,X
+b232: 85 19        STA $19
+b234: 60           RTS
+b235: a0 01        LDY #$01    ; Have to loop, so set the current position to
+b237: b1 18        LDA ($18),Y ;  the loop point
+b239: 95 00        STA $00,X
+b23b: 85 10        STA $10
+b23d: c8           INY
+b23e: b1 18        LDA ($18),Y
+b240: 95 01        STA $01,X
+b242: 85 19        STA $19
+b244: a5 10        LDA $10
+b246: 85 18        STA $18
+b248: 60           RTS
+b249: a5 10        LDA $10
+b24b: 95 0d        STA $0d,X
+b24d: 4c 35 b2     JMP $b235
+
+; Load period and duration for note A into channel X struct
+b250: 85 1e        STA $1e
+b252: 20 68 b2     JSR $b268    ; If channel N, w[X+e]=(A>>4)+4, Otherwise w[X+e]=period for note A>>4
+b255: a5 1e        LDA $1e
+b257: 4c 92 b2     JMP $b292    ; 5,X = p[X+8],(A&15), 4,X=0, b,X=0
+
+; 5,X = p[X+8],(A&15), and $df=0xff if channel T
+b25a: 20 a8 b2     JSR $b2a8    ; 5,X = p[X+8],(A&15)
+b25d: a5 4d        LDA $4d
+b25f: c9 d0        CMP #$d0
+b261: d0 04        BNE +$04  [$b267]
+b263: a9 ff        LDA #$ff
+b265: 85 df        STA $df
+b267: 60           RTS
+
+; If channel N, w[X+e]=(A>>4)+4
+; Otherwise w[X+e]=period for note A>>4
+b268: e0 e0        CPX #$e0
+b26a: d0 0e        BNE +$0e  [$b27a]
+b26c: 4a           LSR
+b26d: 4a           LSR
+b26e: 4a           LSR
+b26f: 4a           LSR
+b270: 18           CLC
+b271: 69 04        ADC #$04
+b273: 95 0e        STA $0e,X
+b275: a9 00        LDA #$00
+b277: 95 0f        STA $0f,X
+b279: 60           RTS
+b27a: 4a           LSR
+b27b: 4a           LSR
+b27c: 4a           LSR
+b27d: 29 1e        AND #$1e
+b27f: a8           TAY
+b280: b5 06        LDA $06,X
+b282: 85 10        STA $10
+b284: b5 07        LDA $07,X
+b286: 85 11        STA $11
+b288: b1 10        LDA ($10),Y
+b28a: 95 0e        STA $0e,X
+b28c: c8           INY
+b28d: b1 10        LDA ($10),Y
+b28f: 95 0f        STA $0f,X
+b291: 60           RTS
+
+; 5,X = p[X+8],(A&15), 4,X=0, b,X=0
+b292: 29 0f        AND #$0f
+b294: a8           TAY
+b295: b5 08        LDA $08,X
+b297: 85 10        STA $10
+b299: b5 09        LDA $09,X
+b29b: 85 11        STA $11
+b29d: b1 10        LDA ($10),Y
+b29f: 95 05        STA $05,X
+b2a1: a9 00        LDA #$00
+b2a3: 95 04        STA $04,X
+b2a5: 95 0b        STA $0b,X
+b2a7: 60           RTS
+
+; 5,X = p[X+8],(A&15)
+b2a8: 29 0f        AND #$0f
+b2aa: a8           TAY
+b2ab: b5 08        LDA $08,X
+b2ad: 85 10        STA $10
+b2af: b5 09        LDA $09,X
+b2b1: 85 11        STA $11
+b2b3: b1 10        LDA ($10),Y
+b2b5: 95 05        STA $05,X
+b2b7: 60           RTS
+
+; w[X+8] = pointer to note length set A
+b2b8: 38           SEC
+b2b9: e9 09        SBC #$09
+b2bb: 29 0f        AND #$0f
+b2bd: 0a           ASL
+b2be: 0a           ASL
+b2bf: 0a           ASL
+b2c0: 0a           ASL
+b2c1: 18           CLC
+b2c2: 69 59        ADC #$59
+b2c4: 95 08        STA $08,X
+b2c6: a9 b3        LDA #$b3
+b2c8: 69 00        ADC #$00
+b2ca: 95 09        STA $09,X
+b2cc: 60           RTS
+
+; w[X+6] = pointer to octave indicated by (A&7)
+b2cd: 29 07        AND #$07
+b2cf: a8           TAY
+b2d0: a9 f9        LDA #$f9
+b2d2: 18           CLC
+b2d3: 79 f3 b2     ADC $b2f3,Y
+b2d6: 95 06        STA $06,X
+b2d8: a9 b2        LDA #$b2
+b2da: 69 00        ADC #$00
+b2dc: 95 07        STA $07,X
+b2de: 60           RTS
+
+; w[X+2] = pointer to "Instrument" number (Y<<4)+A
+b2df: 84 1f        STY $1f
+b2e1: 0a           ASL
+b2e2: 0a           ASL
+b2e3: 0a           ASL
+b2e4: 0a           ASL
+b2e5: 0a           ASL
+b2e6: 26 1f        ROL $1f
+b2e8: 69 c9        ADC #$c9
+b2ea: 95 02        STA $02,X
+b2ec: a9 b3        LDA #$b3
+b2ee: 65 1f        ADC $1f
+b2f0: 95 03        STA $03,X
+b2f2: 60           RTS
+
+; Offsets from b2f9 for each octave
+b2f3: 00 18 30 48
+
+; Seems like these should be two more octaves, but the octave data isn't there.
+b2f7: 60 78
+
+; Note periods for the lowest octave. 2 bytes each.
+b2f9: 57 03 27 03 fa 02 cf 02
+b301: a7 02 81 02 5d 02 3b 02
+b309: 1b 02 fc 01 e0 01 c5 01
+
+; ... second octave
+b311: ab 01 93 01 7d 01 67 01
+b319: 53 01 40 01 2e 01 1d 01
+b321: 0d 01 fe 00 f0 00 e2 00
+
+; ... third octave
+b329: d6 00 ca 00 be 00 b4 00
+b331: aa 00 a0 00 97 00 8f 00
+b339: 87 00 7f 00 78 00 71 00
+
+; ... highest octave
+b341: 6b 00 65 00 5f 00 5a 00
+b349: 55 00 50 00 4c 00 47 00
+b351: 43 00 40 00 3c 00 39 00
+
+; Note lengths
+b359: c0 60 30 18 0c 90 48 24 c0 60 30 18 0c 90 48 24  ; selected by F9
+b369: 78 3c 1e 0f 07 5a 28 14 78 3c 1e 0f 07 5a 28 14  ; selected by FA
+b379: 90 60 48 30 24 18 12 0c 09 06 03 03 04 10 08 08  ; selected by FB
+b389: 78 50 3c 28 1e 14 0f 0a 07 05 03 02 0e 0d 07 06  ; selected by FC
+b399: 6c 48 36 24 1b 12 0e 09 07 04 03 03 0e 60 40 30  ; selected by FD
+b3a9: 60 40 30 20 18 10 0c 08 06 04 02 02 0b 0a 06 05  ; selected by FE
+
+; Envelope adjustment speeds
+b3b9: 80 60 40 30 20 18 10 0c 08 06 04 03 02 01 00 00
+
+; "Instruments", basically these are the attack volume envelopes with the last
+; value being the sustain level
+b3c9: 0f 0f 0e 0e 0d 0d 0c 0c 0b 0b 0a 0a 09 09 08 08
+b3d9: 07 07 06 06 05 05 04 04 03 03 02 02 01 01 00 00
+
+b3e9: 0c 0c 0c 0b 0b 0b 0a 0a 0a 09 09 09 08 08 08 07
+b3f9: 07 06 06 06 05 05 04 04 03 03 02 02 01 01 00 00
+
+b409: 08 08 08 08 07 07 07 07 06 06 06 06 05 05 05 05
+b419: 04 04 04 04 03 03 03 03 02 02 02 02 01 01 00 00
+
+b429: 04 04 04 04 04 04 04 04 03 03 03 03 03 03 03 03
+b439: 03 03 03 03 03 03 03 02 02 02 02 02 02 00 00 00
+
+b449: 0f 0f 0e 0e 0d 0d 0c 0c 0b 0b 0a 0a 09 09 08 08
+b459: 08 08 09 09 0a 0a 0b 0b 0c 0c 0d 0d 0e 0e 0f 0f
+
+b469: 0c 0c 0b 0b 0a 0a 09 09 08 08 07 07 06 06 05 05
+b479: 04 04 05 05 06 06 07 07 08 08 09 09 0a 0a 0b 0b
+
+b489: 08 08 07 07 06 06 05 05 04 04 03 03 02 02 01 01
+b499: 01 01 02 02 03 03 04 04 05 05 06 06 07 07 08 08
+
+b4a9: 0f 0f 0f 0f 0f 0f 0f 0f 0e 0e 0c 0c 0b 0b 0a 0a
+b4b9: 09 09 08 08 07 07 06 06 05 05 04 04 04 03 03 03
+
+b4c9: 0c 0c 0c 0c 0c 0c 0c 0c 0b 0b 0a 0a 09 09 08 08
+b4d9: 06 06 05 05 04 04 04 03 03 03 02 02 02 02 02 02
+
+b4e9: 04 04 04 04 04 04 04 04 04 03 03 03 03 03 03 03
+b4f9: 03 03 02 02 02 02 02 02 02 02 01 01 01 01 01 01
+
+b509: 08 08 09 09 0a 0a 0b 0b 0c 0c 0d 0d 0e 0e 0f 0f
+b519: 0f 0f 0e 0e 0d 0d 0c 0c 0b 0b 0a 0a 09 09 08 08
+
+b529: 04 04 05 05 06 06 07 07 08 08 09 09 0a 0a 0b 0b
+b539: 0c 0b 0a 0a 09 09 08 08 07 07 06 06 05 05 04 04
+
+b549: 0f 0e 0d 0c 0b 0a 09 08 09 0a 0b 0c 0b 0a 09 08
+b559: 07 06 05 04 05 06 07 08 07 06 05 04 03 02 01 00
+
+b569: 0c 0c 0b 0b 0a 0a 09 08 09 0a 0b 0c 0b 0a 09 08
+b579: 07 06 05 04 05 06 07 08 07 06 05 04 03 02 01 00
+
+b589: 0c 0b 0a 09 08 07 06 05 04 05 06 07 08 07 06 05
+b599: 04 05 06 07 08 07 06 05 04 05 06 07 08 09 0a 0b
+
+b5a9: 01 02 03 04 05 06 07 08 09 0a 0b 0c 0b 0a 09 08
+b5b9: 07 06 05 04 05 06 07 08 09 08 07 06 05 04 03 01
+
+; Garbage?
+b5c9: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+b5d9: ff ff ff ff ff ff ff 00 00 00 00 00 00 00 00 00
+b5e9: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 10 00
+b5f9: 00 00 00 00 00 00 00
+
+; Status screen orb images
+b600: 03 0f 1f 1f 3f 3f 3b 1f ff fc f0 f0 e0 e0 e0 f0  ; some dude?
+b610: c0 80 e0 f0 f0 f0 b0 f0 ff 0f 07 07 03 03 03 07
+b620: 1e 2e 73 60 67 27 0f 20 f0 e8 c0 c0 c8 e8 f0 c0
+b630: e0 e0 80 20 e8 e8 c0 00 07 03 01 01 01 03 0f 03
+b640: 00 03 0f 1f 3f 3f 7f 7f ff ff fd ff f8 f1 e3 e7  ; top-left
+b650: 40 c0 fa f8 fc fc fe fe bf bf 15 bf bf bf bf ff
+b660: 7f 7f 3f 3f 5f af 73 0c ef ff ff ff bf 5f 8f f3
+b670: fe fe fc fc fa f5 ce 30 ff ff ff ff fd fa f1 cf
+b680: 00 03 0f 1f 3f 3f 7f 7f ff ff fe f8 f0 e1 e3 c7  ; top-right
+b690: 00 c0 f0 f8 fc fc fe fe ff ff 7f 1f 7f ff ff ff
+b6a0: 7f 7f 3f 3f 5f af 73 0c c7 ef fc f8 b8 5c 8f f3
+b6b0: fe fe fc fc fa f5 ce 30 ff ff 3f 1f 1d 3a f1 cf
+b6c0: 00 03 0f 1f 3f 3f 7f 7f ff fc f3 ef df df bf ba  ; bottom-left
+b6d0: 00 c0 f0 f8 fc fc fe fe ff 3f cf f7 fb fb fd ad
+b6e0: 7f 7f 3f bf 5f 2f d3 3c a8 90 c0 40 a0 f0 3c cf
+b6f0: fe fe fc fd fa f4 cb 3c 15 09 03 02 05 0f 3c f3
+b700: 00 03 0f 1f 3f 3f 7f 7f ff ff fe f8 f0 e0 e1 c3  ; bottom-right
+b710: 00 c0 f0 f8 fc fc fe fe ff ff 3f 0f 3f ff ff ff
+b720: 7f 7f 3f bf 5f af 73 0c c7 ef ff 7f bf 5f 8f f3
+b730: fe fe fc fd fa f5 ce 30 ff ff ff fe fd fa f1 cf
+b740: 7f 55 41 55 22 36 1c 08 80 80 80 94 c1 c1 e3 f7  ; ?
+b750: 00 08 1c 7f 3e 1c 36 22 ff f7 e3 80 c1 e3 c9 dd  ; ?
+b760: 00 03 0f 1f 1f 3f 3f 3f ff fc f1 e0 e0 c0 c0 c0  ; unlit orb
+b770: 00 e0 f8 fc fc fe fe fe ff 1f e7 33 1b 09 0d 0d
+b780: 3f 3f 1f 1f 0f 03 00 00 c0 c0 e0 e0 f0 fc ff ff
+b790: fe fe fc fc f8 e0 00 00 01 0d 1f 03 07 1f ff ff
+b7a0: 00 01 02 04 08 10 20 40 ff ff ff ff ff ff ff ff  ; sig
+b7b0: 08 7c 10 3a 4c 24 20 1e ff ff ff ff ff ff ff ff
+b7c0: 00 00 00 3c 02 02 04 18 ff ff ff ff ff ff ff ff
+b7d0: 00 00 28 3e 62 14 10 08 ff ff ff ff ff ff ff ff
+b7e0: 00 00 08 5c 6a 4a 1c 08 ff ff ff ff ff ff ff ff
+b7f0: 00 00 08 0e 08 18 2c 12 ff ff ff ff ff ff ff ff
+
+b800: 4c 47 b8     JMP $b847
+
+; Do ending!
+b803: a9 43        LDA #$43
+b805: 85 4b        STA $4b
+b807: 20 99 b8     JSR $b899   ; Load the top half of a palette map (windowing?)
+b80a: 20 c4 b8     JSR $b8c4   ; Upload ending(?) palettes and enable BG (no sprites)
+b80d: a9 00        LDA #$00
+b80f: 85 65        STA $65
+b811: ad 00 ae     LDA $ae00
+b814: 85 66        STA $66
+b816: a5 66        LDA $66
+b818: cd 01 ae     CMP $ae01
+b81b: b0 0a        BCS +$0a  [$b827]
+b81d: a9 01        LDA #$01
+b81f: 85 07        STA $07
+b821: 20 e3 b8     JSR $b8e3   ; Display text/credit in $66 with transitions
+b824: 4c 16 b8     JMP $b816
+b827: a9 04        LDA #$04
+b829: 85 38        STA $38
+b82b: 85 39        STA $39
+b82d: a9 12        LDA #$12
+b82f: 85 3c        STA $3c
+b831: a9 0c        LDA #$0c
+b833: 85 3d        STA $3d
+b835: 20 06 c0     JSR $c006   ; Draw $3c by $3d window at ($38,$39), slowly if $37, and ($3a,$3b)=($38,$39)+(1,2)
+b838: 20 8d b9     JSR $b98d   ; Transition in text?
+b83b: 20 00 a4     JSR $a400   ; Display the end fancyness!!
+b83e: 20 00 fe     JSR $fe00   ; wait for V-blank
+b841: 20 00 b0     JSR $b000   ; Start music or play current notes
+b844: 4c 3e b8     JMP $b83e   ; loop forever! THE END!
+
+b847: 20 99 b8     JSR $b899   ; Load the top half of a palette map (windowing?)
+b84a: 20 ca b8     JSR $b8ca   ; Upload ship game(?) palettes and enable BG (no sprites)
+b84d: a9 42        LDA #$42
+b84f: 85 4b        STA $4b
+b851: a9 00        LDA #$00
+b853: 85 65        STA $65
+b855: 85 66        STA $66
+b857: a5 66        LDA $66
+b859: cd 00 ae     CMP $ae00
+b85c: b0 0a        BCS +$0a  [$b868]
+b85e: a9 00        LDA #$00
+b860: 85 07        STA $07
+b862: 20 e3 b8     JSR $b8e3   ; Display text/credit in $66 with transitions
+b865: 4c 57 b8     JMP $b857
+b868: a9 00        LDA #$00
+b86a: 85 66        STA $66
+b86c: a9 01        LDA #$01
+b86e: 85 65        STA $65
+b870: a5 66        LDA $66
+b872: c9 04        CMP #$04
+b874: b0 0a        BCS +$0a  [$b880]
+b876: a9 00        LDA #$00
+b878: 85 07        STA $07
+b87a: 20 e3 b8     JSR $b8e3   ; Display text/credit in $66 with transitions
+b87d: 4c 70 b8     JMP $b870
+b880: a9 80        LDA #$80
+b882: 8d 16 60     STA $6016
+b885: a9 20        LDA #$20
+b887: 48           PHA
+b888: 20 70 ba     JSR $ba70   ; Wait for v-blank?
+b88b: 68           PLA
+b88c: 38           SEC
+b88d: e9 01        SBC #$01
+b88f: d0 f6        BNE +$f6  [$b887]
+b891: a9 01        LDA #$01
+b893: 85 ff        STA $ff
+b895: 8d 00 20     STA $2000
+b898: 60           RTS
+
+; Load the top half of a palette map (windowing?)
+b899: a9 00        LDA #$00
+b89b: 8d 01 20     STA $2001
+b89e: a9 00        LDA #$00
+b8a0: 85 66        STA $66
+b8a2: a2 00        LDX #$00
+b8a4: ad 02 20     LDA $2002
+b8a7: a9 27        LDA #$27
+b8a9: 8d 06 20     STA $2006
+b8ac: a9 c0        LDA #$c0
+b8ae: 8d 06 20     STA $2006
+b8b1: bd 7f ba     LDA $ba7f,X
+b8b4: 8d 07 20     STA $2007
+b8b7: e8           INX
+b8b8: e0 20        CPX #$20
+b8ba: 90 f5        BCC +$f5  [$b8b1]
+b8bc: a9 00        LDA #$00
+b8be: 85 ff        STA $ff
+b8c0: 8d 00 20     STA $2000
+b8c3: 60           RTS
+
+; Upload ending(?) palettes and enable BG (no sprites)
+b8c4: 20 ff b9     JSR $b9ff   ; Load ending(?) background palettes
+b8c7: 4c cd b8     JMP $b8cd
+
+; Upload ship game(?) palettes and enable BG (no sprites)
+b8ca: 20 f3 b9     JSR $b9f3   ; Load ship game(?) background palettes
+b8cd: 20 00 fe     JSR $fe00   ; wait for V-blank
+b8d0: a2 00        LDX #$00
+b8d2: 20 0f c0     JSR $c00f   ; Upload palettes: BG at $03c0, sprite at $03d0
+b8d5: a9 0a        LDA #$0a
+b8d7: 8d 01 20     STA $2001   ; enable BG only, sprites off
+b8da: a9 00        LDA #$00
+b8dc: 8d 05 20     STA $2005
+b8df: 8d 05 20     STA $2005
+b8e2: 60           RTS
+
+; Display text/credit in $66 with transitions
+b8e3: a9 01        LDA #$01
+b8e5: 85 ff        STA $ff
+b8e7: 8d 00 20     STA $2000
+b8ea: 85 37        STA $37
+b8ec: a9 0d        LDA #$0d
+b8ee: 85 57        STA $57
+b8f0: 85 58        STA $58
+b8f2: a9 04        LDA #$04
+b8f4: 85 38        STA $38
+b8f6: 85 39        STA $39
+b8f8: a9 12        LDA #$12
+b8fa: 85 3c        STA $3c
+b8fc: a9 0c        LDA #$0c
+b8fe: 85 3d        STA $3d
+b900: 20 06 c0     JSR $c006   ; Draw $3c by $3d window at ($38,$39), slowly if $37, and ($3a,$3b)=($38,$39)+(1,2)
+b903: 20 0b ba     JSR $ba0b   ; If $65, output credit $66, else output text line $66
+b906: 20 8d b9     JSR $b98d   ; Transition in text?
+b909: 20 11 b9     JSR $b911   ; Wait for ~8.5 seconds or until A or B is pressed
+b90c: e6 66        INC $66
+b90e: 4c 3f b9     JMP $b93f   ; Transition out text?
+
+; Wait for ~8.5 seconds or until A or B is pressed
+b911: a9 02        LDA #$02
+b913: 85 67        STA $67
+b915: a9 00        LDA #$00
+b917: 85 f0        STA $f0
+b919: 85 24        STA $24
+b91b: 85 25        STA $25
+b91d: 20 00 fe     JSR $fe00   ; wait for V-blank
+b920: 20 00 b0     JSR $b000   ; Start music or play current notes
+b923: 20 0c c0     JSR $c00c   ; Get button presses in $20-$25
+b926: a5 07        LDA $07
+b928: d0 06        BNE +$06  [$b930]
+b92a: a5 24        LDA $24
+b92c: 05 25        ORA $25
+b92e: d0 08        BNE +$08  [$b938]
+b930: e6 f0        INC $f0
+b932: d0 e9        BNE +$e9  [$b91d]
+b934: c6 67        DEC $67
+b936: d0 e5        BNE +$e5  [$b91d]
+b938: a9 00        LDA #$00
+b93a: 85 24        STA $24
+b93c: 85 25        STA $25
+b93e: 60           RTS
+
+; Transition out text?
+b93f: a9 10        LDA #$10
+b941: 85 61        STA $61
+b943: a9 01        LDA #$01
+b945: 85 62        STA $62
+b947: a9 00        LDA #$00
+b949: 85 ff        STA $ff
+b94b: 20 00 fe     JSR $fe00   ; wait for V-blank
+b94e: 20 e2 b9     JSR $b9e2   ; delay?
+b951: a9 07        LDA #$07
+b953: 48           PHA
+b954: a6 62        LDX $62
+b956: 20 db b9     JSR $b9db   ; delay?
+b959: ca           DEX
+b95a: d0 fa        BNE +$fa  [$b956]
+b95c: a9 00        LDA #$00
+b95e: 8d 00 20     STA $2000
+b961: a6 61        LDX $61
+b963: 20 db b9     JSR $b9db   ; delay?
+b966: ca           DEX
+b967: d0 fa        BNE +$fa  [$b963]
+b969: a9 01        LDA #$01
+b96b: 8d 00 20     STA $2000
+b96e: 68           PLA
+b96f: 38           SEC
+b970: e9 01        SBC #$01
+b972: d0 df        BNE +$df  [$b953]
+b974: 20 00 b0     JSR $b000   ; Start music or play current notes
+b977: e6 f0        INC $f0
+b979: a5 f0        LDA $f0
+b97b: 29 01        AND #$01
+b97d: d0 c8        BNE +$c8  [$b947]
+b97f: e6 62        INC $62
+b981: c6 61        DEC $61
+b983: d0 c2        BNE +$c2  [$b947]
+b985: a9 01        LDA #$01
+b987: 8d 00 20     STA $2000
+b98a: 85 ff        STA $ff
+b98c: 60           RTS
+
+; Transition in text?
+b98d: a9 10        LDA #$10
+b98f: 85 61        STA $61
+b991: a9 01        LDA #$01
+b993: 85 62        STA $62
+b995: a9 01        LDA #$01
+b997: 85 ff        STA $ff
+b999: 20 00 fe     JSR $fe00   ; wait for V-blank
+b99c: 20 e2 b9     JSR $b9e2   ; delay?
+b99f: a9 07        LDA #$07
+b9a1: 48           PHA
+b9a2: a6 61        LDX $61
+b9a4: 20 db b9     JSR $b9db   ; delay?
+b9a7: ca           DEX
+b9a8: d0 fa        BNE +$fa  [$b9a4]
+b9aa: a9 00        LDA #$00
+b9ac: 8d 00 20     STA $2000
+b9af: a6 62        LDX $62
+b9b1: 20 db b9     JSR $b9db   ; delay?
+b9b4: ca           DEX
+b9b5: d0 fa        BNE +$fa  [$b9b1]
+b9b7: a9 01        LDA #$01
+b9b9: 8d 00 20     STA $2000
+b9bc: 68           PLA
+b9bd: 38           SEC
+b9be: e9 01        SBC #$01
+b9c0: d0 df        BNE +$df  [$b9a1]
+b9c2: 20 00 b0     JSR $b000   ; Start music or play current notes
+b9c5: e6 f0        INC $f0
+b9c7: a5 f0        LDA $f0
+b9c9: 29 01        AND #$01
+b9cb: d0 c8        BNE +$c8  [$b995]
+b9cd: e6 62        INC $62
+b9cf: c6 61        DEC $61
+b9d1: d0 c2        BNE +$c2  [$b995]
+b9d3: a9 00        LDA #$00
+b9d5: 8d 00 20     STA $2000
+b9d8: 85 ff        STA $ff
+b9da: 60           RTS
+
+; delay?
+b9db: a0 11        LDY #$11
+b9dd: 88           DEY
+b9de: d0 fd        BNE +$fd  [$b9dd]
+b9e0: ea           NOP
+b9e1: 60           RTS
+
+; delay?
+b9e2: a9 00        LDA #$00
+b9e4: 8d 05 20     STA $2005
+b9e7: 8d 05 20     STA $2005
+b9ea: a2 1e        LDX #$1e
+b9ec: 20 db b9     JSR $b9db   ; delay?
+b9ef: ca           DEX
+b9f0: d0 fa        BNE +$fa  [$b9ec]
+b9f2: 60           RTS
+
+; Load ship game(?) background palettes
+b9f3: a2 0f        LDX #$0f
+b9f5: bd 00 bf     LDA $bf00,X
+b9f8: 9d c0 03     STA $03c0,X
+b9fb: ca           DEX
+b9fc: 10 f7        BPL +$f7  [$b9f5]
+b9fe: 60           RTS
+
+; Load ending(?) background palettes
+b9ff: a2 0f        LDX #$0f
+ba01: bd 10 bf     LDA $bf10,X
+ba04: 9d c0 03     STA $03c0,X
+ba07: ca           DEX
+ba08: 10 f7        BPL +$f7  [$ba01]
+ba0a: 60           RTS
+
+; If $65, output credit $66, else output text line $66
+ba0b: a5 65        LDA $65
+ba0d: d0 03        BNE +$03  [$ba12]  ; output text line $66 if $65==0
+ba0f: 4c 5f ba     JMP $ba5f
+ba12: a5 66        LDA $66
+ba14: 0a           ASL
+ba15: aa           TAX
+ba16: bd 00 bb     LDA $bb00,X
+ba19: 85 3e        STA $3e
+ba1b: bd 01 bb     LDA $bb01,X
+ba1e: 85 3f        STA $3f
+ba20: 20 70 ba     JSR $ba70   ; Wait for v-blank?
+ba23: ad 02 20     LDA $2002
+ba26: a0 01        LDY #$01
+ba28: b1 3e        LDA ($3e),Y
+ba2a: 8d 06 20     STA $2006
+ba2d: 88           DEY
+ba2e: b1 3e        LDA ($3e),Y
+ba30: 8d 06 20     STA $2006
+ba33: a5 3e        LDA $3e
+ba35: 18           CLC
+ba36: 69 02        ADC #$02
+ba38: 85 3e        STA $3e
+ba3a: a5 3f        LDA $3f
+ba3c: 69 00        ADC #$00
+ba3e: 85 3f        STA $3f
+ba40: a0 00        LDY #$00
+ba42: b1 3e        LDA ($3e),Y
+ba44: f0 10        BEQ +$10  [$ba56]
+ba46: e6 3e        INC $3e
+ba48: d0 02        BNE +$02  [$ba4c]
+ba4a: e6 3f        INC $3f
+ba4c: c9 01        CMP #$01
+ba4e: f0 d0        BEQ +$d0  [$ba20]
+ba50: 8d 07 20     STA $2007
+ba53: 4c 40 ba     JMP $ba40
+ba56: a9 00        LDA #$00
+ba58: 8d 05 20     STA $2005
+ba5b: 8d 05 20     STA $2005
+ba5e: 60           RTS
+ba5f: a5 66        LDA $66
+ba61: 0a           ASL
+ba62: aa           TAX
+ba63: bd 00 a8     LDA $a800,X
+ba66: 85 3e        STA $3e
+ba68: bd 01 a8     LDA $a801,X
+ba6b: 85 3f        STA $3f
+ba6d: 4c 03 c0     JMP $c003   ; Output string at p[$3e] in bank $57 to ($3a,$3b)
+
+; Wait for v-blank?
+ba70: a9 00        LDA #$00
+ba72: 8d 05 20     STA $2005
+ba75: 8d 05 20     STA $2005
+ba78: 20 00 b0     JSR $b000   ; Start music or play current notes
+ba7b: 20 00 fe     JSR $fe00   ; wait for V-blank
+ba7e: 60           RTS
+
+ba7f: 55 55 55 55 55 55 55 55
+ba87: 55 00 00 00 00 44 55 55
+ba8f: 55 00 00 00 00 44 55 55
+ba97: 55 00 00 00 00 44 55 55
+
+ba9f: 00           BRK
+baa0: a5 10        LDA $10
+baa2: c5 11        CMP $11
+baa4: 90 29        BCC +$29  [$bacf]
+baa6: e5 11        SBC $11
+baa8: 85 12        STA $12
+baaa: a6 11        LDX $11
+baac: bd 01 03     LDA $0301,X
+baaf: 9d 00 03     STA $0300,X
+bab2: e8           INX
+bab3: e4 10        CPX $10
+bab5: 90 f5        BCC +$f5  [$baac]
+bab7: a9 00        LDA #$00
+bab9: 9d 00 03     STA $0300,X
+babc: a9 01        LDA #$01
+babe: 85 33        STA $33
+bac0: a5 10        LDA $10
+bac2: a6 12        LDX $12
+bac4: 95 63        STA $63,X
+bac6: 38           SEC
+bac7: e9 01        SBC #$01
+bac9: ca           DEX
+baca: d0 f8        BNE +$f8  [$bac4]
+bacc: 4c 9e be     JMP $be9e
+bacf: a5 11        LDA $11
+bad1: 38           SEC
+bad2: e5 10        SBC $10
+bad4: 85 12        STA $12
+bad6: a6 11        LDX $11
+bad8: bd ff 02     LDA $02ff,X
+badb: 9d 00 03     STA $0300,X
+bade: ca           DEX
+badf: e4 10        CPX $10
+bae1: d0 f5        BNE +$f5  [$bad8]
+bae3: a9 00        LDA #$00
+bae5: 9d 00 03     STA $0300,X
+bae8: 85 33        STA $33
+baea: a5 10        LDA $10
+baec: a6 12        LDX $12
+baee: 95 63        STA $63,X
+baf0: 18           CLC
+baf1: 69 01        ADC #$01
+baf3: ca           DEX
+baf4: d0 f8        BNE +$f8  [$baee]
+baf6: 4c 9e be     JMP $be9e
+baf9: 09 03        ORA #$03
+bafb: 02           .DB $02
+bafc: 05 0f        ORA $0f
+bafe: 3c           .DB $3C
+baff: f3           .DB $F3
+
+; Prologue credit pointers
+bb00: 08 bb        .DW $bb08
+bb02: 26 bb        .DW $bb26
+bb04: 4c bb        .DW $bb4c
+bb06: 6b bb        .DW $bb6b
+
+bb08: e8 20        .DW $20e8
+bb0a: 2f 31 2e 26 31 20 2c 2c 24 23 01  ; PROGRAMMED
+bb15: 2c 21        .DW $212c
+bb17: 21 38 01                          ; BY
+bb1a: 88 21        .DW $2188
+bb1c: 2d ff 20 ff 32 ff 28 ff 31 00     ; N A S I R
+
+bb26: e8 20        .DW $20e8
+bb28: 22 27 20 31 20 22 33 24 31 01     ; CHARACTER
+bb32: 29 21        .DW $2129
+b834: 23 24 32 28 26 2d 01              ; DESIGN
+bb3b: 86 21        .DW $2186
+bb3d: 38 2e 32 28 33 20 2a 20 ff 20 2c 20 2d 2e 00  ; YOSITAKA AMANO
+
+bb4c: e9 20        .DW $20e9
+bb4e: 32 22 24 2d 20 31 28 2e 01        ; SCENARIO
+bb57: 2c 21        .DW $212c
+bb59: 21 38 01                          ; BY
+bb5c: 87 21        .DW $2187
+bb5e: 2a 24 2d 29 28 ff 33 24 31 20 23 20 00  ; KENJI TERADA
+
+bb6b: e8 20        .DW $20e8
+bb6d: 2f 31 2e 23 34 22 33 28 2e 2d 01  ; PRODUCTION
+bb78: 2c 21        .DW $212c
+bb7a: 2e 25 01                          ; OF
+bb7d: 86 21        .DW $2186
+bb7f: 32 30 34 20 31 24 ff ff 20 c2 33 24 20 2c 00  ; SQUARE  A-TEAM
+
+; Old garbage of $b892 - $b903?
+;  diffs: Expects $ba7f table at $ba77
+;         Expects $b9ff routine at $b9f7
+;         Expects $b8cd routine at $b8c9
+;         Expects $b9f3 routine at $b9eb
+bb8e: 01 85 ff 8d 00 20 60 a9 00 8d 01 20 a9 00 85 66
+bb9e: a2 00 ad 02 20 a9 27 8d 06 20 a9 c0 8d 06 20 bd
+bbae: 77 ba 8d 07 20 e8 e0 20 90 f5 a9 00 85 ff 8d 00
+bbbe: 20 60 20 f7 b9 4c c9 b8 20 eb b9 20 00 fe a2 00
+bbce: 20 0f c0 a9 0a 8d 01 20 a9 00 8d 05 20 8d 05 20
+bbde: 60 a9 01 85 ff 8d 00 20 85 37 a9 0d 85 57 85 58
+bbee: a9 04 85 38 85 39 a9 12 85 3c a9 0c 85 3d 20 06
+bbfe: c0 20
+
+; Prices
+bc00: 00 00        .DW $0000  ;     0
+bc02: 00 00        .DW $0000  ;     0  ; LUTE
+bc04: 00 00        .DW $0000  ;     0  ; CROWN
+bc06: 00 00        .DW $0000  ;     0  ; CRYSTAL
+bc08: 00 00        .DW $0000  ;     0  ; HERB
+bc0a: 00 00        .DW $0000  ;     0  ; KEY
+bc0c: 00 00        .DW $0000  ;     0  ; TNT
+bc0e: 00 00        .DW $0000  ;     0  ; ADAMANT
+bc10: 00 00        .DW $0000  ;     0  ; SLAB
+bc12: 00 00        .DW $0000  ;     0  ; RUBY
+bc14: 00 00        .DW $0000  ;     0  ; ROD
+bc16: 00 00        .DW $0000  ;     0  ; FLOATER
+bc18: 00 00        .DW $0000  ;     0  ; CHIME
+bc1a: 00 00        .DW $0000  ;     0  ; TAIL
+bc1c: 00 00        .DW $0000  ;     0  ; CUBE
+bc1e: 50 c3        .DW $c350  ; 50000  ; BOTTLE
+bc20: 00 00        .DW $0000  ;     0  ; OXYALE
+bc22: 00 00        .DW $0000  ;     0  ; CANOE
+bc24: 00 00        .DW $0000  ;     0  ; 
+bc26: 00 00        .DW $0000  ;     0  ; 
+bc28: 00 00        .DW $0000  ;     0  ; 
+bc2a: 00 00        .DW $0000  ;     0  ; 
+bc2c: 4b 00        .DW $004b  ;    75  ; TENT
+bc2e: fa 00        .DW $00fa  ;   250  ; CABIN
+bc30: b8 0b        .DW $0bb8  ;  3000  ; HOUSE
+bc32: 3c 00        .DW $003c  ;    60  ; HEAL[potion]
+bc34: 4b 00        .DW $004b  ;    75  ; PURE[potion]
+bc36: 20 03        .DW $0320  ;   800  ; SOFT[potion]
+bc38: 0a 00        .DW $000a  ;    10  ; Wooden[nunchucks]
+bc3a: 05 00        .DW $0005  ;     5  ; Small [knife]
+bc3c: 05 00        .DW $0005  ;     5  ; Wooden[staff]
+bc3e: 0a 00        .DW $000a  ;    10  ; Rapier
+bc40: 0a 00        .DW $000a  ;    10  ; Iron  [hammer]
+bc42: 26 02        .DW $0226  ;   550  ; Short [sword]
+bc44: 26 02        .DW $0226  ;   550  ; Hand  [axe]
+bc46: c8 00        .DW $00c8  ;   200  ; Scimtar
+bc48: c8 00        .DW $00c8  ;   200  ; Iron  [nunchucks]
+bc4a: af 00        .DW $00af  ;   175  ; Large [knife]
+bc4c: c8 00        .DW $00c8  ;   200  ; Iron  [staff]
+bc4e: c2 01        .DW $01c2  ;   450  ; Sabre
+bc50: dc 05        .DW $05dc  ;  1500  ; Long  [sword]
+bc52: d0 07        .DW $07d0  ;  2000  ; Great [axe]
+bc54: c2 01        .DW $01c2  ;   450  ; Falchon
+bc56: 20 03        .DW $0320  ;   800  ; Silver[knife]
+bc58: a0 0f        .DW $0fa0  ;  4000  ; Silver[sword]
+bc5a: c4 09        .DW $09c4  ;  2500  ; Silver[hammer]
+bc5c: 94 11        .DW $1194  ;  4500  ; Silver[axe]
+bc5e: 10 27        .DW $2710  ; 10000  ; Flame [sword]
+bc60: 98 3a        .DW $3a98  ; 15000  ; Ice   [sword]
+bc62: 40 1f        .DW $1f40  ;  8000  ; Dragon[sword]
+bc64: 40 1f        .DW $1f40  ;  8000  ; Giant [sword]
+bc66: 20 4e        .DW $4e20  ; 20000  ; Sun   [sword]
+bc68: 40 1f        .DW $1f40  ;  8000  ; Coral [sword]
+bc6a: 70 17        .DW $1770  ;  6000  ; Were  [sword]
+bc6c: 88 13        .DW $1388  ;  5000  ; Rune  [sword]
+bc6e: 39 30        .DW $3039  ; 12345  ; Power [staff]
+bc70: 10 27        .DW $2710  ; 10000  ; Light [axe]
+bc72: a8 61        .DW $61a8  ; 25000  ; Heal  [staff]
+bc74: a8 61        .DW $61a8  ; 25000  ; Mage  [staff]
+bc76: 40 9c        .DW $9c40  ; 40000  ; Defense
+bc78: 50 c3        .DW $c350  ; 50000  ; Wizard[staff]
+bc7a: 30 75        .DW $7530  ; 30000  ; Vorpal
+bc7c: e8 fd        .DW $fde8  ; 65000  ; CatClaw
+bc7e: 40 9c        .DW $9c40  ; 40000  ; Thor  [hammer]
+bc80: 60 ea        .DW $ea60  ; 60000  ; Bane  [sword]
+bc82: 60 ea        .DW $ea60  ; 60000  ; Katana
+bc84: 60 ea        .DW $ea60  ; 60000  ; Xcalber
+bc86: 60 ea        .DW $ea60  ; 60000  ; Masmune
+bc88: 0a 00        .DW $000a  ;    10  ; Cloth
+bc8a: 32 00        .DW $0032  ;    50  ; Wooden[armor]
+bc8c: 50 00        .DW $0050  ;    80  ; Chain [armor]
+bc8e: 20 03        .DW $0320  ;   800  ; Iron  [armor]
+bc90: c8 af        .DW $afc8  ; 45000  ; Steel [armor]
+bc92: 4c 1d        .DW $1d4c  ;  7500  ; Silver[armor]
+bc94: 30 75        .DW $7530  ; 30000  ; Flame [armor]
+bc96: 30 75        .DW $7530  ; 30000  ; Ice   [armor]
+bc98: 60 ea        .DW $ea60  ; 60000  ; Opal  [armor]
+bc9a: 60 ea        .DW $ea60  ; 60000  ; Dragon[armor]
+bc9c: e8 03        .DW $03e8  ;  1000  ; Copper[bracelet]
+bc9e: 88 13        .DW $1388  ;  5000  ; Silver[bracelet]
+bca0: 50 c3        .DW $c350  ; 50000  ; Gold  [bracelet]
+bca2: e8 fd        .DW $fde8  ; 65000  ; Opal  [bracelet]
+bca4: 02 00        .DW $0002  ;     2  ; White [shirt]
+bca6: 02 00        .DW $0002  ;     2  ; Black [shirt]
+bca8: 0f 00        .DW $000f  ;    15  ; Wooden[shield]
+bcaa: 64 00        .DW $0064  ;   100  ; Iron  [shield]
+bcac: c4 09        .DW $09c4  ;  2500  ; Silver[shield]
+bcae: 10 27        .DW $2710  ; 10000  ; Flame [shield]
+bcb0: 10 27        .DW $2710  ; 10000  ; Ice   [shield]
+bcb2: 98 3a        .DW $3a98  ; 15000  ; Opal  [shield]
+bcb4: 40 9c        .DW $9c40  ; 40000  ; Aegis [shield]
+bcb6: c4 09        .DW $09c4  ;  2500  ; Buckler
+bcb8: 20 4e        .DW $4e20  ; 20000  ; ProCape
+bcba: 50 00        .DW $0050  ;    80  ; Cap
+bcbc: 64 00        .DW $0064  ;   100  ; Wooden[helmet]
+bcbe: c2 01        .DW $01c2  ;   450  ; Iron  [helmet]
+bcc0: c4 09        .DW $09c4  ;  2500  ; Silver[helmet]
+bcc2: 10 27        .DW $2710  ; 10000  ; Opal  [helmet]
+bcc4: 20 4e        .DW $4e20  ; 20000  ; Heal  [helmet]
+bcc6: 02 00        .DW $0002  ;     2  ; Ribbon
+bcc8: 3c 00        .DW $003c  ;    60  ; Gloves
+bcca: c8 00        .DW $00c8  ;   200  ; Copper[gauntlet]
+bccc: ee 02        .DW $02ee  ;   750  ; Iron  [gauntlet]
+bcce: c4 09        .DW $09c4  ;  2500  ; Silver[gauntlet]
+bcd0: 98 3a        .DW $3a98  ; 15000  ; Zeus  [gauntlet]
+bcd2: 10 27        .DW $2710  ; 10000  ; Power [gauntlet]
+bcd4: 20 4e        .DW $4e20  ; 20000  ; Opal  [gauntlet]
+bcd6: 20 4e        .DW $4e20  ; 20000  ; ProRing
+bcd8: 0a 00        .DW $000a  ;    10  ; 10 G
+bcda: 14 00        .DW $0014  ;    20  ; 20 G
+bcdc: 19 00        .DW $0019  ;    25  ; 25 G
+bcde: 1e 00        .DW $001e  ;    30  ; 30 G
+bce0: 37 00        .DW $0037  ;    55  ; 55 G
+bce2: 46 00        .DW $0046  ;    70  ; 70 G
+bce4: 55 00        .DW $0055  ;    85  ; 85 G
+bce6: 6e 00        .DW $006e  ;   110  ; 110 G
+bce8: 87 00        .DW $0087  ;   135  ; 135 G
+bcea: 9b 00        .DW $009b  ;   155  ; 155 G
+bcec: a0 00        .DW $00a0  ;   160  ; 160 G
+bcee: b4 00        .DW $00b4  ;   180  ; 180 G
+bcf0: f0 00        .DW $00f0  ;   240  ; 240 G
+bcf2: ff 00        .DW $00ff  ;   255  ; 255 G
+bcf4: 04 01        .DW $0104  ;   260  ; 260 G
+bcf6: 27 01        .DW $0127  ;   295  ; 295 G
+bcf8: 2c 01        .DW $012c  ;   300  ; 300 G
+bcfa: 3b 01        .DW $013b  ;   315  ; 315 G
+bcfc: 4a 01        .DW $014a  ;   330  ; 330 G
+bcfe: 5e 01        .DW $015e  ;   350  ; 350 G
+bd00: 81 01        .DW $0181  ;   385  ; 385 G
+bd02: 90 01        .DW $0190  ;   400  ; 400 G
+bd04: c2 01        .DW $01c2  ;   450  ; 450 G
+bd06: f4 01        .DW $01f4  ;   500  ; 500 G
+bd08: 12 02        .DW $0212  ;   530  ; 530 G
+bd0a: 3f 02        .DW $023f  ;   575  ; 575 G
+bd0c: 6c 02        .DW $026c  ;   620  ; 620 G
+bd0e: a8 02        .DW $02a8  ;   680  ; 680 G
+bd10: ee 02        .DW $02ee  ;   750  ; 750 G
+bd12: 1b 03        .DW $031b  ;   795  ; 795 G
+bd14: 70 03        .DW $0370  ;   880  ; 880 G
+bd16: fc 03        .DW $03fc  ;  1020  ; 1020 G
+bd18: e2 04        .DW $04e2  ;  1250  ; 1250 G
+bd1a: af 05        .DW $05af  ;  1455  ; 1455 G
+bd1c: f0 05        .DW $05f0  ;  1520  ; 1520 G
+bd1e: e0 06        .DW $06e0  ;  1760  ; 1760 G
+bd20: b7 07        .DW $07b7  ;  1975  ; 1975 G
+bd22: d0 07        .DW $07d0  ;  2000  ; 2000 G
+bd24: be 0a        .DW $0abe  ;  2750  ; 2750 G
+bd26: 48 0d        .DW $0d48  ;  3400  ; 3400 G
+bd28: 36 10        .DW $1036  ;  4150  ; 4150 G
+bd2a: 88 13        .DW $1388  ;  5000  ; 5000 G
+bd2c: 4a 15        .DW $154a  ;  5450  ; 5450 G
+bd2e: 00 19        .DW $1900  ;  6400  ; 6400 G
+bd30: 40 1a        .DW $1a40  ;  6720  ; 6720 G
+bd32: ac 1c        .DW $1cac  ;  7340  ; 7340 G
+bd34: 0a 1e        .DW $1e0a  ;  7690  ; 7690 G
+bd36: dc 1e        .DW $1edc  ;  7900  ; 7900 G
+bd38: c7 1f        .DW $1fc7  ;  8135  ; 8135 G
+bd3a: 28 23        .DW $2328  ;  9000  ; 9000 G
+bd3c: 54 24        .DW $2454  ;  9300  ; 9300 G
+bd3e: 1c 25        .DW $251c  ;  9500  ; 9500 G
+bd40: ac 26        .DW $26ac  ;  9900  ; 9900 G
+bd42: 10 27        .DW $2710  ; 10000  ; 10000 G
+bd44: 3e 30        .DW $303e  ; 12350  ; 12350 G
+bd46: c8 32        .DW $32c8  ; 13000  ; 13000 G
+bd48: 8a 34        .DW $348a  ; 13450  ; 13450 G
+bd4a: e2 36        .DW $36e2  ; 14050  ; 14050 G
+bd4c: 80 39        .DW $3980  ; 14720  ; 14720 G
+bd4e: 98 3a        .DW $3a98  ; 15000  ; 15000 G
+bd50: 52 44        .DW $4452  ; 17490  ; 17490 G
+bd52: 5a 46        .DW $465a  ; 18010  ; 18010 G
+bd54: 16 4e        .DW $4e16  ; 19990  ; 19990 G
+bd56: 20 4e        .DW $4e20  ; 20000  ; 20000 G
+bd58: 2a 4e        .DW $4e2a  ; 20010  ; 20010 G
+bd5a: 90 65        .DW $6590  ; 26000  ; 26000 G
+bd5c: c8 af        .DW $afc8  ; 45000  ; 45000 G
+bd5e: e8 fd        .DW $fde8  ; 65000  ; 65000 G
+bd60: 64 00        .DW $0064  ;   100  ; CURE
+bd62: 64 00        .DW $0064  ;   100  ; HARM
+bd64: 64 00        .DW $0064  ;   100  ; FOG
+bd66: 64 00        .DW $0064  ;   100  ; RUSE
+bd68: 64 00        .DW $0064  ;   100  ; FIRE
+bd6a: 64 00        .DW $0064  ;   100  ; SLEP
+bd6c: 64 00        .DW $0064  ;   100  ; LOCK
+bd6e: 64 00        .DW $0064  ;   100  ; LIT
+bd70: 90 01        .DW $0190  ;   400  ; LAMP
+bd72: 90 01        .DW $0190  ;   400  ; MUTE
+bd74: 90 01        .DW $0190  ;   400  ; ALIT
+bd76: 90 01        .DW $0190  ;   400  ; INVS
+bd78: 90 01        .DW $0190  ;   400  ; ICE
+bd7a: 90 01        .DW $0190  ;   400  ; DARK
+bd7c: 90 01        .DW $0190  ;   400  ; TMPR
+bd7e: 90 01        .DW $0190  ;   400  ; SLOW
+bd80: dc 05        .DW $05dc  ;  1500  ; CUR2
+bd82: dc 05        .DW $05dc  ;  1500  ; HRM2
+bd84: dc 05        .DW $05dc  ;  1500  ; AFIR
+bd86: dc 05        .DW $05dc  ;  1500  ; HEAL
+bd88: dc 05        .DW $05dc  ;  1500  ; FIR2
+bd8a: dc 05        .DW $05dc  ;  1500  ; HOLD
+bd8c: dc 05        .DW $05dc  ;  1500  ; LIT2
+bd8e: dc 05        .DW $05dc  ;  1500  ; LOK2
+bd90: a0 0f        .DW $0fa0  ;  4000  ; PURE
+bd92: a0 0f        .DW $0fa0  ;  4000  ; FEAR
+bd94: a0 0f        .DW $0fa0  ;  4000  ; AICE
+bd96: a0 0f        .DW $0fa0  ;  4000  ; AMUT
+bd98: a0 0f        .DW $0fa0  ;  4000  ; SLP2
+bd9a: a0 0f        .DW $0fa0  ;  4000  ; FAST
+bd9c: a0 0f        .DW $0fa0  ;  4000  ; CONF
+bd9e: a0 0f        .DW $0fa0  ;  4000  ; ICE2
+bda0: 40 1f        .DW $1f40  ;  8000  ; CUR3
+bda2: 40 1f        .DW $1f40  ;  8000  ; LIFE
+bda4: 40 1f        .DW $1f40  ;  8000  ; HRM3
+bda6: 40 1f        .DW $1f40  ;  8000  ; HEL2
+bda8: 40 1f        .DW $1f40  ;  8000  ; FIR3
+bdaa: 40 1f        .DW $1f40  ;  8000  ; BANE
+bdac: 40 1f        .DW $1f40  ;  8000  ; WARP
+bdae: 40 1f        .DW $1f40  ;  8000  ; SLO2
+bdb0: 20 4e        .DW $4e20  ; 20000  ; SOFT
+bdb2: 20 4e        .DW $4e20  ; 20000  ; EXIT
+bdb4: 20 4e        .DW $4e20  ; 20000  ; FOG2
+bdb6: 20 4e        .DW $4e20  ; 20000  ; INV2
+bdb8: 20 4e        .DW $4e20  ; 20000  ; LIT3
+bdba: 20 4e        .DW $4e20  ; 20000  ; RUB
+bdbc: 20 4e        .DW $4e20  ; 20000  ; QAKE
+bdbe: 20 4e        .DW $4e20  ; 20000  ; STUN
+bdc0: c8 af        .DW $afc8  ; 45000  ; CUR4
+bdc2: c8 af        .DW $afc8  ; 45000  ; HRM4
+bdc4: c8 af        .DW $afc8  ; 45000  ; ARUB
+bdc6: c8 af        .DW $afc8  ; 45000  ; HEL3
+bdc8: c8 af        .DW $afc8  ; 45000  ; ICE3
+bdca: c8 af        .DW $afc8  ; 45000  ; BRAK
+bdcc: c8 af        .DW $afc8  ; 45000  ; SABR
+bdce: c8 af        .DW $afc8  ; 45000  ; BLND
+bdd0: 60 ea        .DW $ea60  ; 60000  ; LIF2
+bdd2: 60 ea        .DW $ea60  ; 60000  ; FADE
+bdd4: 60 ea        .DW $ea60  ; 60000  ; WALL
+bdd6: 60 ea        .DW $ea60  ; 60000  ; XFER
+bdd8: 60 ea        .DW $ea60  ; 60000  ; NUKE
+bdda: 60 ea        .DW $ea60  ; 60000  ; STOP
+bddc: 60 ea        .DW $ea60  ; 60000  ; ZAP!
+bdde: 60 ea        .DW $ea60  ; 60000  ; XXXX
+
+bde0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+bdf0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+be00: 20 ab af     JSR $afab   ; $0200-02ff = #$f8
+be03: a9 48        LDA #$48
+be05: 85 40        STA $40
+be07: a9 2f        LDA #$2f
+be09: 85 41        STA $41
+be0b: a9 00        LDA #$00
+be0d: 48           PHA
+be0e: 20 30 be     JSR $be30
+be11: a5 40        LDA $40
+be13: 18           CLC
+be14: 69 10        ADC #$10
+be16: 85 40        STA $40
+be18: c9 88        CMP #$88
+be1a: 90 0b        BCC +$0b  [$be27]
+be1c: a9 48        LDA #$48
+be1e: 85 40        STA $40
+be20: a5 41        LDA $41
+be22: 18           CLC
+be23: 69 10        ADC #$10
+be25: 85 41        STA $41
+be27: 68           PLA
+be28: 18           CLC
+be29: 69 01        ADC #$01
+be2b: c9 10        CMP #$10
+be2d: 90 de        BCC +$de  [$be0d]
+be2f: 60           RTS
+be30: 85 19        STA $19
+be32: aa           TAX
+be33: bd 00 03     LDA $0300,X
+be36: d0 08        BNE +$08  [$be40]
+be38: a5 26        LDA $26
+be3a: 18           CLC
+be3b: 69 10        ADC #$10
+be3d: 85 26        STA $26
+be3f: 60           RTS
+be40: 0a           ASL
+be41: 0a           ASL
+be42: 85 18        STA $18
+be44: a6 26        LDX $26
+be46: a5 41        LDA $41
+be48: 9d 00 02     STA $0200,X
+be4b: 9d 04 02     STA $0204,X
+be4e: 18           CLC
+be4f: 69 08        ADC #$08
+be51: 9d 08 02     STA $0208,X
+be54: 9d 0c 02     STA $020c,X
+be57: a5 40        LDA $40
+be59: 9d 03 02     STA $0203,X
+be5c: 9d 0b 02     STA $020b,X
+be5f: 18           CLC
+be60: 69 08        ADC #$08
+be62: 9d 07 02     STA $0207,X
+be65: 9d 0f 02     STA $020f,X
+be68: a5 18        LDA $18
+be6a: 9d 01 02     STA $0201,X
+be6d: 18           CLC
+be6e: 69 01        ADC #$01
+be70: 9d 05 02     STA $0205,X
+be73: 18           CLC
+be74: 69 01        ADC #$01
+be76: 9d 09 02     STA $0209,X
+be79: 18           CLC
+be7a: 69 01        ADC #$01
+be7c: 9d 0d 02     STA $020d,X
+be7f: a9 00        LDA #$00
+be81: a4 62        LDY $62
+be83: c4 19        CPY $19
+be85: d0 08        BNE +$08  [$be8f]
+be87: a5 f0        LDA $f0
+be89: 29 02        AND #$02
+be8b: 0a           ASL
+be8c: 0a           ASL
+be8d: 0a           ASL
+be8e: 0a           ASL
+be8f: 9d 02 02     STA $0202,X
+be92: 9d 06 02     STA $0206,X
+be95: 9d 0a 02     STA $020a,X
+be98: 9d 0e 02     STA $020e,X
+be9b: 4c 38 be     JMP $be38
+be9e: a5 11        LDA $11
+bea0: 85 62        STA $62
+bea2: a9 00        LDA #$00
+bea4: 48           PHA
+bea5: 20 00 fe     JSR $fe00   ; wait for V-blank
+bea8: a9 02        LDA #$02    ; upload sprites
+beaa: 8d 14 40     STA $4014
+bead: 20 00 b0     JSR $b000   ; Start music or play current notes
+beb0: a5 64        LDA $64
+beb2: 20 ca be     JSR $beca
+beb5: a5 65        LDA $65
+beb7: 20 ca be     JSR $beca
+beba: a5 66        LDA $66
+bebc: 20 ca be     JSR $beca
+bebf: 68           PLA
+bec0: 18           CLC
+bec1: 69 01        ADC #$01
+bec3: c9 10        CMP #$10
+bec5: 90 dd        BCC +$dd  [$bea4]
+bec7: 4c cf ae     JMP $aecf
+beca: 10 01        BPL +$01  [$becd]
+becc: 60           RTS
+becd: 0a           ASL
+bece: 0a           ASL
+becf: 0a           ASL
+bed0: 0a           ASL
+bed1: aa           TAX
+bed2: a4 33        LDY $33
+bed4: b9 53 af     LDA $af53,Y
+bed7: 85 10        STA $10
+bed9: b9 57 af     LDA $af57,Y
+bedc: 85 11        STA $11
+bede: a0 04        LDY #$04
+bee0: bd 00 02     LDA $0200,X
+bee3: 18           CLC
+bee4: 65 10        ADC $10
+bee6: 9d 00 02     STA $0200,X
+bee9: bd 03 02     LDA $0203,X
+beec: 18           CLC
+beed: 65 11        ADC $11
+beef: 9d 03 02     STA $0203,X
+bef2: 8a           TXA
+bef3: 18           CLC
+bef4: 69 04        ADC #$04
+bef6: aa           TAX
+bef7: 88           DEY
+bef8: d0 e6        BNE +$e6  [$bee0]
+befa: 60           RTS
+
+befb: 00 00 00 00 00
+
+; Ship game palettes?
+bf00: 0f 00 02 30 0f 3b 11 24 0f 3b 0b 2b 0f 00 0f 30
+
+; Ending palettes?
+bf10: 0f 00 01 30 0f 32 21 30 0f 2c 2a 1a 0f 00 0f 30
+
+; Intro text!
+bf20: ff ff ff ff 9d ab 1a ba 35 af 27 ac 1e 32 ac 45 27 1f 01 ff ff 67 2f ae b1 2c b6 c0 ff 9d ab 1a ba 1f a7 24 28 b3 b6 bf 01 ff ff ff ff ff ff ff 1b ab 1a b6 2b 2d 1e ba 61 a7 bf 01 ff a4 3b 1b ab 1a 2b b5 1c 31 a8 aa 1f b6 1b 2e 4d b7 c0 01 ff ff ff ff ff ff ff ff 9d ab 1a b3 a8 b2 b3 af 1a 5d 5b bf 01 ff b7 1d ac b5 36 b1 af 4b ab b2 b3 a8 bf 20 4f 4d b3 1d a6 bc 69 05 01 be a0 1d b1 1b ab 1a ba 35 af 27 ac 1e 1f 67 2f ae b1 2c b6 01 ff ff 8f 26 44 a0 2f 5c 35 1e ba ac 4e 38 b2 34 69 be 05 01 ff ff 8a a9 b7 25 20 65 b2 2a ff ad 26 b5 5a bc bf 43 26 b5 01 ff ff ff 50 26 2a 33 2f 5c 35 1e 2f 5c 32 bf 01 ff ff ff ff ff 2b a6 ab 59 b2 af a7 1f aa 20 29 98 9b 8b c0 00 ; "    The world is veiled in\\   darkness. The wind stops,\\        the sea is wild,\\ and the earth begins to rot.\\        The people wait,\\ their only hope, a prophecy....\\\'When the world is in darkness\\  Four Warriors will come....'\\\  After a long journey, four\\    young warriors arrive,\\     each holding an ORB."

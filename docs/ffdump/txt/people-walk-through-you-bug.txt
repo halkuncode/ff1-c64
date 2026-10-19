@@ -1,0 +1,39 @@
+;;; BANK 15
+;;; PART 1
+
+; To fix the bug, we need to add "AND #$3f" after both the ADCs. We move the
+; per-tileset background music table out of the way to make room.
+
+cf99: a9 0b        LDA #$0b
+cf9b: 20 03 fe     JSR $fe03  ; Show Bank in A in memory locations $8000-$bfff 
+cf9e: a6 49        LDX $49
+cfa0: bd d8 94     LDA $94d8,X ; Load per-tileset background music
+cfa3: 85 4b        STA $4b
+cfa5: 85 7c        STA $7c
+cfa7: a9 04        LDA #$04
+cfa9: 85 33        STA $33
+cfab: a5 29        LDA $29
+cfad: 18           CLC
+cfae: 69 07        ADC #$07
+cfb0: 29 3f        AND #$3f
+cfb2: 85 68        STA $68
+cfb4: a5 2a        LDA $2a
+cfb6: 18           CLC
+cfb7: 69 07        ADC #$07
+cfb9: 29 3f        AND #$3f
+cfbb: 85 69        STA $69
+cfbd: a6 48        LDX $48    ; Map battle frequency?
+cfbf: bd 01 8c     LDA $8c01,X
+cfc2: 85 f8        STA $f8
+cfc4: 4c 94 cb     JMP $cb94  ; p[$10]=map tile data for current position; $52 = (map tile data byte 0) & 0x1e
+
+cfc7: ea           NOP
+cfc8: ea           NOP
+cfc9: ea           NOP
+cfca: ea           NOP
+;cfca
+
+;;; BANK 11
+;;; PART 2
+; Convenient empty space to move the per-tileset background music to
+94d8: 47 48 49 4a 4b 4c 4d 4e 

@@ -1,0 +1,6 @@
+;;; BANK 12
+
+; It seems there may originally have been an intenton for a spell targeting
+; type "all except caster". Enemies implement this in place of "all allies"
+
+b56e: f0 00        BEQ +$00  [$b570]

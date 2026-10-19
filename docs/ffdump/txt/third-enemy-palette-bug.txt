@@ -1,0 +1,5 @@
+;;; BANK 11
+
+; For the third enemy in the 2-large-6-small formation, the game shifts one too
+; far and uses the palette selection bit for the second enemy instead.
+a384: ea           NOP

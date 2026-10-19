@@ -1,0 +1,36 @@
+;;; BANK 11
+;;; PART 1
+
+9d72: a9 33        LDA #$33
+9d74: 8d a7 6a     STA $6aa7
+9d77: a0 00        LDY #$00
+9d79: 8c a6 6a     STY $6aa6
+9d7c: b9 ac 6a     LDA $6aac,Y
+9d7f: f0 30        BEQ +$30  [$9db1]
+9d81: a9 38        LDA #$38    ; display stat up, if up
+9d83: 8d fd 6a     STA $6afd
+9d86: a9 0f        LDA #$0f
+9d88: 8d fa 6a     STA $6afa
+9d8b: 8d fc 6a     STA $6afc
+9d8e: ad a7 6a     LDA $6aa7
+9d91: 8d fb 6a     STA $6afb
+9d94: a9 00        LDA #$00
+9d96: 8d fe 6a     STA $6afe
+9d99: a9 0b        LDA #$0b
+9d9b: 85 57        STA $57
+9d9d: a9 04        LDA #$04
+9d9f: a2 fa        LDX #$fa
+9da1: a0 6a        LDY #$6a
+9da3: 20 18 f2     JSR $f218
+9da6: 20 66 9f     JSR $9f66   ; Respond rate delay ($6bac)
+9da9: 20 78 9f     JSR $9f78   ; Wait for joypad activity
+9dac: a9 01        LDA #$01
+9dae: 20 0f f2     JSR $f20f
+9db1: ee a7 6a     INC $6aa7
+9db4: ac a6 6a     LDY $6aa6
+9db7: c8           INY
+9db8: c0 05        CPY #$05
+9dba: d0 bd        BNE +$bd  [$9d79]
+9dbc: 20 57 9f     JSR $9f57
+9dbf: 20 f3 9b     JSR $9bf3   ; p[$80]=p[$86]+7
+9dc2: 4c e8 9b     JMP $9be8

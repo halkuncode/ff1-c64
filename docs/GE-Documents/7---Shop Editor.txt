@@ -1,0 +1,425 @@
+
+
+
+
+....................X0---Overview
+....................X1---Items, Weapons & Armor, Magic
+....................X2---Shops
+....................X3---Shop Pointers
+....................X4---Shop Menu Text
+....................X5---Shop Menu Text Pointers
+
+
+
+
+******************************************************---X0---***********************************************************
+*************************************************************************************************************************
+
+_____________________________________________________-Overview-__________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........Some plot point items that are not in Shops, will have to be renamed for the price to line up properly,
+..........if you decide to place them in Shops.
+
+..........3a4a5-Buy 10 modifier. (09 = 10) (18 = 25) (31 = 50) (62 = 99) (63 = 100)
+
+..........The amount is 1 higher than the byte value. Dont forget to change the Buy 10 Text to match.
+
+
+..........Shop Inventory and Prices can be done with Hackster, but even with DTE on, 
+..........it will still be difficult to read some Weapons, Armor, and Magic.
+
+
+
+******************************************************---X1---***********************************************************
+*************************************************************************************************************************
+
+_________________________________________-Items, Weapons & Armor, Magic-_________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+............Items
+
+
+01-Sara's Lute.......02-Royal Crown.......03-Crystal Eye.......04-Wake up Herb......05-Mystic Key........
+
+06-Nitro Powder......07-Adamantite........08-Rosetta Stone.....09-Star Ruby.........0a-Earth Rod.........
+
+0b-Floatstone........0c-Tintinnabulum.....0d-Rat's Tail........0e-Warp Cube.........0f-Mystery Jar.......
+
+10-Fairy Water.......11-Canoe.............
+
+
+12-Heal Potion.......13-Pure Potion.......14-Gold Needle.......1a-Sleeping Bag......1b-Tent..............
+
+15-Phoenix Down......17-Mind Plus.........18-Stamina Plus......19-Luck Plus.........16-Spell Book........
+
+
+
+............Weapons.........................................Armor
+
+
+1f-Short Sword----(09,05)........................45-Leather Armor---(04,08)
+21-Broad Sword----(15,10)........................46-Chain Armor-----(12,10)
+28-Claymore-------(20,10)........................47-Iron Armor------(20,24)
+3d-Vorpal Blade---(22,20)........................49-Silver Armor----(20,10)
+2c-Silver Sword---(24,15)........................4a-Flame Armor-----(32,20)
+40-Razor Edge-----(24,25)........................4b-Ice Armor-------(32,20)
+2f-Flametongue----(26,20)........................4c-Diamond Armor---(40,24)
+30-Icebrand-------(29,19)........................4d-Dragon Armor----(40,20)
+3b-Defender-------(30,35)........................48-Maximilian------(88,32)
+33-Gaia Blade-----(32,30)........................44-Linen Tunic-----(02,02)
+42-Excalibur------(45,35)........................52-White Robe------(28,04)
+37-SaveTheQueen---(47,47)........................53-Black Robe------(28,04)
+
+27-Cutlass--------(15,05)........................4e-Bronze Band-----(06,01)
+34-Coral Sword----(18,15)........................4f-Silver Band-----(16,01)
+36-Rune Blade-----(18,15)........................50-Ruby Band-------(24,01)
+31-Dragonslayer---(19,15)........................51-Pearl Band------(32,01)
+41-Katana---------(28,35)........................54-Wooden Shield---(02,+1)
+43-Masamune-------(45,45)........................55-Iron Shield-----(04,+2)
+
+22-Battle Axe-----(18,05)........................56-Silver Shield---(08,+4)
+29-Titans Axe-----(24,07)........................57-Flame Shield----(12,+4)
+2e-Silver Axe-----(29,10)........................58-Ice Shield------(12,+4)
+38-Sacred Axe-----(34,15)........................59-Diamond Shield--(16,+8)
+
+1c-Iron Fist------(09,06)........................5a-Aegis Shield----(16,+8)
+24-Burning Fist---(12,08)........................5b-Buckler---------(02,+2)
+26-Dragon Claw----(15,10)........................5c-Fey Mantle------(08,+8)
+2a-Tiger Fangs----(18,12)........................5e-Bronze Helm-----(02,02)
+23-Kaiser Fist----(24,16)........................5f-Iron Helm-------(04,04)
+
+20-Heavy Mallet---(09,00)........................60-Silver Helm-----(06,03)
+35-Beast Killer---(23,07)........................61-Diamond Helm----(10,05)
+3f-Mjolnir--------(29,15)........................63-Ribbon----------(00,00)
+
+1d-Battle Knife---(05,10)........................5d-Felt Hat--------(01,01)
+25-Baselard-------(07,10)........................62-Plumed Hat------(2,+12)
+2b-Silver Knife---(10,15)........................64-Leather Glove---(01,00)
+32-Cleaver--------(16,15)........................65-Bronze Glove----(02,02)
+3e-Orichalcum-----(16,40)........................66-Iron Glove------(04,03)
+
+1e-Cypress Cane---(04,00)........................67-Silver Glove----(06,02)
+39-Healing Staff--(06,00)........................69-Power Glove-----(06,02)
+3a-Mages Wand-----(12,10)........................6a-Diamond Glove---(10,04)
+2d-Silver Staff---(15,05)........................68-Magical Ring----(01,00)
+3c-Wizards Wand---(15,15)........................6b-Angels Ring-----(08,00)
+
+
+..............................Magic
+
+
+b0-Cure.................b1-Dia..................b2-Protect..............b3-Invisible............
+b4-Fire.................b5-Sleep................b6-Poison...............b7-Thunder..............
+
+b8-Poisona..............b9-Silence..............ba-Fear.................bb-Float................
+bc-Blizzard.............bd-Darkness.............be-Strike...............bf-Slow.................
+
+c0-Cura.................c1-Diara................c2-A.Spell..............c3-Stona................
+c4-Fira.................c5-Hold.................c6-Thundara.............c7-Sleepra..............
+
+c8-Tornado..............c9-Heal.................ca-A.Element............cb-Raise................
+cc-Quake................cd-Haste................ce-Confuse..............cf-Blizzara.............
+
+d0-Curaga...............d1-Ruin.................d2-Diaga................d3-A.Death..............
+d4-Firaga...............d5-Scourge..............d6-Teleport.............d7-Slowra...............
+
+d8-Healara..............d9-Silega...............da-Protera..............db-Invisira.............
+dc-Thundaga.............dd-Death................de-Chasm................df-Stun.................
+
+e0-Curaja...............e1-Diaja................e2-Exit.................e3-Arise................
+e4-Blizzaga.............e5-Break................e6-Sever................e7-Bio..................
+
+e8-Healaga..............e9-Holy.................ea-Barrier..............eb-Dispel...............
+ec-Flare................ed-Stop.................ee-Banish...............ef-Kill.................
+
+
+
+******************************************************---X2---***********************************************************
+*************************************************************************************************************************
+
+______________________________________________________-Shops-____________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+1-|......|......|......|......|......|......|......|......|......|......|......|......|......|......|......|......|-1
+
+2-|......|......|......|......|......|......|......|......|......|......|......|......|......|......|Armr 2|Armr 3|-2
+
+3-|......|......|......|......|......|......|Cre Cl|......|......|......|......|......|......|Armr 1|......|......|-3
+
+4-|......|......|......|......|......|......|Cre In|......|......|......|......|......|......|......|Weap 1|Weap 2|-4
+
+5-|Item 1|......|......|Cre Wp|Cre Ar|Cre Wh|Cre Bl|......|......|Lef Wh|Lef Bl|......|......|RareIt|......|......|-5
+
+6-|Con Wp|Con Ar|Con Wh|Con Bl|Con It|Con In|Con Cl|......|Pro Wp|Pro Ar|Pro Wh|Pro Bl|Pro It|Pro In|Pro Cl|......|-6
+
+7-|Elf Wp|Elf Ar|Elf W1|Elf W2|Elf B1|Elf B2|Elf It|Elf In|Elf Cl|......|Mel Wp|Mel Ar|Mel Wh|Mel Bl|Mel In|......|-7
+
+8-|Gai Wp|Gai Ar|Gai W1|Gai W2|Gai B1|Gai B2|Gai In|Gai Cl|......|Onr Wh|Onr Bl|Onr In|Onr Cl|......|......|......|-8
+
+
+
+..........For both Inn and Clinic, the value you put in gives you the price.
+
+..........Item 1 is used in Melmond, Crescent, Gaia, and Onrac. Gaia Weapon is used in Onrac.
+
+..........Weapon 1 is used in the special area, Earthgift Forest.
+
+..........Weapon 2 and Armor 3 are not yet assigned. Armor 1 replaces Gaia Armor in Onrac. Armor 2 is on 3F Sky Tower.
+
+
+3839e/a1-Coneria Weapon.......383a3/a5-Coneria Armor........383a7/aa-Coneria White........383ac/af-Coneria Black........
+383b1/b3-Coneria Item.........383b5/b6-Coneria Inn..........383b8/b9-Coneria Clinic.......
+
+
+383bb/be-Provoka Weapon.......383c0/c3-Provoka Armor........383c5/c8-Provoka White........383ca/cd-Provoka Black........
+383cf/d2-Provoka Item.........383d4/d5-Provoka Inn..........383d7/d8-Provoka Clinic.......
+
+
+383da/dd-Elfland Weapon.......383df/e3-Elfland Armor........383e5/e8-Elfland White 1......383ea/ed-Elfland White 2......
+383ef/f2-Elfland Black 1......383f4/f7-Elfland Black 2......383f9/fd-Elfland Item.........383ff/00-Elfland Inn..........
+38402/03-Elfland Clinic.......
+
+
+38404/07-Melmond Weapon.......38409/0c-Melmond Armor........3840e/11-Melmond White........38413/16-Melmond Black........
+38418/19-Melmond Inn..........
+
+
+3841b/1e-Crescent Weapon......38420/24-Crescent Armor.......38426/29-Crescent White.......3842b/2e-Crescent Black.......
+38430/31-Crescent Inn.........38433/34-Crescent Clinic......
+
+
+38436/3a-Gaia Weapon..........3843c/40-Gaia Armor...........38442/43-Gaia White 1.........38445/47-Gaia White 2.........
+38449/4a-Gaia Black 1.........3844c/4e-Gaia Black 2.........38450/51-Gaia Inn.............38453/54-Gaia Clinic..........
+
+
+38456/57-Onrac White..........38459/5a-Onrac Black..........3845c/5d-Onrac Inn............3845f/60-Onrac Clinic.........
+
+
+38462/62-Leifen White.........38464/64-Leifen Black.........
+
+
+38466/6a-Caravan..............3846c/70-Item-1...............38472/76-Rare Item............
+
+
+38478/7c-Weapon 1.............38694/98-Weapon 2.............
+
+
+3869a/9e-Armor 1..............386a0/a4-Armor 2..............386a6/aa-Armor 3..............
+
+
+
+******************************************************---X3---***********************************************************
+*************************************************************************************************************************
+
+__________________________________________________-Shop Pointers-________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........Changing Pointers is a little tricky. Here is what to look for.
+
+
+.........|8|...|9|....A....|B|....For Banks 00-14, the Pointer will be 8-b. 
+..........C.....D....(E)....F.....For Bank 15, it will be c-f
+
+..........0.....1.....2.....3
+..........4....|5|....6.....7
+.........|8|....9.....A.....B
+..........C.....D....(E)....F
+
+..........The ones in parenthesis or brackets are for the following text examples.
+..........Directly above those is what determines the Pointer.
+
+..........3(83)9e = 8E 83
+..........3(53)9e = 8E 93
+..........3(e3)9e = 8E E3
+
+..........Here is an sample, so you can see what to look for. Notice the last one requires a subtraction.
+
+..........3839e-Coneria Weapon-8E 83.....383c0-Provoka Armor-B0 83......3840e-Melmond White-FE 83......
+
+
+
+38312/13-Coneria Weapon.......38314/15-Provoka Weapon.......38316/17-Elfland Weapon.......38318/19-Melmond Weapon.......
+
+3831a/1b-Crescent Weapon......3831c/1d-Gaia Weapon..........3831e/1f-Weapon 1.............38320/21-Weapon 2.............
+
+38322/23-Weapon...............38324/25-Weapon...............38326/27-Weapon...............
+
+
+38328/29-Coneria Armor........3832a/2b-Provoka Armor........3832c/2d-Elfland Armor........3832e/2f-Melmond Armor........
+
+38330/31-Crescent Armor.......38332/33-Gaia Armor...........38334/35-Armor 1..............38336/37-Armor 2..............
+
+38338/39-Armor 3..............3833a/3b-Armor................3833c/3d-Armor................
+
+
+3833e/3f-Coneria White........38340/41-Provoka White........38342/43-Elfland White 1......38344/45-Elfland White 2......
+
+38346/47-Melmond White........38348/49-Crescent White.......3834a/4b-Gaia White 1.........3834c/4d-Gaia White 2.........
+
+3834e/4f-Onrac White..........38350/51-Leifen White.........38352/53-White 1..............
+
+
+38354/55-Coneria Black........38356/57-Provoka Black........38358/59-Elfland Black 1......3835a/5b-Elfland Black 2......
+
+3835c/5d-Melmond Black........3835e/5f-Crescent Black.......38360/61-Gaia Black 1.........38362/63-Gaia Black 2.........
+
+38364/65-Onrac Black..........38366/67-Leifen Black.........38368/69-Black 1..............
+
+
+3836a/6b-Coneria Clinic.......3836c/6d-Provoka Clinic.......3836e/6f-Elfland Clinic.......38370/71-Crescent Clinic......
+
+38372/73-Gaia Clinic..........38374/75-Onrac Clinic.........38376/77-Clinic...............
+
+
+38378/79-Coneria Inn..........3837a/7b-Provoka Inn..........3837c/7d-Elfland Inn..........3837e/7f-Melmond Inn..........
+
+38380/81-Crescent Inn.........38382/83-Gaia Inn.............38384/85-Onrac Inn............
+
+
+38386/87-Coneria Item.........38388/89-Provoka Item.........3838a/8b-Elfland Item.........3838c/8d-Item-1...............
+
+3838e/8f-Caravan..............38390/91-Rare Item............
+
+
+
+38392/93-Inn..................38394/95-Clinic...............38396/97-Armor................38398/99-Armor................
+
+3839a/9b-Weapon...............3839c/9d-White................
+
+
+
+******************************************************---X4---***********************************************************
+*************************************************************************************************************************
+
+__________________________________________________-Shop Menu Text-_______________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........The last byte for anything you rename must end with 00, before the next Pointer.
+..........The words will bleed into each other if the (00) is removed.
+
+..........1 dash means it drops down 1 line, 2 dashes means it drops down 2 lines. (05), (05)(05), or (01)
+
+..........Item Shop, and Rare Item Shop, both share the same text space, but each have their own Pointer.
+
+
+
+38281/89-Weapon Shop..................3828b/93-Armor Shop...................38295/a1-White Magic Shop.............
+
+382a3/b0-Black Magic Shop.............382c1/c8-Item Shop*...................382be/c8-Rare Item Shop*..............
+
+382ba/bc-Inn..........................382b2/b8-Sanctuary....................
+
+
+
+38086/8c-Buy--Exit....................3807a/84-Buy--Sell--Exit..............381ed/f9-Buy--Buy-10--Exit............
+
+
+
+38061/78-Welcome!--How may I help-you today?.............3809f/af-What would you-like to buy?.....................
+
+380b1/be- --Gold_Is that Ok?.............................380c0/c4-Yes--No.........................................
+
+380c6/d5-You don't have-enough Gold......................380d7/e9-Who should I give-this to?......................
+
+380eb/fc-Thank you!--Anything else?......................3808e/9d-You can't carry-any more........................
+
+380fe/0e-Who has something-to sell?......................381d1/eb-You have nothing-to sell.--Anything else?.......
+
+38110/1c-What are you--selling?..........................38270/7f-Too bad...--Anything else?......................
+
+
+
+38267/6e-Learn--Exit.....................................3811e/37-Welcome!--Who wants to-learn a spell?...........
+
+38139/4c-Which spell are-you interested in?..............3814e/68-You can't learn-that spell.--Someone else?......
+
+3816a/7a-You already know-that spell.../.................3822c/45-This spell level-is full.--Someone else?........
+
+
+
+3817c/98-Welcome!--Stay, to rest from-your travels!......3819a/ad-Good night!--And don't forget.../...............
+
+381af/cf-Save from the main-menu before you-take a break!
+
+
+
+381fb/0d-Bring the stricken-one before me.../............3820f/2a-By the Father's-name, be whole-once more!.......
+
+38247/65-Return to me when-you are in need.--Go with God.
+
+
+
+******************************************************---X4---***********************************************************
+*************************************************************************************************************************
+
+_____________________________________________-Shop Menu Text Pointers-___________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+38010/11-Weapon Shop..................38012/13-Armor Shop...................38014/15-White Magic Shop.............
+
+38016/17-Black Magic Shop.............3801c/1d-Item Shop....................3801e/1f-Rare Item Shop...............
+
+3801a/1b-Inn..........................38018/19-Sanctuary....................
+
+
+
+38026/27-Buy--Exit....................38024/25-Buy--Sell--Exit..............3803c/3d-Buy--Buy-10--Exit............
+
+
+
+38022/23-Welcome!--How may I help-you today?.............3802a/2b-What would you-like to buy?.....................
+
+3802c/2d- --Gold_Is that Ok?.............................3802e/2f-Yes--No.........................................
+
+38030/31-You don't have-enough Gold......................38032/33-Who should I give-this to?......................
+
+38036/37-Thank you!--Anything else?......................38028/29-You can't carry-any more........................
+
+38038/39-Who has something-to sell?......................3804c/4d-You have nothing-to sell.--Anything else?.......
+
+3803a/3b-What are you--selling?..........................3805a/5b-Too bad...--Anything else?......................
+
+
+
+38058/59-Learn--Exit.....................................3803e/3f-Welcome!--Who wants to-learn a spell?...........
+
+38040/41-Which spell are-you interested in?..............38042/43-You can't learn-that spell.--Someone else?......
+
+38044/45-You already know-that spell.../.................38054/55-This spell level-is full.--Someone else?........
+
+
+
+38046/47-Welcome!--Stay, to rest from-your travels!......38048/49-Good night!--And don't forget.../...............
+
+3804a/4b-Save from the main-menu before you-take a break!
+
+
+
+38050/51-Bring the stricken-one before me.../............38052/53-By the Father's-name, be whole-once more!......
+
+38056/57-Return to me when-you are in need.--Go with God.
+
+
+
+
+
+
+
+
+
+
+
+

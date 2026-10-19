@@ -1,0 +1,103 @@
+;;; This patch will correct some bugs in the attack evade calculations:
+;;;  * Target dark shouldn't matter if the target is asleep/paralyed
+;;;  * Hit% should always be added, even if the target is stopped/asleep
+;;;  * Don't clip hit chance until after all the math.
+
+a6b0: ad 6d 68     LDA $686d   ; if category or element hit,
+a6b3: 2d 76 68     AND $6876   ;  w[0]=w[0]+40 and w[1]=clamp255(w[1]+4)
+a6b6: d0 08        BNE +$08  [$a6c0]
+a6b8: ad 6e 68     LDA $686e
+a6bb: 2d 77 68     AND $6877
+a6be: f0 14        BEQ +$14  [$a6d4]
+a6c0: a9 00        LDA #$00
+a6c2: a2 28        LDX #$28
+a6c4: 20 dd ae     JSR $aedd   ; w[A] = clamp(w[A] + X)
+a6c7: ad 58 68     LDA $6858
+a6ca: 18           CLC
+a6cb: 69 04        ADC #$04
+a6cd: 90 02        BCC +$02  [$a6d1]
+a6cf: a9 ff        LDA #$ff
+a6d1: 8d 58 68     STA $6858
+
+a6d4: 4c f1 a6     JMP $a6f1  ; skip a bunch of NOPs
+a6d7: ea           NOP
+a6d8: ea           NOP
+a6d9: ea           NOP
+a6da: ea           NOP
+a6db: ea           NOP
+a6dc: ea           NOP
+a6dd: ea           NOP
+a6de: ea           NOP
+a6df: ea           NOP
+a6e0: ea           NOP
+a6e1: ea           NOP
+a6e2: ea           NOP
+a6e3: ea           NOP
+a6e4: ea           NOP
+a6e5: ea           NOP
+a6e6: ea           NOP
+a6e7: ea           NOP
+a6e8: ea           NOP
+a6e9: ea           NOP
+a6ea: ea           NOP
+a6eb: ea           NOP
+a6ec: ea           NOP
+a6ed: ea           NOP
+a6ee: ea           NOP
+a6ef: ea           NOP
+a6f0: ea           NOP
+
+a6f1: a9 00        LDA #$00   ;; Add attacker hit %
+a6f3: ae 6f 68     LDX $686f  ; attacker hit %
+a6f6: 20 dd ae     JSR $aedd  ; w[A] = clamp(w[A] + X)
+
+a6f9: ad 89 68     LDA $6889  ;; if target stopped or asleep, damage*=5/4
+a6fc: 29 30        AND #$30   ;; else subtract target evade and add dark bonus
+a6fe: f0 13        BEQ +$13  [$a713]
+
+a700: ad 58 68     LDA $6858
+a703: 4a           LSR
+a704: 4a           LSR
+a705: 18           CLC
+a706: 6d 58 68     ADC $6858
+a709: 90 02        BCC +$02  [$a70d]
+a70b: a9 ff        LDA #$ff
+a70d: 8d 58 68     STA $6858
+a710: 4c 27 a7     JMP $a727
+
+a713: ae 78 68     LDX $6878   ; subtract target evade (clamp 0)
+a716: 20 0a af     JSR $af0a   ; w[A] = clamp(w[A] - X)
+
+a719: ad 89 68     LDA $6889   ; if target dark, w[0]+=40
+a71c: 29 08        AND #$08
+a71e: f0 07        BEQ +$07  [$a727]
+a720: a9 00        LDA #$00
+a722: a2 28        LDX #$28
+a724: 20 dd ae     JSR $aedd   ; w[A] = clamp(w[A] + X)
+
+a727: ac 56 68     LDY $6856   ;; Now, clamp w[0] to 255
+a72a: ae 57 68     LDX $6857
+a72d: 20 aa a4     JSR $a4aa   ; Clamp XY to 255
+a730: 8c 56 68     STY $6856
+a733: 8e 57 68     STX $6857
+
+a736: 4c 4b a7     JMP $a74b  ; skip a bunch of NOPs
+a739: ea           NOP
+a73a: ea           NOP
+a73b: ea           NOP
+a73c: ea           NOP
+a73d: ea           NOP
+a73e: ea           NOP
+a73f: ea           NOP
+a740: ea           NOP
+a741: ea           NOP
+a742: ea           NOP
+a743: ea           NOP
+a744: ea           NOP
+a745: ea           NOP
+a746: ea           NOP
+a747: ea           NOP
+a748: ea           NOP
+a749: ea           NOP
+a74a: ea           NOP
+; a74b

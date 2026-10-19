@@ -1,0 +1,110 @@
+;;; This patch will actually load the weapon critical chance, category attack,
+;;; and elemental attack. We have to rewrite a good sized chunk of code to get
+;;; the room for the extra loads.
+
+;; Copy a word from ($82),Y to ($80),X-1
+ace1: b1 82        LDA ($82),Y
+ace3: 48           PHA
+ace4: c8           INY
+ace5: b1 82        LDA ($82),Y
+ace7: 48           PHA
+ace8: 8a           TXA
+ace9: a8           TAY
+acea: 68           PLA
+aceb: 91 80        STA ($80),Y
+aced: 88           DEY
+acee: 68           PLA
+acef: 91 80        STA ($80),Y
+acf1: 60           RTS
+
+; Initialize players in-battle structs
+acf2: a9 00        LDA #$00
+acf4: 20 06 ad     JSR $ad06
+acf7: a9 01        LDA #$01
+acf9: 20 06 ad     JSR $ad06
+acfc: a9 02        LDA #$02
+acfe: 20 06 ad     JSR $ad06
+ad01: a9 03        LDA #$03
+ad03: 4c 06 ad     JMP $ad06
+
+; Initialize in-battle struct for warrior A
+ad06: 8d b3 68     STA $68b3
+ad09: 20 45 a1     JSR $a145  ; Warrior A structs: p[$82]=permanent, p[$80]=in-battle
+ad0c: a0 00        LDY #$00   ; Save palette into palette area
+ad0e: b1 82        LDA ($82),Y
+ad10: a8           TAY
+ad11: b9 3c a0     LDA $a03c,Y
+ad14: ac b3 68     LDY $68b3
+ad17: 99 a8 6b     STA $6ba8,Y
+ad1a: ad b3 68     LDA $68b3  ; save player index
+ad1d: a0 00        LDY #$00
+ad1f: 91 80        STA ($80),Y
+ad21: a2 02        LDX #$02   ; class and status
+ad23: 20 e1 ac     JSR $ace1
+ad26: a0 0a        LDY #$0a   ; HP
+ad28: a2 04        LDX #$04
+ad2a: 20 e1 ac     JSR $ace1
+ad2d: a0 21        LDY #$21   ; Hit %
+ad2f: a2 06        LDX #$06
+ad31: 20 e1 ac     JSR $ace1
+ad34: a0 25        LDY #$25   ; Mag def
+ad36: a2 07        LDX #$07
+ad38: 20 e1 ac     JSR $ace1
+ad3b: a0 23        LDY #$23   ; Evade %
+ad3d: a2 08        LDX #$08
+ad3f: 20 e1 ac     JSR $ace1
+ad42: a0 22        LDY #$22   ; Absorb
+ad44: a2 09        LDX #$09
+ad46: 20 e1 ac     JSR $ace1
+ad49: a0 20        LDY #$20   ; Damage
+ad4b: a2 0a        LDX #$0a
+ad4d: 20 e1 ac     JSR $ace1
+ad50: a0 24        LDY #$24   ; Elemental resistance
+ad52: a2 0b        LDX #$0b
+ad54: 20 e1 ac     JSR $ace1
+ad57: a9 01        LDA #$01   ; hit multiplier = 1
+ad59: a0 0b        LDY #$0b
+ad5b: 91 80        STA ($80),Y
+ad5d: a0 21        LDY #$21   ; #hits = (hit%>>5) + 1
+ad5f: b1 82        LDA ($82),Y
+ad61: 4a           LSR
+ad62: 4a           LSR
+ad63: 4a           LSR
+ad64: 4a           LSR
+ad65: 4a           LSR
+ad66: 18           CLC
+ad67: 69 01        ADC #$01
+ad69: a0 0c        LDY #$0c
+ad6b: 91 80        STA ($80),Y
+ad6d: a9 00        LDA #$00  ; default attack category = 0
+ad6f: a0 0d        LDY #$0d
+ad71: 91 80        STA ($80),Y
+ad73: c8           INY       ; default attack element = 0
+ad74: 91 80        STA ($80),Y
+ad76: c8           INY       ; default critical% = 0
+ad77: 91 80        STA ($80),Y
+ad79: a0 18        LDY #$18  ; find equipped weapon
+ad7b: b1 82        LDA ($82),Y
+ad7d: 30 07        BMI +$07  [$ad86]
+ad7f: c8           INY
+ad80: c0 1c        CPY #$1c
+ad82: d0 f7        BNE +$f7  [$ad7b]
+ad84: a9 00        LDA #$00
+ad86: 29 7f        AND #$7f
+ad88: f0 2d        BEQ +$2d  [$adb7]
+ad8a: e9 00        SBC #$00  ; cheat, C is always set here so use this to -1
+ad8c: 20 05 ac     JSR $ac05 ; p[$88] = weapon data
+ad8f: 85 88        STA $88
+ad91: 86 89        STX $89
+ad93: a0 02        LDY #$02  ; weapon critical%
+ad95: b1 88        LDA ($88),Y
+ad97: a0 0f        LDY #$0f
+ad99: 91 80        STA ($80),Y
+ad9b: a0 05        LDY #$05  ; category attack
+ad9d: b1 88        LDA ($88),Y
+ad9f: a0 0d        LDY #$0d
+ada1: 91 80        STA ($80),Y
+ada3: a0 04        LDY #$04  ; elemental attack
+ada5: b1 88        LDA ($88),Y
+ada7: a0 0e        LDY #$0e
+ada9: 91 80        STA ($80),Y

@@ -1,0 +1,24 @@
+* This hack gives all items, all orbs, the airship, the ship, the canoe, and
+  999999 G for a new game.
++ ips/hack-airship.ips
+
+* This hack makes IMPs give 10000 exp each.
++ ips/hack-imp-exp.ips
+
+* Enemies always run
+! Requires enemy-waking-bug.txt
++ IGOLPZGZ
+
+* Enemies always attack each other
+! Requires enemy-waking-bug.txt
++ LPOLPZGZ
+
+* No random battles on the world map
++ AAEKYITA
+
+* No random battles or spiked squares in maps. There are still battles from
+  talking to people.
++ XSXKUIUK
+
+* Walk anywhere in maps
++ AANGXXEY

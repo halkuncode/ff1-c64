@@ -1,0 +1,80 @@
+;; This function will reset a stat to its original value. To actually use it,
+;; you'll have to adjust the appropriate spell effect routines to call it. For
+;; input, A must be set to indicate which stat to reset per the table at the
+;; bottom. When it returns, Y is set to the offset from $6800 of the address of
+;; the stat, and A is the (new) value.
+
+;;; PART 1
+;;; BANK 12
+bacb: 48           PHA
+bacc: ad 8a 6c     LDA $6c8a
+bacf: 10 0a        BPL +$0a  [$badb]
+bad1: 20 eb b5     JSR $b5eb   ; Set pointers for warrior A: p[$92]=permanent, p[$90]=in-battle
+bad4: 68           PLA
+bad5: aa           TAX
+bad6: bc ec ba     LDY $baec,X
+bad9: d0 08        BNE +$08  [$bae3]
+badb: 20 be b4     JSR $b4be   ; Set pointers for slot A: p[$92]=in-ROM, p[$90]=in-RAM
+bade: 68           PLA
+badf: aa           TAX
+bae0: bc f0 ba     LDY $baf0,X
+bae3: b1 92        LDA ($92),Y
+bae5: bc f4 ba     LDY $baf4,X
+bae8: 99 00 68     STA $6800,Y
+baeb: 60           RTS
+
+;; List of stat offsets:
+;     hit%  abs
+;        ev    dmg
+baec: 21 23 22 20  ; warrior
+baf0: 0b 08 09 0c  ; enemy
+baf4: 84 85 7f 82  ; variable
+
+
+;; This changes the existing effect routines to use the above function
+
+;;; PART 2a
+b819: 46 ba        .DW $ba46   ; Effect 09: Absorb up
+;;; PART 2b
+b81d: 7c ba        .DW $ba7c   ; Effect 0b: Damage up
+;;; PART 2c
+b821: 64 ba        .DW $ba64   ; Effect 0d: Hit% and Damage up
+b823: 50 ba        .DW $ba50   ; Effect 0e: Evade down
+;;; PART 2d
+b827: 5a ba        .DW $ba5a   ; Effect 10: Evade up
+
+;;; PART 2e
+; Effect 09: Absorb up 
+ba46: a9 02        LDA #$02
+ba48: 20 cb ba     JSR $bacb
+ba4b: a2 00        LDX #$00    ; @@@1 FOG Int contribution (X/32)
+ba4d: 4c 79 b8     JMP $b879
+
+; Effect 0e: Evade down
+ba50: a9 01        LDA #$01
+ba52: 20 cb ba     JSR $bacb
+ba55: a2 10        LDX #$10    ; @@@1 LOCK Int contribution (X/32)
+ba57: 4c 55 b8     JMP $b855
+
+; Effect 10: Evade up
+ba5a: a9 01        LDA #$01
+ba5c: 20 cb ba     JSR $bacb
+ba5f: a2 00        LDX #$00    ; @@@1 RUSE/INVS Int contribution (X/32)
+ba61: 4c 79 b8     JMP $b879
+
+; Effect 0d: Hit% and damage up
+ba64: a9 00        LDA #$00
+ba66: 20 cb ba     JSR $bacb
+ba69: 20 6b b6     JSR $b66b   ; w[1] = A
+ba6c: a9 01        LDA #$01
+ba6e: ae 70 68     LDX $6870   ; current spell hit rate
+ba71: 20 dd ae     JSR $aedd   ; w[A] = clamp(w[A] + X)
+ba74: a2 10        LDX #$10    ; @@@1 SABR Int contribution to Hit% (X/32)
+ba76: 20 b5 b6     JSR $b6b5
+ba79: 8d 84 68     STA $6884   ; target hit %
+
+; Effect 0b: Damage up 
+ba7c: a9 03        LDA #$03
+ba7e: 20 cb ba     JSR $bacb
+ba81: a2 00        LDX #$00    ; @@@1 TMPR/SABR Int contribution to damage (X/32)
+ba83: 4c 79 b8     JMP $b879

@@ -1,0 +1,150 @@
+;;; BANK 12
+;;; PART 1
+
+; Reduce critical hit rate for BB and Ma
+adbb: a0 10        LDY #$10           ; BB/Ma bare handed weapon Pal/GFX
+adbd: b1 80        LDA ($80),Y        ;  and #hits*=2
+adbf: d0 28        BNE +$28  [$ade9]  ;  and Crit% = Lv/4 or Lv/2 (BB or Ma)
+adc1: a0 00        LDY #$00
+adc3: b1 82        LDA ($82),Y
+adc5: aa           TAX
+adc6: a0 26        LDY #$26
+adc8: b1 82        LDA ($82),Y
+adca: 4a           LSR
+adcb: e0 08        CPX #$08
+adcd: f0 05        BEQ +$05  [$add4]
+adcf: 4a           LSR
+add0: e0 02        CPX #$02
+add2: d0 15        BNE +$15  [$ade9]
+add4: a0 0f        LDY #$0f
+add6: 91 80        STA ($80),Y
+add8: a9 ac        LDA #$ac
+adda: c8           INY
+addb: 91 80        STA ($80),Y
+addd: a9 28        LDA #$28
+addf: c8           INY
+ade0: 91 80        STA ($80),Y
+ade2: a0 0c        LDY #$0c
+ade4: b1 80        LDA ($80),Y
+ade6: 0a           ASL
+ade7: 91 80        STA ($80),Y
+ade9: 60           RTS
+
+;;; BANK 11
+;;; PART 2a
+;;; Reduce Dmg
+
+9966: a0 00        LDY #$00     ; Is BB/Ma?
+9968: b1 86        LDA ($86),Y
+996a: c9 02        CMP #$02
+996c: f0 04        BEQ +$04  [$9972]
+996e: c9 08        CMP #$08
+9970: d0 2e        BNE +$2e  [$99a0] ; go ret
+9972: a0 18        LDY #$18     ; Scan for equipped weapons
+9974: b1 86        LDA ($86),Y
+9976: 30 13        BMI +$13  [$998b]
+9978: c8           INY
+9979: c0 1c        CPY #$1c
+997b: 90 f7        BCC +$f7  [$9974]
+997d: a0 10        LDY #$10     ; None equipped, Damage=STR/2+Level
+997f: b1 86        LDA ($86),Y
+9981: 4a           LSR
+9982: 38           SEC   ; set C to add (Level-1)+1
+9983: a0 26        LDY #$26
+9985: 71 86        ADC ($86),Y
+9987: a0 20        LDY #$20
+9989: 91 86        STA ($86),Y
+998b: a0 1c        LDY #$1c     ; Now scan for equipped armor
+998d: b1 86        LDA ($86),Y
+998f: 30 0f        BMI +$0f  [$99a0]
+9991: c8           INY
+9992: c0 20        CPY #$20
+9994: 90 f7        BCC +$f7  [$998d]
+9996: a0 26        LDY #$26     ; None found, Absorb=Level
+9998: b1 86        LDA ($86),Y
+999a: 69 00        ADC #$00  ; (C is always set if we're here, so...)
+999c: a0 22        LDY #$22
+999e: 91 86        STA ($86),Y
+99a0: 60           RTS
+
+; p[$80],0 -= 1
+99a1: a0 00        LDY #$00
+99a3: b1 80        LDA ($80),Y
+99a5: 38           SEC
+99a6: e9 01        SBC #$01
+99a8: 91 80        STA ($80),Y
+99aa: 60           RTS
+
+99ab: 40 42 0f     .DB $40, $42, $0f  ; 1000000
+99ae: e8 03        .DB $e8, $03       ; 1000
+
+; Start of battle?
+99b0: a9 00        LDA #$00
+99b2: 8d b7 68     STA $68b7
+99b5: 8d b8 68     STA $68b8
+99b8: a9 50        LDA #$50
+99ba: 85 4b        STA $4b
+99bc: 8d a7 6b     STA $6ba7
+99bf: a4 fa        LDY $fa
+99c1: b9 22 9a     LDA $9a22,Y
+99c4: 8d ac 6b     STA $6bac
+99c7: a9 ba        LDA #$ba
+99c9: 85 8c        STA $8c
+99cb: 85 8e        STA $8e
+99cd: a9 68        LDA #$68
+99cf: 85 8d        STA $8d
+99d1: 85 8f        STA $8f
+99d3: 20 2a 9a     JSR $9a2a   ; Convert out-of-battle data to in-battle data
+99d6: 20 2a a1     JSR $a12a   ; Set up the enemy party
+99d9: a9 06        LDA #$06
+
+; Start the battle
+99db: 85 96        STA $96
+99dd: a9 93        LDA #$93
+99df: 85 97        STA $97
+99e1: a9 0c        LDA #$0c
+99e3: 4c 09 f2     JMP $f209  ; Go start the battle, ends up at b12:9306
+
+99e6: ea           NOP
+99e7: ea           NOP
+; next: 99e8
+
+;; Replace a bunch of pointers
+;;; PART 2b
+9a00: 4c b0 99     JMP $99b0
+;;; PART 2c
+9af2: 4c db 99     JMP $99db
+;;; PART 2d
+9b11: 4c db 99     JMP $99db
+;;; PART 2e
+9e26: a9 ab        LDA #$ab
+;;; PART 2f
+9e40: 4c a1 99     JMP $99a1
+;;; PART 2g
+9e47: a9 ae        LDA #$ae
+;;; PART 2h
+9e61: 20 a1 99     JSR $99a1
+
+;;; BANK 15
+;;; PART 3
+;;; Reduce Dmg, other part
+
+; Do BB/Ma bare bonuses
+eeee: bd 20 61     LDA $6120,X
+eef1: d0 09        BNE +$09  [$eefc]
+eef3: bd 26 61     LDA $6126,X
+eef6: 18           CLC
+eef7: 69 01        ADC #$01
+eef9: 9d 20 61     STA $6120,X
+eefc: bd 10 61     LDA $6110,X
+eeff: 4a           LSR
+ef00: 18           CLC
+ef01: 7d 20 61     ADC $6120,X
+ef04: 9d 20 61     STA $6120,X
+ef07: 60           RTS
+ef08: 60           RTS
+
+;;; BANK 0
+;;; PART 4
+; Fix starting stats to match new formula
+b067: 03

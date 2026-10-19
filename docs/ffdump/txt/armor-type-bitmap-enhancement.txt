@@ -1,0 +1,13 @@
+;;; BANK 14
+;;; PART 1
+; Instead of comparing if the types are equal, compare if they share bits
+bca4: 25 12        AND $12
+bca6: f0 0a        BEQ +$0a  [$bcb2]
+
+;;; PART 2
+; Now we have to change the type bytes to match the new system.
+bcd1: 01 01 01 01 01 01 01 01
+bcd9: 01 01 01 01 01 01 01 01
+bce1: 02 02 02 02 02 02 02 02
+bce9: 02 04 04 04 04 04 04 04
+bcf1: 08 08 08 08 08 08 08 08

@@ -1,0 +1,26 @@
+;;; BANK 0
+
+; Elf in Elfland on top of a tree
+;;; PART 1
+b467: 1b
+
+; 3 different people in Gaia on top of trees
+;;; PART 2a
+b4f8: 3a
+;;; PART 2b
+b4fa: 39
+;;; PART 2c
+b510: 3a
+
+; Useless fairy in ice cave
+;;; PART 3
+b6d0: 00 00 00
+
+; Waterfall bat on top of a wall, half the time it'll move up into "outside"
+; space.
+;;; PART 4
+b765: 04
+
+; Marsh cave bat completely outside the walls
+;;; PART 5
+b82a: 2d 19

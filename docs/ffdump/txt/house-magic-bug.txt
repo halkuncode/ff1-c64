@@ -1,0 +1,14 @@
+;;; BANK 14
+;;; PART 1
+
+; Text "[HP] and magic recovered.\\SAVE?       [\\PUSH A....YES  PUSH B....NO]"
+8816: 20 3b 42 a4 aa ac a6 ff 23 a6
+8820: b2 32 23 a7 c0 05 9c 8a 9f 8e c5 ff ff ff ff ff
+8830: ff ff
+
+;;; Part 2
+b2cb: 20 f3 ab    JSR $abf3   ; Restore magic first
+b2ce: a9 1e       LDA #$1e    ; Then ask the question and save if A pressed
+b2d0: 20 e0 b2    JSR $b2e0
+b2d3: ea          NOP
+b2d4: ea          NOP

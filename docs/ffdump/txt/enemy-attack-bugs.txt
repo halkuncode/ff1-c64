@@ -1,0 +1,17 @@
+;;; BANK 12
+;;; PART 1
+a5b0: a9 00       LDA #$00   ; category attack should be 0
+a5b2: 8d 6d 68    STA $686d
+a5b5: a0 0e       LDY #$0e   ; use status attack element for attack element
+
+;;; PART 2
+a5e8: a9 00       LDA #$00   ; target category (warrior) should be 0
+a5ea: 8d 76 68    STA $6876
+a5ed: a0 0e       LDY #$0e
+a5ef: a9 00       LDA #$00   ; target elemental weakness (warrior) should be 0
+
+;;; PART 3
+b618: a9 00       LDA #$00   ; warrior creature type should be 0
+
+;;; PART 4
+b655: a9 00       LDA #$00   ; warrior elemental weakness should be 0

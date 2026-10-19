@@ -1,0 +1,49 @@
+Each song is made of three channels: S1, S2, and T:
+  S1 is a square wave with a 25% duty cycle
+  S2 is a square wave with a 12.5% duty cycle
+     * S2 is dropped out for many sound effects
+  T is a triangle wave
+     * "Instruments" cannot be set for this channel
+
+00-BF are normal notes.
+  The high nybble selects the note, which may resemble the following:
+    0 = C     1 = C#    2 = D     3 = D#    4 = E     5 = F
+    6 = F#    7 = G     8 = G#    9 = A     a = A#    b = B
+  The octave is set by the D8-DB commands.
+  The low nybble sets the note length, see commands F9-FE and the table at
+  0x37369. There isn't any strict correspondence between the nybble value and
+  the note length.
+
+C0-CF are rest/sustain, depending on the instrument.
+  The low nybble sets the length. Channel T is always a rest.
+
+D0-D7 are loops.
+  D0 is an infinite loop; D1 to D7 loop 1 to 7 times. The following two bytes
+  are the address to loop to.
+
+D8-DF select the octave.
+  D8 is the lowest, DB is the highest. DC-DF are b0rken.
+
+E0-EF select the instrument.
+  Each instrument is basically a volume envelope, which is processed at the
+  speed set by command F8. The final value of the envelope is sustained until
+  the note ends.
+
+F0-F7 are NOPs.
+
+F8 sets the envelope speed.
+  The low nybble of the following byte selects the speed; 0 is fastest and D is
+  the slowest. E and F will sustain the first volume level of the instrument.
+
+F9-FE select the note length set.
+  The note lengths (in 1/60 second) are:
+   F9: 192  96  48  24  12 144  72  36 192  96  48  24  12 144  72  36
+   FA: 120  60  30  15   7  90  40  20 120  60  30  15   7  90  40  20
+   FB: 144  96  72  48  36  24  18  12   9   6   3   3   4  16   8   8
+   FC: 120  80  60  40  30  20  15  10   7   5   3   2  14  13   7   6
+   FD: 108  72  54  36  27  18  14   9   7   4   3   3  14  96  64  48
+   FE:  96  64  48  32  24  16  12   8   6   4   2   2  11  10   6   5
+
+FF ends the channel.
+  The channel will be silent until a new song is started by setting the
+  appropriate value in $4b.

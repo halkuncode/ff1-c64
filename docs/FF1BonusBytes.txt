@@ -1,0 +1,388 @@
+Bonus Bytes, rev .1.
+
+------------------------------------------------------------
+Default Party:
+------------------------------------------------------------
+Offsets:
+
+Char. 1: $3A0BE 
+Char. 2: $3A0CE 
+Char. 3: $3A0DE 
+Char. 4: $3A0EE 
+
+Values: 
+
+Standard:Upgrade (*): 
+00 = Fighter06 = Knight 
+01 = Thief07 = Ninja 
+02 = Black Belt08 = Master 
+03 = Red Mage09 = Red Wizard 
+04 = White Mage0A = White Wizard 
+05 = Black Mage0B = Black Wizard 
+
+*: Use these at your own risk; they're glitched after class change. 
+
+Names: 
+
+Char. 1: $3A0C0 
+Char. 2: $3A0D0 
+Char. 3: $3A0E0 
+Char. 4: $3A0F0 
+
+There are four bytes to change there, all set by default at $FF, which is a
+space.  You can change these to whatever... grab a table if need be.
+Remember, though, this will only give suggested names; you still have to
+enter the names at selection.  There is a way to make those names stick,
+though.  It'll be in here in the next revision.
+
+------------------------------------------------------------
+Background Colors: 
+------------------------------------------------------------
+This refers to menus, intro text, etc.  The main tipoff for these is that the
+palette is $0F-$00-$01-$30, which would be, in that order, black, white,
+blue, gray.  The blue, as you probably know, is the background, so change all
+$01 values for the background.
+
+Menu Colors: $3EB3A (thanks, Square!  Just one value!) 
+"Equip/Trade/Drop" Menu Color: $3AD8E (highlight for selected option) 
+"Weapon/Armor" Menu Title Highlight: $3AD92 
+Intro BG Color: $3A12C (This will not change the text fade-in color.) 
+
+Towns: 
+
+Ooh, FUN.  Each map has a pair of palettes, one for when you're in a room and
+one for when you're outside.  Everything in this series is a standard map, so
+it goes towns, castles, dungeons.  These are the palettes themselves, not
+just the locations of the $01 bytes.
+
+Coneria:Indoors:$201C 
+Outdoors:$203C 
+Pravoka:Indoors:$204C 
+Outdoors:$206C 
+Elfland:Indoors:$207C 
+Outdoors:$209C 
+Melmond:Indoors:$20AC 
+Outdoors:$20CC 
+Crescent Lake:Indoors:$20DC 
+Outdoors:$20FC 
+Gaia:Indoors:$210C 
+Outdoors:$212C 
+Onrac:Indoors:$213C 
+Outdoors:$215C 
+Lefein:Indoors:$216C 
+Outdoors:$218C 
+Coneria Castle (1F):Indoors:$219C 
+Outdoors:$21BC 
+Coneria Castle (2F):Indoors:$21CC 
+Outdoors:$21EC 
+Elfland Castle:Indoors:$21FC 
+Outdoors:$22BC 
+Northwest Castle:Indoors: 
+Outdoors: 
+...and so on. 
+------------------------------------------------------------
+Speeds 
+------------------------------------------------------------ 
+Walking: $3D088 
+Ship/Airship Multipliers: $3D08D, $3D096 
+
+Warning: Don't set higher than original airship speed, or you'll get palette
+glitches.  If you use different speeds, the game may crash in battle.  Their
+present values are $4A.  Changing them to, say, $EA or $0A will speed up or
+lower their speeds.
+
+Canoe: 
+
+Intro Fade-In: $3A2C8 
+
+Currently set at $0F.  Setting it lower makes the fade-in go faster.  Raising
+it to, say, $FF builds in a nice bathroom break for your players, because it
+goes REALLY slow.
+
+------------------------------------------------------------
+Black Belt/Master Attributes 
+------------------------------------------------------------ 
+As you may have heard, the Black Belt and Master have their stats determined
+differently.  Unarmed, their Damage will be double their current level.
+Without armor, their Absorb will be equal to their level.  They also get
+double the hits of other classes.  You can reassign them to other classes, as
+well.
+
+At 2D97A, the code reads "C9 02 F0 05 C9 08 F0". 
+At 32DCF, the code reads "C9 02 F0 04 C9 08 D0". 
+At 3EED2, the code reads "C9 02 F0 04 C9 08 D0". 
+At 3EEF0, the code reads "C9 02 F0 04 C9 08 D0". 
+
+The $02 and $08 bytes select the Black Belt and Master classes, respectively.
+Change all of them using the values listed under "Default Party" and you can
+reassign them to those classes.  If you select a value that isn't in the list
+(ie, anything higher than $0B), no one will get the bonuses.  In other words,
+you can give none, 1, or 2 classes the bonuses.  In addition, you can also
+reassign them to a range of classes.
+
+Change all the $F0 bytes to $90. 
+Change all the $D0 bytes to $B0. 
+
+Now, as long as the first class's value is less than the second class, all
+classes between the two numbers, including the first number, but not the
+second, get the bonuses.  For instance, if you change the $F0 and $D0 bytes,
+but not the classes, all classes between Black Belt and Master get the
+bonuses (Black Belt, Red/White/Black Mages, Knight, Ninja, Master).  The
+doubled hits may not carry over.
+
+------------------------------------------------------------
+Hold Magic Switches 
+------------------------------------------------------------ 
+By default, the Fighter and Thief get no MP until class change.  They can
+gain MP if they start off as Knights or Ninjas, though.  Here's how to tweak
+that.
+
+$2DC7D reads "F0 40 C9 01 F0 3C". 
+
+Change the $01 to whatever class you want to be without MP.  So if you don't
+want the Red Mage to have magic, you'd change it to 03.
+
+Just like the Black Belt stats, you can tweak this, to include a range.
+Here's how.  Change the second $F0 byte to read $30:
+
+$2DC7D should now read "F0 40 C9 01 30 3C". 
+
+However, if you're using FFHackster, this WILL be overwritten.  Until someone
+changes that... ^_^
+
+------------------------------------------------------------
+Text Locations 
+------------------------------------------------------------ 
+Intro: $37F30 
+Bridge: $36843 "And so...our world." 
+Item Descriptions: $385BD 
+Spell Descriptions: $38A17 
+Ending: $368F3 "The Time-Loop...continue to shine..." 
+Character Name Menu: $3A021 
+Shop Text: $38095
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OK, so here's what I've found:
+
+On the Continue/New Game screen:
+
+The C 1987 SQUARE & C 1990 NINTEDO offset is: 384B8. The numbers are:
+00 - Waits for a button press to display next window of text
+05 - Line feed
+01 - Blank text window
+80 - 0
+81 - 1
+82 - 2
+83 - 3
+84 - 4
+85 - 5
+86 - 6
+87 - 7
+88 - 8
+89 - 9
+FF - SPACE
+
+NINTENDO in Bridge scene is at 2FF72.
+
+C1, E7-EA
+
+2FEB9
+
+The Continue/New Game/Respond Rate text is at 3A263.
+
+On the name input screen:
+The Name Input alphabet is at 3A021.
+The Select Name text is at 3A0B1.
+
+Shop screens:
+Shop names are at 3805C.
+The word OK when you buy something is at 380DE.
+The word RESET at the Inn is at 38211, and POWER is at 38225.
+
+Specific Item Descriptions:
+TENT/CABIN/HOUSE HP/SAVE Message - 387B6
+
+Status Screen Text starts at 388C2.
+
+EQUIP/TRADE/DROP is at 38B30.
+ARMOR for Equip screen is at 38B57.
+
+OK,  that's normal stuff. Now for fun stuff...
+
+Main Menu commands:
+ITEM   - 38956
+MAGIC  - 3859C
+WEAPON - 385A3*
+ARMOR  - 385AA
+
+*If you want to change this to use standard text, don't use a word that is
+more than 5 letters long. 385A8 and 385A9 MUST be 01 and FF, respectivly, or
+it will mess up the menu. It will also cause the word STATUS to vanish. If
+you ever want to restore it, the default values are CF D0 D1 D2 D3 01 FF.
+
+Unknown Use Text
+WARRIOR @ 38281
+EQUIP/TRADE/DROP @ 38C4D, 38CDF
+ARMOR @ 38C74, 38C8A, 38CFF
+STONE @ 38AAE, 38BA0
+WEAPON @ 38CD5
+
+I'm thinking that at least one of those STONEs is for when a character is petrified, but I haven't been able to test that yet....
+
+
+
+
+
+
+
+
+
+
+
+
+Open the FF1 ROM in your hex editor and go to the addresses listed below.
+In each location you'll find an 01 (representing blue). Simply change all of
+these 01s to whatever color value, in your case you'll use 0F for black.
+
+$3a12c 
+$3a2e3 
+$3ad8a 
+$3ad8e 
+$3ad92 
+$3eb3a 
+
+3AD8E = menu color for "Equip" "Trade" "Drop" 
+3AD92 = color for "Weapon" "Armor" 
+
+The color for the text is immidiatly after (3AD8F, 3AD93).
+
+http://www.zophar.net/trans/docs/paletdat.html
+
+
+Default Party Info
+
+Char. 1: 3A0BE 
+Char. 2: 3A0CE 
+Char. 3: 3A0DE 
+Char. 4: 3A0EE
+
+Classes
+0 - Fighter
+1 - Thief
+2 - Black Belt
+3 - Red Mage
+4 - White Mage
+5 - Black Mage
+6 - Knight
+7 - Ninja
+8 - Master
+9 - Red Wizard
+A - White Wizard
+B - Black Wizard
+
+
+The default names are at the following offsets: 
+
+Char. 1:  $3A0C0 
+Char. 2:  $3A0D0 
+Char. 3:  $3A0E0 
+Char. 4:  $3A0F0 
+
+The default names all have $FF values for the 4 bytes in the original ROM,
+which of course, represents empty text.
+
+The C 1987 SQUARE & C 1990 NINTEDO offset is: 384B8. The numbers are:
+80 - 0
+81 - 1
+82 - 2
+83 - 3
+84 - 4
+85 - 5
+86 - 6
+87 - 7
+88 - 8
+89 - 9
+FF - SPACE
+
+The Name Input alphabet is at 3A021.
+The Select Name text is at 3A0B1.
+The Continue/New Game/Respond Rate text is at 3A263.
+Shop names are at 3805C.
+The word OK when you buy something is at 380DE.
+The word RESET at the Inn is at 38211, and POWER is at 38225.
+
+Main Menu commands:
+ITEM   - 38956
+MAGIC  - 3859C
+WEAPON - 385A3*
+ARMOR  - 385AA
+
+*If you want to change this to use standard text, don't use a word that is
+more than 5 letters long. 385A8 and 385A9 MUST be 01 and FF, respectivly, or
+it will mess up the menu. It will also cause the word STATUS to vanish. If
+you ever want to restore it, the default values are CF D0 D1 D2 D3 01 FF.
+
+Specific Item Descriptions:
+CROWN - 3860A
+CRYSTAL - 3861C
+KEY - 38649
+SLAB - 3867B
+ROD - 386B1
+AIRSHIP - 386D0
+MADE IN LEFEIN OOHH - 3870F
+CUBE - 3875D
+OXYALE - 3878E
+TENT/CABIN/HOUSE HP/SAVE Message - 387B6
+
+Status Screen Text starts at 388C2.
+
+EQUIP/TRADE/DROP is at 38B30.
+ARMOR for Equip screen is at 38B57.
+
+Unknown Use Text
+EQUIP/TRADE/DROP @ 38C4D, 38CDF
+ARMOR @ 38C74, 38C8A, 38CFF
+STONE @ 38AAE, 38BA0
+WEAPON @ 38CD5
+
+
+
+
+Bypass N A S I R Checksum by Vagla
+
+Do either one of these:
+
+3CFEF- A900
+-or-
+3CFEF- 2900
+
+There's really no difference. Both feed it 00, which is what the hack requires (one does it by loading the current value as 00, and the other ANDing the current value to 00).
+
+I really wonder why it was so hard for anyone to figure this out, since it's been an issue for years. I simply dumped the RAM, found out where N A S I R was in it, and watched for reads to that data in FCEUd when entering a town. It brought me to a line of code very near the code at 3CFEF, and a few opcodes down was a BEQ which was the source of all of the trouble. It branches on 00, which is what it gets from its checksum if it's true, so I just changed the EOR #$AE (checks to make sure the values sum to $AE) to LDA #$00/AND #$00. Thus, it always branches, simple as that. :P
+
+
+
+
+More Bytes! by Dark Steak
+Offset 0x3A12C is for the starting screen background.
+
+Offset 0x3A2E3 is for the fade-in text on the starting screen. While the blue doesn't look all that bad (for the fade-in) against most colours, the effect just isn't quite the same. This one staying the same as the others isn't as critical.
+
+Offset 0x3EB3A is the "general background." Nearly all of the normal sub-screen, the item screen, magic screen, most of the weapon and armor screens, status screen, party select windows, and party lineup screen backgrounds (all of them) are determined by this byte. What's fun is how this colour over-rides the starting screen background in block chunks behind the fading-in text. Those two must be the same, or it looks...off.
+
+Offset 0x3AD92 is on the weapon and armor screens of the main sub-screen. This controls a block of the background in the upper window where the hand-pointer starts, and stays behind most of what word the hand is pointing at. Must be the same as the rest of the sub-screen background or it looks just plain icky.
+
+Offset 0x3AD8E is also on the weapon and armor screens. This goes as the main part of the background on the box in the upper-lefthand corner, where is says either weapon or armor. This also looks amazingly bad if it's not the same as the rest of the sub-screen.
+
+
+The Black Belt/Master's fist's palette determiner is at 0x32DE4.
+
+The palette for the lit Orbs is from 0x3AD88 to 0x3AD8B.
+
+Name select screen's red window's background is at 0x39C7E.
+
+Shop Title window's palette is from 0x3EB84 to 0x3EB87.
+
+Current money in shop window's palette is from 0x3EB88 to 3EB8B.

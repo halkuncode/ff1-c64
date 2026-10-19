@@ -1,0 +1,106 @@
+;;; BANK 11
+;;; PART 1
+;; Unfortunately, we have to relocate a bunch of extra code to make room for
+;; the addition.
+
+; Apply BB/Ma bare bonuses
+9966: a0 00        LDY #$00     ; Is BB/Ma?
+9968: b1 86        LDA ($86),Y
+996a: c9 02        CMP #$02
+996c: f0 04        BEQ +$04  [$9972]
+996e: c9 08        CMP #$08
+9970: d0 27        BNE +$27  [$9999]
+9972: a0 26        LDY #$26     ; Load level into X
+9974: b1 86        LDA ($86),Y
+9976: aa           TAX
+9977: e8           INX
+9978: a0 18        LDY #$18     ; Scan for equipped weapons
+997a: b1 86        LDA ($86),Y
+997c: 30 0b        BMI +$0b  [$9989]
+997e: c8           INY
+997f: c0 1c        CPY #$1c
+9981: 90 f7        BCC +$f7  [$997a]
+9983: 8a           TXA          ; None equipped, Damage=Level*2
+9984: 0a           ASL
+9985: a0 20        LDY #$20
+9987: 91 86        STA ($86),Y
+9989: a0 1c        LDY #$1c     ; Now scan for equipped armor
+998b: b1 86        LDA ($86),Y
+998d: 30 0a        BMI +$0a  [$9999]
+998f: c8           INY
+9990: c0 20        CPY #$20
+9992: 90 f7        BCC +$f7  [$998b]
+9994: a0 22        LDY #$22     ; None found, Absorb=Level
+9996: 8a           TXA
+9997: 91 86        STA ($86),Y
+9999: 60           RTS
+
+999a: ea           NOP
+
+; p[$80],0 -= 1
+999b: a0 00        LDY #$00
+999d: b1 80        LDA ($80),Y
+999f: 38           SEC
+99a0: e9 01        SBC #$01
+99a2: 91 80        STA ($80),Y
+99a4: 60           RTS
+
+99a5: 40 42 0f     .DB $40, $42, $0f  ; 1000000
+99a8: e8 03        .DB $e8, $03       ; 1000
+
+99aa: 18           CLC
+99ab: 69 00        ADC #$00
+99ad: 85 96        STA $96
+99af: a9 00        LDA #$00
+99b1: 69 93        ADC #$93
+99b3: 85 97        STA $97
+99b5: a9 0c        LDA #$0c
+99b7: 4c 09 f2     JMP $f209  ; Go start the battle, ends up at b12:9306
+
+; Start of battle?
+99ba: a9 00        LDA #$00
+99bc: 8d b7 68     STA $68b7
+99bf: 8d b8 68     STA $68b8
+99c2: a9 50        LDA #$50
+99c4: 85 4b        STA $4b
+99c6: 8d a7 6b     STA $6ba7
+99c9: a4 fa        LDY $fa
+
+;;; PART 2
+;; Replace a bunch of pointers
+
+;;; PART 2a
+99e5: 4c aa 99     JMP $99aa
+;;; PART 2b
+9a00: 4c ba 99     JMP $99ba
+;;; PART 2c
+9af2: 4c aa 99     JMP $99aa
+;;; PART 2d
+9b11: 4c aa 99     JMP $99aa
+;;; PART 2e
+9e26: a9 a5        LDA #$a5
+;;; PART 2f
+9e40: 4c 9b 99     JMP $999b
+;;; PART 2g
+9e47: a9 a8        LDA #$a8
+;;; PART 2h
+9e61: 20 9b 99     JSR $999b
+
+;;; BANK 15
+;;; PART 3
+;; Fix broken calculation when exiting Weapon screen with weapon equipped
+;; (Rounds STR/2 up instead of down)
+eeee: bd 20 61     LDA $6120,X
+eef1: f0 0c        BEQ +$0c  [$eeff]
+eef3: bd 10 61     LDA $6110,X
+eef6: 4a           LSR
+eef7: 18           CLC
+eef8: 7d 20 61     ADC $6120,X
+eefb: 9d 20 61     STA $6120,X
+eefe: 60           RTS
+eeff: bd 26 61     LDA $6126,X
+ef02: 18           CLC
+ef03: 69 01        ADC #$01
+ef05: 0a           ASL
+ef06: d0 f3        BNE +$f3  [$eefb]
+ef08: 60           RTS

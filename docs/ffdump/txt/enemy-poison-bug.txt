@@ -1,0 +1,166 @@
+;;; BANK 12
+;;; PART 1
+a1d7: 20 32 a2     JSR $a232  ; do post-round handling (e.g. poison)
+
+;;; PART 2
+; do post-round handling (e.g. poison)
+a232: a9 00        LDA #$00
+a234: 20 c3 a2     JSR $a2c3   ; Handle warrior poison
+a237: a9 01        LDA #$01
+a239: 20 c3 a2     JSR $a2c3   ; Handle warrior poison
+a23c: a9 02        LDA #$02
+a23e: 20 c3 a2     JSR $a2c3   ; Handle warrior poison
+a241: a9 03        LDA #$03
+a243: 20 c3 a2     JSR $a2c3   ; Handle warrior poison
+a246: 20 50 aa     JSR $aa50
+
+; Handle regenerative/poisoned monsters
+a249: a9 08        LDA #$08
+a24b: 8d 8a 6c     STA $6c8a
+a24e: ad 8a 6c     LDA $6c8a
+a251: 20 be b4     JSR $b4be   ; Set pointers for slot A: p[$92]=in-ROM, p[$90]=in-RAM
+a254: a0 14        LDY #$14
+a256: b1 90        LDA ($90),Y
+a258: 99 56 68     STA $6856,Y
+a25b: b1 92        LDA ($92),Y
+a25d: 99 6a 68     STA $686a,Y
+a260: 88           DEY
+a261: 10 f3        BPL +$f3  [$a256]
+
+a263: ad 5c 68     LDA $685c   ; poisoned?
+a266: 29 04        AND #$04
+a268: f0 15        BEQ +$15  [$a27f]
+;;
+a26a: a9 01        LDA #$01    ;; Subtract 2 from HP
+a26c: a2 02        LDX #$02
+a26e: 20 0a af     JSR $af0a   ; w[A] = clamp(w[A] - X)
+a271: 20 3c af     JSR $af3c   ; w[A]<=0 (sets flags NZ)
+a274: ea           NOP
+;a26a: a9 0a        LDA #$0a    ;; This instead subtracts 10%
+;a26c: 20 ac a2     JSR $a2ac   ; w[1b] = w[1]/A; A=X=1, Y=1b
+;a26f: 20 ac ae     JSR $aeac   ; w[A] = clamp(w[X] - w[Y])
+;a272: 1d 56 68     ORA $6856,X
+;;
+a275: d0 08        BNE +$08  [$a27f]
+a277: a9 01        LDA #$01
+a279: 8d 5c 68     STA $685c
+a27c: 20 48 bb     JSR $bb48
+
+a27f: ad 7a 68     LDA $687a   ; regenerative?
+a282: 10 14        BPL +$14  [$a298]
+;;
+a284: a9 01        LDA #$01    ;; Add 3 to HP
+a286: a2 03        LDX #$03
+a288: 20 dd ae     JSR $aedd   ; w[A] = clamp(w[A] + X)
+a28b: ea           NOP
+;a284: a9 0a        LDA #$0a   ;; This instead adds 10%
+;a286: 20 ac a2     JSR $a2ac   ; w[1b] = w[1]/A; A=X=1, Y=1b
+;a289: 20 7b ae     JSR $ae7b   ; w[A] = clamp(w[X] + w[Y])
+;;
+a28c: a2 0c        LDX #$0c
+a28e: a0 01        LDY #$01
+a290: 20 ea ad     JSR $adea   ; CMP w[Y] >= w[X] (sets NC, clear others)
+a293: 90 03        BCC +$03  [$a298]
+a295: 20 50 af     JSR $af50   ; w[Y/2] = w[X/2]
+
+a298: a0 06        LDY #$06
+a29a: b9 56 68     LDA $6856,Y
+a29d: 91 90        STA ($90),Y
+a29f: 88           DEY
+a2a0: 10 f8        BPL +$f8  [$a29a]
+
+a2a2: ce 8a 6c     DEC $6c8a
+a2a5: 10 a7        BPL +$a7  [$a24e]
+a2a7: 4c 0d a2     JMP $a20d   ; Check for won/lost battle
+
+a2aa: ea           NOP
+a2ab: ea           NOP
+
+; w[1b] = w[1]/A; A=X=1, Y=1b
+a2ac: ae 6e 68     LDX $686e   ;; Load HP (use 686e and 686f for MaxHP)
+a2af: ac 6f 68     LDY $686f
+a2b2: 20 1b aa     JSR $aa1b   ; A = YX / A, X = YX % A
+a2b5: 0d 8d 68     ORA $688d
+a2b8: d0 03        BNE +$03  [$a2bd]
+a2ba: ee 8c 68     INC $688c
+a2bd: a9 01        LDA #$01
+a2bf: aa           TAX
+a2c0: a0 1b        LDY #$1b
+a2c2: 60           RTS
+;a2c3
+
+;;; PART 3
+; Handle player poison as well
+a2d0: bd 01 61     LDA $6101,X  ; poisoned?
+a2d3: 29 04        AND #$04
+a2d5: f0 49        BEQ +$49  [$a320]
+a2d7: bd 0a 61     LDA $610a,X
+a2da: 8d 58 68     STA $6858
+a2dd: bd 0b 61     LDA $610b,X
+a2e0: 8d 59 68     STA $6859
+a2e3: bd 0c 61     LDA $610c,X
+a2e6: 8d 6e 68     STA $686e
+a2e9: bd 0d 61     LDA $610d,X
+a2ec: 8d 6f 68     STA $686f
+;;
+a2ef: a9 01        LDA #$01    ;; Subtract 2 from HP
+a2f1: a2 02        LDX #$02
+a2f3: 20 0a af     JSR $af0a   ; w[A] = clamp(w[A] - X)
+a2f6: 20 3c af     JSR $af3c   ; w[A]<=0 (sets flags NZ)
+a2f9: ea           NOP
+;a2ef: a9 0a        LDA #$0a    ;; This instead subtracts 10%
+;a2f1: 20 ac a2     JSR $a2ac   ; w[1b] = w[1]/A; A=X=1, Y=1b
+;a2f4: 20 ac ae     JSR $aeac   ; w[A] = clamp(w[X] - w[Y])
+;a2f7: 1d 56 68     ORA $6856,X
+;;
+a2fa: d0 15        BNE +$15  [$a311]
+a2fc: ae ad 6b     LDX $6bad   ; dead from poison
+a2ff: a9 01        LDA #$01
+a301: 9d 01 61     STA $6101,X
+a304: ad 5a 68     LDA $685a
+a307: 29 03        AND #$03
+a309: 0a           ASL
+a30a: 0a           ASL
+a30b: a8           TAY
+a30c: a9 00        LDA #$00
+a30e: 99 8f 68     STA $688f,Y
+a311: ae ad 6b     LDX $6bad
+a314: ad 58 68     LDA $6858
+a317: 9d 0a 61     STA $610a,X
+a31a: ad 59 68     LDA $6859
+a31d: 9d 0b 61     STA $610b,X
+a320: 60           RTS
+
+a321: ea           NOP
+a322: ea           NOP
+a323: ea           NOP
+a324: ea           NOP
+a325: ea           NOP
+a326: ea           NOP
+a327: ea           NOP
+a328: ea           NOP
+a329: ea           NOP
+a32a: ea           NOP
+a32b: ea           NOP
+a32c: ea           NOP
+
+;;; PART 4
+aa1b: 8d 8b 68     STA $688b
+aa1e: 8e 8c 68     STX $688c
+aa21: 8c 8d 68     STY $688d
+aa24: 20 2b ae     JSR $ae2b   ; w[$688c] /= $688b, $688b = w[$688c] % $688b
+aa27: ad 8c 68     LDA $688c
+aa2a: ae 8b 68     LDX $688b
+
+;;; PART 5a
+ae34: 2e 8c 68     ROL $688c
+ae37: 2e 8d 68     ROL $688d
+;;; PART 5b
+ae40: cd 8b 68     CMP $688b
+ae43: 90 06        BCC +$06  [$ae4b]
+ae45: ed 8b 68     SBC $688b
+ae48: 8d b3 68     STA $68b3
+ae4b: 2e 8c 68     ROL $688c
+ae4e: 2e 8d 68     ROL $688d
+;;; PART 5c
+ae57: 8d 8b 68     STA $688b

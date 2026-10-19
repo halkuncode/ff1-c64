@@ -1,0 +1,157 @@
+; $6ffe-f could possibly be used to store PRNG state?
+
+;;; BANK 12
+;;; PART 0
+; Formerly cycles the PRNG while waiting in battle. Good to kill, or not?
+;97c7: ea           NOP
+;97c8: ea           NOP
+;97c9: ea           NOP
+
+;;; BANK 13
+;;; PART 1a
+; Shuffles tiles for the ship game
+9da6: ea           NOP
+9da7: ea           NOP
+9da8: ea           NOP
+9da9: ea           NOP
+9daa: 20 e7 fc     JSR $fce7
+
+;;; BANK 15
+;;; PART 1b
+; Hijack a (useless anyway) JMP
+c0a9: 4c 02 fd     JMP $fd02   ; Seed the non-saved half of the PRNG
+
+;;; PART 1b
+; Hijack a JSR
+c0b4: 20 1a fd     JSR $fd1a   ; Copy initial stats for each warrior and seed the PRNG
+
+;;; PART 1c
+; Get next battle. Good to combine with all other PRNGs?
+c55e: 20 e7 fc     JSR $fce7
+c561: 29 3f        AND #$3f
+c563: aa           TAX
+c564: bc 8c c5     LDY $c58c,X ; Look up battle number
+c567: b1 10        LDA ($10),Y
+c569: 85 6a        STA $6a
+c56b: 18           CLC
+c56c: 60           RTS
+c56d: ea           NOP
+c56e: ea           NOP
+c56f: ea           NOP
+c570: ea           NOP
+
+; Replacement routine for "get next step random number"
+; Maintains a countdown in w[$f5], decrementing by $f8 each call, and returning
+; C clear if a battle should be entered.
+c571: 38           SEC
+c572: a5 f5        LDA $f5
+c574: e5 f8        SBC $f8
+c576: 85 f5        STA $f5
+c578: a5 f6        LDA $f6
+c57a: e9 00        SBC #$00
+c57c: b0 0b        BCS +$0b  [$c589]
+; Enter here to seed the counter
+c57e: 20 e7 fc     JSR $fce7 ; get rnd
+c581: 18           CLC
+c582: 69 78        ADC #$78
+c584: 85 f5        STA $f5
+c586: a9 00        LDA #$00
+c588: 2a           ROL
+c589: 85 f6        STA $f6
+c58b: 60           RTS
+
+;;; PART 1d
+; Next step random number.
+c507: 85 f8        STA $f8
+c509: 20 71 c5     JSR $c571
+c50c: ea           NOP
+c50d: ea           NOP
+
+;;; PART 1d
+; Next step random number.
+cdc7: 20 71 c5     JSR $c571
+cdca: ea           NOP
+cdcb: ea           NOP
+
+;;; PART 2
+; Former PRNG lookup table
+f100: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+f110: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+f120: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+f130: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+f140: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+f150: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+f160: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+f170: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+f180: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+f190: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+f1a0: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+f1b0: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+f1c0: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+f1d0: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+f1e0: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+f1f0: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+
+;;; PART 3
+; (Former PRNG function and lookup table)
+; LFSR PRNG, with a period of 65535
+; bad part: either 22 or 38 cycles per random number instead of 14
+fce7: 06 f7        ASL $f7
+fce9: 6e 8a 68     ROR $688a
+fcec: 90 0e        BCC +$0e  [$fcfc]
+fcee: a5 f7        LDA $f7
+fcf0: 49 4b        EOR #$4b
+fcf2: 85 f7        STA $f7
+fcf4: ad 8a 68     LDA $688a
+fcf7: 49 5f        EOR #$5f
+fcf9: 8d 8a 68     STA $688a
+fcfc: ad 8a 68     LDA $688a
+fcff: 45 f7        EOR $f7
+fd01: 60           RTS
+
+; Seed the non-saved half of the PRNG
+fd02: a2 00        LDX #$00
+fd04: 8a           TXA
+fd05: 7d 00 61     ADC $6100,X
+fd08: e8           INX
+fd09: d0 fa        BNE +$fa  [$fd05]
+fd0b: 85 f7        STA $f7
+fd0d: 0d 8a 68     ORA $688a
+fd10: d0 02        BNE +$02  [$fd14]
+fd12: e6 f7        INC $f7
+fd14: 20 7e c5     JSR $c57e
+fd17: 4c b7 c0     JMP $c0b7
+
+; Seed the PRNG
+fd1a: 20 6d c7     JSR $c76d  ; Copy initial stats for each warrior
+fd1d: a2 00        LDX #$00
+fd1f: 8a           TXA
+fd20: 7d 00 61     ADC $6100,X
+fd23: e8           INX
+fd24: e8           INX
+fd25: d0 f9        BNE +$f9  [$fd20]
+fd27: 8d 8a 68     STA $688a
+fd2a: 8a           TXA
+fd2b: 7d 01 61     ADC $6101,X
+fd2e: e8           INX
+fd2f: e8           INX
+fd30: d0 f9        BNE +$f9  [$fd2b]
+fd32: 85 f7        STA $f7
+fd34: 0d 8a 68     ORA $688a
+fd37: d0 02        BNE +$02  [$fd3b]
+fd39: e6 f7        INC $f7
+fd3b: 4c 7e c5     JMP $c57e
+
+fd3c:                                     ea ea ea ea
+fd40: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+fd50: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+fd60: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+fd70: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+fd80: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+fd90: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+fda0: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+fdb0: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+fdf0: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+fdd0: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+fde0: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+fdf0: ea

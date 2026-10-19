@@ -1,0 +1,681 @@
+
+
+
+
+
+....................X0---Overview
+....................X1---Dialogue
+....................X2---Dialogue Pointers
+....................X3---
+....................X4---
+....................X5---
+
+
+....................Remaining text to be finished in an update
+
+
+
+******************************************************---X0---***********************************************************
+*************************************************************************************************************************
+
+_____________________________________________________-Overview-__________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+
+
+******************************************************---X1---***********************************************************
+*************************************************************************************************************************
+
+_____________________________________________________-Dialogue-__________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+28210/17-(Text:00)-Nothing here.
+
+28219/5a-(Text:01)-Light Warriors... Just as in Lukahn's prophecy. Garland has kidnapped Princess Sara. Please help her!!
+
+2825c/b2-(Text:02)-Thank you for saving the Princess. To aid your quest I ordered a bridge built to the continent. 
+                   Go now, and make the Orbs shine again!!
+
+282b4/cc-(Text:03)-The Princess always worries about you.
+
+282ce/12-(Text:04)-No one touches my Princess!! Light Warriors?? You impertinent fools. 
+                   I Garland, will knock you all down!!
+
+28314/2e-(Text:05)-So, you are the Light Warriors! Thank you.
+
+28330/9e-(Text:06)-This Lute has been passed down from Queen to Princess for 2000 years. Garland stole it                                      when he kidnapped me. Please accept it as my gift__it just might come in handy.
+
+283a0/c5-(Text:07)-Now, get ready for your trip, and make the Orbs shine again.
+
+2b3c7/19-(Text:08)-Aye, I am Bikke the Pirate, and surprised I am that ye scurvy dogs have the cheek to face me. 
+                   Mates! Get those landlubbers!
+
+2841b/30-(Text:09)-Aye, ye got me. Take my ship.
+
+28432/4a-(Text:0a)-I shan't be any more bother. I promise.
+
+2844c/87-(Text:0b)-For five years the Prince has slept under Astos' spell. Only Wake_up Herb can cure him.
+
+28489/b7-(Text:0c)-Ah, this Herb will release the Prince from Astos' curse. Look! He rises...
+
+284b9/d4-(Text:0d)-Thank you. Peace will return to Elfland.
+
+284d6/17-(Text:0e)-Thank you! Wait... Could you be the Light Warriors?...
+                   Then as legend says, I give you the Mystic Key.
+
+28519/19-(Text:0f)-?
+
+2851b/20-(Text:10)-z... ... z... ...
+
+28522/6c-(Text:11)-Astos double_crossed us. Go south to the Marsh Cave, to retrieve the Crown.
+                 
+2856e/bf-(Text:12)-HA, HA, HA, I am Astos, King of the Dark Elves.
+                   I have Matoya's Crystal Eye, and you shall give me that Crown, now!!!
+
+285c1/f1-(Text:13)-A huge rock blocks construction of my canal. If only I had Nitro Powder!
+
+285f3/4d-(Text:14)-Oh, wonderful! Nice work! Yes, yes indeed, this Nitro Powder is just what I need to finish my canal.
+                   Now excuse me while I get to work!
+
+2864f/95-(Text:15)-For the Light Warriors I would make a truely legendary sword. 
+                   However, my supply of Adamantite is exausted.
+
+28697/d6-(Text:16)-Adamantite!! Now let me make the sword for you... Here, the best work I've ever done. It is my Gift.
+
+286d8/0f-(Text:17)-Where is my Crystal Eye? I can't see anything without it... Who stole my Crystal Eye?
+
+28711/2f-(Text:18)-Light Warriors! Revive the Power of the Orbs.
+
+28731/7f-(Text:19)-The Prince needs my help? I'll give you the most powerful Wake_up Herb to get my Crystal Eye back...
+                   Oh! I can see!!
+28781/97-(Text:1a)-You have no more business here. Go!!
+
+28799/be-(Text:1b)-Everybody knows me. What!? You've never heard of Dr. Unne?
+
+287c0/ff-(Text:1c)-The Rosetta Stone!? This should lead us to solve the riddle of Lufeinian!! Now listen to me.
+
+28801/2c-(Text:1d)-All living things were born to die. No one can defeat me, the Vampire.
+
+2882e/6d-(Text:1e)-Use this Rod behind the Vampire's room. Hiding deep inside you will find the cause of the earths rot.
+
+2886f/b0-(Text:1f)-I am Bahamut, King of the Dragons. 
+                   Bring me proof of your courage, to receive the honor due true Warriors.
+
+288b2/01-(Text:20)-The Tail of a rat proves your courage. I shall give you the honor true Warriors.
+                   Now, let us see if you are worthy of that honor!
+
+28903/41-(Text:21)-The four Orbs surround the black Orb... To take a step forward is to go back 2000 years in time.
+
+28943/68-(Text:22)-The black Orb glitters ominously... But nothing happens.
+
+2896a/9b-(Text:23)-Oh, its you! I will draw Fairy Water from the bottom of the spring for you.
+
+2899d/c8-(Text:24)-Thank you for saving me. Remember! Fairy Water will give you air.
+
+289ca/03-(Text:25)-I made a submarine to save the mermaids, but to go deep enough it requires Fairy Water.
+
+28a05/30-(Text:26)-Warriors, you have Fairy Water! The mermaids wait__ please help them!
+
+28a32/5f-(Text:27)-Take this Warp Cube. With it, you can transfer to the Floating Castle.
+
+28a61/65-(Text:28)-Please...
+
+28a67/74-(Text:29)-No one passes this road.
+
+28a76/c4-(Text:2a)-If you want to pass, give me the Ruby... _Crunch, crunch, crunch_
+                   Mmm, it tastes so sweet. Rubies are my favorite.
+
+28ac6/1d-(Text:2b)-Great job vanquishing the Earth Fiend. Now, the Fire Fiend wakes.
+                   With this Canoe go to Gurgu Volcano, and defeat that Fiend also!
+
+28b1f/79-(Text:2c)-400 years ago, we lost control of the Wind. 200 years later we lost the Water, 
+                   then Earth, and Fire followed. The Powers that bind this world are gone.
+
+28b7b/d1-(Text:2d)-Possesion of the Royal Crown is required to test your courage.
+                   Take it to the throne, and bring back proof of your courage. GOOD LUCK!
+
+28bd3/20-(Text:2e)-Remember me, Garland? Your puny lot thought it had defeated me.
+                   But, the Four Fiends sent me back 2000 years into the past.
+
+28c22/6c-(Text:2f)-From here I sent the Four Fiends to the future. The Fiends will send me back to here,
+                   and the Time_Loop will go on.
+
+28c6e/b4-(Text:30)-After 2000 years, I will be forgotten, and the Time_Loop will close.
+                   I will ive forever, and you shall meet doom!!
+
+28cb6/ea-(Text:31)-The King is looking for the Light Warriors. You would not happen to be them, would you?
+
+28cec/11-(Text:32)-Yes, Sir!! I belong to the Honor Guard of Cornelia Castle.
+
+28d13/24-(Text:33)-Please, save the Princess!
+
+28d26/3e-(Text:34)-Thank you for rescuing the Princess.
+
+28d40/5e-(Text:35)-Legend says that the Lute can break an evil seal.
+
+28d60/79-(Text:36)-Garland used to be a good knight, until...
+
+28d7b/96-(Text:37)-In sadness, the Queen shut herself inside.
+
+28d98/ad-(Text:38)-The Princess was looking for you!
+
+28daf/c1-(Text:39)-So, you are the Light Warriors.
+
+28dc3/e5-(Text:3a)-Don't be greedy. You already have too many weapons to carry.
+
+28de7/14-(Text:3b)-I am Jane, Queen of Cornelia. Please save my daughter, Princess Sara.
+
+28e16/2d-(Text:3c)-Thank you for saving Princess Sara.
+
+28e2f/39-(Text:3d)-Oh... My sister...
+
+28e3b/51-(Text:3e)-My sister is back safe! Thank you.
+
+28e53/8b-(Text:3f)-Reports say that Garland holds the Princess in the Temple of Fiends, to the northwest.
+
+28e8d/b3-(Text:40)-Use that Key. Inside what you find will be quite helpful.
+
+28eb5/06-(Text:41)-400 years ago, the Treasury was locked by the Mystic Key.
+                   Our ancestors gave the Key to the Prince of the Elves for safekeeping.
+
+28f08/26-(Text:42)-This treasure room is locked with the Mystic Key.
+
+28f28/6e-(Text:43)-The King is sure that someday the Light Warriors will come to save the Princess,
+                   just as in Lukahn's prophecy.
+
+28f70/99-(Text:44)-Lukahn left this town, to join his colleagues at Crescent Lake.
+
+28f9b/ef-(Text:45)-As legend foretold, the Orbs shine again!! Quickly, take them to the Temple of Fiends
+                   and place them before the black Orb.
+
+28ff1/03-(Text:46)-The King wishes to reward you.
+
+29005/14-(Text:47)-I am Arylon, the dancer!
+
+29016/2a-(Text:48)-This is Cornelia, the dream city.
+
+2902c/49-(Text:49)-North of Cornelia lives a witch named Matoya.
+
+2904b/71-(Text:4a)-Matoya has poor eyesight. She needs the Crystal Eye to see.
+
+29073/99-(Text:4b)-My home is Provoka, a beautiful port city far east of here.
+
+2909b/a1-(Text:4c)-Kee... Kee...
+
+290a3/e2-(Text:4d)-Help! The Fiends' curse turned us into bats. With the Orbs shining anew, once again we can speak!
+
+290e4/15-(Text:4e)-The Four Fiends' power is rooted 2000 years ago. The real enemy is in that time.
+
+29117/55-(Text:4f)-When the four Orbs surround the black Orb in the center of the Temple, the Time Gate will open.
+
+29157/91-(Text:50)-You must travel back in time 2000 years. Now, with the Orbs shining, stand in the Time Gate.
+
+29193/d3-(Text:51)-We are the five lost Sky Warriors. 400 years ago we battled 
+                   against the cause of the world's destruction.
+
+291d5/f9-(Text:52)-Thank you. We dont need to be afraid of pirates anymore.
+
+291fb/2e-(Text:53)-I have escaped from Melmond, in the west. My town is in trouble. Please help them!!
+
+29230/6a-(Text:54)-The Elves live across the sea. Matoya's Herb is the only thing that will wake their Prince.
+
+2926c/82-(Text:55)-This town has been invaded by Pirates.
+
+29284/ab-(Text:56)-Ships can stop only at ports. There are no ports in the north.
+
+292ad/b0-(Text:57)-Help!
+
+292b2/d3-(Text:58)-There are many dangerous monsters at sea. Be careful.
+
+292d5/f5-(Text:59)-Astos put the Prince to sleep. Please save him!
+
+292f7/11-(Text:5a)-The Prince is awake? Thank you so much!
+
+29313/32-(Text:5b)-The Dwarf Cave is at the west end of the Aldi Sea.
+
+29334/6b-(Text:5c)-Without warning, Astos attacked our castle and laid our Prince under a sleeping spell.
+
+2936d/9f-(Text:5d)-It is said there is a witch who has herbs. I believe that her name is... Matoya!
+
+293a1/bb-(Text:5e)-Is that it? The Herb to save the Prince?
+
+293bd/eb-(Text:5f)-The Prince keeps the Mystic Key until the coming of the Light Warriors.
+
+293ed/32-(Text:60)-Maybe it's only rumor, but I think the cause of all problems is to be found in the  
+                   Earth Cave to the far West.
+
+29434/3e-(Text:61)-Save our Prince!
+
+29440/5d-(Text:62)-Our Prince was to become King of Elfland.
+
+2945f/a0-(Text:63)-Long ago I wandered to the northwest. I found an ancient castle that was so spooky. I left immediately.
+
+294a2/c7-(Text:64)-Astos has been defeated? Peace will now return to Elfland.
+
+294c9/e8-(Text:65(-Astos wears a disguise, and lurks in seclusion.
+
+294ea/1a-(Text:66)-The Prince must wake soon, or the power of the Dark Elf will dominate us!
+
+2951c/37-(Text:67)-Legend says an Airship is buried somewhere.
+
+29539/5c-(Text:68)-Weapons and armor made of mithril silver are very powerful.
+
+2955e/9c-(Text:69)-I can see a cave above the crescent... To the north of the volcano, 
+                   there you will find the Floatstone.
+
+2959e/dd-(Text:6a)-In the desert south of the crescent, something is emerging from below the sand... Use the Floatstone!
+
+295df/0c-(Text:6b)-I am a clairvoyant. I meditate here until I am given a revelation...
+
+2960e/3a-(Text:6c)-I'm looking for the Floatstone. I'll bet with it I could float anything!
+
+2963c/58-(Text:6d)-Old Nerrick is a very respectable Dwarf.
+
+2965a/73-(Text:6e)-That sound? Nerrick is digging a canal.
+
+29675/85-(Text:6f)-Dwarves can see in the dark!
+
+29687/9e-(Text:70)-Did you meet Smith, our blacksmith?
+
+296a0/d0-(Text:71)-With the Crystal Eye, even the blind can see. Astos stole it from Matoya.
+
+296d2/ec-(Text:72)-The earth is rotting slowly from the west...
+
+296ee/0e-(Text:73)-The earth is reviving thanks to you, Light Warriors!
+
+29710/2e-(Text:74)-Armbands can protect you like a suit of armor!
+
+29730/57-(Text:75)-Oh, did you see that canal? Old Nerrick truly is great indeed.
+
+29759/84-(Text:76)-Long ago, Cornelia's Treasury safeguarded the use of Nitro Powder.
+
+29786/8d-(Text:77)-Rally_ho!!
+
+2978f/a8-(Text:78)-... ...trats sulp tceles ... ... A magic spell
+
+297aa/dc-(Text:79)-The Vampire of the Earth Cave is stealing the Power of the Earth. We need your help.
+
+297de/f3-(Text:7a)-Melmond was once a beautiful town.
+
+297f5/1c-(Text:7b)-The Titan who lives in the tunnel eats gems. He loves Rubies.
+
+2981e/4a-(Text:7c)-The Vampire is gone, but the earth continues to rot. What causes this?
+
+2984c/53-(Text:7d)-I'm a farmer.
+
+29855/79-(Text:7e)-The Earth Cave is on the peninsula southwest of this town.
+
+2987b/94-(Text:7f)-Look! The Earth Orb is shining again.
+
+29896/cc-(Text:80)-This town was invaded by the Vampire. The sanctuary was destroyed and the town was cursed.
+
+298ce/de-(Text:81)-Are you the Light Warriors?
+
+298e0/08-(Text:82)-Go through the Titan's Tunnel, then south, to find Sarda the Sage.
+
+2990a/29-(Text:83)-The Vampire is gone, but the earth still rots?...
+
+2992b/61-(Text:84)-In the northern world, there was once a prosperous civilization, but now it is in ruin.
+
+29963/8b-(Text:85)-If the Orb of Earth begins to shine again, the earth shall revive.
+
+2998d/a6-(Text:86)-At last, the earth will begin to recover...
+
+299a8/d4-(Text:87)-They say the ancient people used a Stone to make their ship float.
+
+299d6/fb-(Text:88)-Oh! An Airship! The fables are true, it really does exist!!
+
+299fd/16-(Text:89)-Sarda does not fear the evils of the cave.
+
+29a18/33-(Text:8a)-Well, well... You have become fine warriors.
+
+29a35/5f-(Text:8b)-I am Jim. My home is the Dwarf Cave, but I am here investigating.
+
+29a61/88-(Text:8c)-We, the Twelve Sages, were lead here by the stars and prophecy.
+
+29a8a/ce-(Text:8d)-Once the Orbs shined with the power of Earth, Wind, Fire, and Water.
+                   The four Fiends seized those powers.
+
+29ad0/fb-(Text:8e)-Earth, Wind, Fire, and Water... The world is bound by these four Powers.
+
+29afd/52-(Text:8f)-Each element's power focuses at its alter. Locate, and crush the Fiend.
+                   Then to make it shine, place the Orb upon the altar!
+
+29b54/a8-(Text:90)-Four Fiends are bent on the world's destruction. 200 years ago, the Fiend of Wind
+                   teamed with that of the Water to destroy civilization.
+
+29baa/c4-(Text:91)-The Earth Fiend causes the rot of our land.
+
+29bc6/e0-(Text:92)-The Fire Fiend will burn everything up!
+
+29be2/18-(Text:93)-As you restore light to the Orbs, we will reveal more secrets__please see us repeatedly
+
+29c1a/3c-(Text:94)-Light Warriors, only you can make the Orbs shine again!!
+
+29c3e/72-(Text:95)-Quickly, before all is burnt, hurry to Gurgu Volcano and stop the Fiend of Fire.
+
+29c74/b9-(Text:96)-The Temple of Fiends is the focal point of the Four Altars. The time has come
+                   to destroy the source of evil.
+
+29cbb/fc-(Text:97)-With the four Orbs shining again, the Time Gate can be opened.
+                   The true enemy is 2000 years in the past.
+
+29cfe/25-(Text:98)-The world was suddenly thrown into disorder. You must restore it.
+
+29d27/72-(Text:99)-Time is repeating... In order to break the Time_Loop 
+                   you must eliminate the one who controls from 2000 years in the past.
+
+29d74/ca-(Text:9a)-Someone travelled 2000 years to the past. The four Fiends were then sent forward in time.
+                   Those Fiends threaten to destroy the world today.
+
+29dcc/28-(Text:9b)-Someone who travelled back 2000 years is the cause of the world's destruction.
+                   After 2000 years he will travel back again... Then again... Then again...
+
+29e2a/52-(Text:9c)-Time will repeat itself every 2000 years. Break the Time Loop!
+
+29e54/96-(Text:9d)-In the Temple of Fiends are the remaining Sky Warriors. 
+                   They fought the Fiends but were turned into bats.
+
+29e98/b4-(Text:9e)-We must use force only for just purposes.
+
+29eb6/e3-(Text:9f)-For ten years I probed for the Floatstone. Canoe north, to the Ice Cave.
+
+29ee5/1d-(Text:a0)-I am Lukahn. Now all legends and prophecy will be fulfilled. Our path has been decided.
+
+29f1f/30-(Text:a1)-Light Warriors, you can do it!
+
+29f32/83-(Text:a2)-My brother Dr. Unne has studied Lufeinian, the language of the Sky Warriors.
+                   If he had the Rosetta Stone, he could teach it.
+
+29f85/a5-(Text:a3)-Soar to my brother Unne with the Rosetta Stone!
+
+29fa7/b8-(Text:a4)-Have you found Fairy Water?
+
+29fba/d3-(Text:a5)-Those legs! Were you born with those?
+
+29fd5/f4-(Text:a6)-My legs are so beautiful! Its so nice to have legs.
+
+29ff6/18-(Text:a7)-Underhill, the Caravan Master, had something very strange...
+
+2a01a/5d-(Text:a8)-Until 200 years ago the Mermaids lived in the Sea Shrine.
+                   Then, in fire and smoke, it sank. The Mermaids?...
+
+2a05f/87-(Text:a9)-Until 200 years ago, the Power of Water brought us good fortune.
+
+2a089/b0-(Text:aa)-The Power of Water!! Now our country will prosper like before.
+
+2a0b2/ea-(Text:ab)-I saw Bahamut, but to be honored as a true warrior, I must return with proof of courage.
+
+2a0ec/04-(Text:ac)-Well, well... I see you have been honored.
+
+2a106/21-(Text:ad)-Avast ye landlubbers! Stay out of my way.
+
+2a123/59-(Text:ae)-My father runs the caravan. He is holding a bazaar near the oasis in the western desert.
+
+2a15b/77-(Text:af)-Kope 'says' he saw a shining object fall.
+
+2a179/bb-(Text:b0)-Fables say that when the shrine sank, many treasures were lost.
+                   Also, they tell of a cryptic stone plate.
+
+2a1bd/f8-(Text:b1)-My name is Kope. I saw it north, near the waterfall. Believe me! I think it was a robot.
+
+2a1fa/16-(Text:b2)-This town used to be prosperous 200 years ago.
+
+2a218/34-(Text:b3)-No, no. That is just an unusable sample!
+
+2a236/67-(Text:b4)-If we cannot regain the Power of Water, we will become bubbles, then disappear.
+
+2a269/7e-(Text:b5)-Are we going to become bubbles?
+
+2a280/97-(Text:b6)-As long as the Fiend of Water lives, we...
+
+2a299/b0-(Text:b7)-Oh, Are you the answer to my prayers?
+
+2a2b2/e7-(Text:b8)-This is the Shrine's top floor. The Fiend of Water, Kraken, lives on the bottom floor.
+
+2a2e9/fc-(Text:b9)-I suppose you are the legendary...
+
+2a2fe/1d-(Text:ba)-Please save the sea, and make the Orb shine again!
+
+2a31f/48-(Text:bb)-Now, order has returned. The sea will be as it was before, beautiful.
+
+2a34a/9a-(Text:bc)-My friend Daryl went to the land, then never returned. I've often wondered what happened...
+                   Maybe she grew legs and walked away?
+
+2a39c/b7-(Text:bd)-You can breath underwater?! Im impressed!
+
+2a3b9/e0-(Text:be)-To enter the Mirage Tower, the Lufeinians used a musical tone.
+
+2a3e2/fa-(Text:bf)-This door is locked by the Mystic Key.
+
+2a3fc/0b-(Text:c0)-This town is called Gaia.
+
+2a40d/5a-(Text:c1)-Have you been to the city south of here? I just cannot understand a word spoken there.
+                   I have often wondered what language...
+
+2a45c/92-(Text:c2)-Legend says the Sky Warriors flew about, here and there, from a castle high in the sky.
+
+2a494/be-(Text:c3)-I saw a shining object flying far towards the east, across the sea.
+
+2a4c0/f2-(Text:c4)-Unbelievable! You are outsiders, right? How did you get over the mountains?
+
+2a4f4/1c-(Text:c5)-Let me see... Yes, there was a professor that studied Lufeinian.
+
+2a51e/4a-(Text:c6)-Only a fairy can draw the magical Fairy Water from this town's spring.
+
+2a54c/75-(Text:c7)-Everyone thinks the tower in Yahnikurm Desert is a mirage. I wonder...
+
+2a577/ac-(Text:c8)-Hardy har, you are too late! I stuffed the fairy into a Jar and sold her to a caravan.
+
+2a5ae/d4-(Text:c9)-Legends say that the castle in the west is a place to test courage.
+
+2a5d6/e4-(Text:ca)-... eltit eht ta b sserp ...
+
+2a5e6/06-(Text:cb)-What's that broom up to? Its talking backwards!
+
+2a608/20-(Text:cc)-The fairy at the spring was kidnapped.
+
+2a622/45-(Text:cd)-With this tintinnabulum you can enter the Mirage Tower.
+
+2a647/69-(Text:ce)-The Mirage Tower was the gateway to our home in the sky.
+
+2a66b/9b-(Text:cf)-400 years ago, we had an advanced civilization. Our interest was the universe.
+
+2a69d/a9-(Text:d0)-Lu... pa...? Lu... pa...?
+
+2a6ab/e1-(Text:d1)-We are the Lufeinians. Only our bravest became Sky Warriors. Your Airship was theirs.
+
+2a6e3/15-(Text:d2)-The Floating Castle... Our ancestors lived there. The Mirage Tower is the entrance.
+
+2a717/5f-(Text:d3)-At the time of ruin a legend was born... In 400 years, Warriors with Orbs
+                   will appear to save our people. Are you?...
+
+2a761/9f-(Text:d4)-We fought with Tiamat, but were unsuccessful. The Fiend now inhabits our Floating Castle.
+
+2a7a1/dc-(Text:d5)-Our last five Warriors left to find the cause of the world's decay. We know they live, but as bats.
+
+2a7de/1a-(Text:d6)-We knew that a great power controlled the Fiends. Our five bravest Warriors left, never to return.
+
+2a81c/5c-(Text:d7)-We have passed on the legends from generation to generation.
+                   But 400 years have caused our memories to fade.
+
+2a85e/78-(Text:d8)-Oh, the Light Warriors!! The legend is true!
+
+2a87a/bb-(Text:d9)-Until 400 years ago we controlled the Power of the Wind. 
+                   This enabled us to suspend the castle in the air.
+
+2a8bd/d5-(Text:da)-The Power of Wind was taken by Tiamat.
+
+2a8d7/f3-(Text:db)-Here lies Link 837 _ 866 R. I. P.
+
+2a8f5/1a-(Text:dc)-I wonder if the robots made by our ancestors are still moving?
+
+2a91c/48-(Text:dd)-The Floating Castle floats high in the sky, seemingly among the stars.
+
+2a94a/71-(Text:de)-One of us escaped with a Warp Cube. He floated far to the east.
+
+2a973/91-(Text:df)-Transporter operation requires a Warp Cube.
+
+2a993/9d-(Text:e0)-Are you the master?
+
+2a99f/bd-(Text:e1)-You can look out over this world from this window.
+
+2a9bf/e9-(Text:e2)-If you are brave enough, try meeting the King of the Dragons, Bahamut.
+
+2a9eb/11-(Text:e3)-Senseless killing is not a practice of the Dragons of Cardia.
+
+2aa13/38-(Text:e4)-Long ago, Dragons and Humans lived at peace with one another.
+
+2aa3a/5a-(Text:e5)-You are not afraid of me?? Then, I am impressed!
+
+2aa5c/87-(Text:e6)-See your face upon the clean water. How dirty! Come! Wash your face!
+
+2aa89/c7-(Text:e7)-We are going to the Castle of Ordeals to the east. There we will test, 
+                   and bring back proof of our courage.
+
+2aac9/df-(Text:e8)-The proof of courage could be anything...
+
+2aae1/1a-(Text:e9)-Have you met Bahamut, the Dragon King? He honors those who show courage as true warriors.
+
+2ab1c/44-(Text:ea)-Only the most courageous return with Bahamut's proof of courage.
+
+2ab46/73-(Text:eb)-Once, here in the north, there were beautiful palaces and mechanical castles.
+
+2ab75/83-(Text:ec)-This is Bahamut's room.
+
+2ab85/9d-(Text:ed)-Bahamut verifies the true courage of all.
+
+2ab9f/aa-(Text:ee)-This is a tombstone.
+
+2abac/e9-(Text:ef)-This is a well. You might think that there is something to it...
+                   But in fact it is just an ordinary well.
+
+2abeb/f1-(Text:f0)-You found {02}
+
+2abf3/fe-(Text:f1)-You cant hold the {02}
+
+2ac00/05-(Text:f2)-Nothing!
+
+2ac07/15-(Text:f3)-The Elemental Altar.
+
+2ac17/17-(Text:f4)-...
+
+2ac19/5a-(Text:f5)-Who are you? Have you come to harm Queen Sara!? I, the Queens Knight, shall defend her with my life!!
+
+2ac5c/8d-(Text:f6)-Wait a second... This is no ordinary well! Its a pathway to another dimension!!
+
+2ac8f/ac-(Text:f7)-Something is flowing at the bottom of the spring.
+
+2acae/d7-(Text:f8)-_War Machine status_ Currently patrolling area near 5f bridge.
+
+2acd9/35-(Text:f9)-From this window one can see the entire world. The Four Forces are flowing together,
+                   into the center of the Four Altars... into the Temple of Fiends.
+
+2ad37/81-(Text:fa)-The Fiend's ball cracks open... An ominous cloud rises, and an evil shape congeals...
+                   It is Lich, the Fiend of Earth.
+
+2ad83/e9-(Text:fb)-Is it you, the tinder that defeated the Fiend of the Earth, and disturbed my sleep?
+                   I, Marilith will now show you the force of Fire, and you shall perish in its flames!!
+
+2adeb/42-(Text:fc)-The Fiend's ball is shattered, evaporating all the Water... Ho, Ho, Ho...
+                   How foolhardy to dare challenge me, Kraken the Fiend of Water!
+
+2ae44/9a-(Text:fd)-Lightning erupts from the Fiend's ball... So, you have come this far...
+                   I, Tiamat the Fiend of the Wind will now put an end to your adventure!!
+
+2ae9c/b1-(Text:fe)-What?? You can speak Lufeinian?
+
+2aeb3/db-(Text:ff)-There is a stone plate on the floor. You can sense something evil below...
+
+
+
+******************************************************---X2---***********************************************************
+*************************************************************************************************************************
+
+________________________________________________-Dialogue Pointers-______________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........Remember, each Pointer is 2 bytes. To format to rows of 8, the 2nd byte was left out.
+..........Text:00's Pointer is 28010/11, but only 28010 is listed, ect.
+
+
+Txt:00-28010...Txt:01-28012...Txt:02-28014...Txt:03-28016...Txt:04-28018...Txt:05-2801a...Txt:06-2801c...Txt:07-2801e...
+
+Txt:08-28020...Txt:09-28022...Txt:0a-28024...Txt:0b-28026...Txt:0c-28028...Txt:0d-2802a...Txt:0e-2802c...Txt:0f-2802e...
+
+Txt:10-28030...Txt:11-28032...Txt:12-28034...Txt:13-28036...Txt:14-28038...Txt:15-2803a...Txt:16-2803c...Txt:17-2803e...
+
+Txt:18-28040...Txt:19-28042...Txt:1a-28044...Txt:1b-28046...Txt:1c-28048...Txt:1d-2804a...Txt:1e-2804c...Txt:1f-2804e...
+
+Txt:20-28050...Txt:21-28052...Txt:22-28054...Txt:23-28056...Txt:24-28058...Txt:25-2805a...Txt:26-2805c...Txt:27-2805e...
+
+Txt:28-28060...Txt:29-28062...Txt:2a-28064...Txt:2b-28066...Txt:2c-28068...Txt:2d-2806a...Txt:2e-2806c...Txt:2f-2806e...
+
+Txt:30-28070...Txt:31-28072...Txt:32-28074...Txt:33-28076...Txt:34-28078...Txt:35-2807a...Txt:36-2807c...Txt:37-2807e...
+
+Txt:38-28080...Txt:39-28082...Txt:3a-28084...Txt:3b-28086...Txt:3c-28088...Txt:3d-2808a...Txt:3e-2808c...Txt:3f-2808e...
+
+Txt:40-28090...Txt:41-28092...Txt:42-28094...Txt:43-28096...Txt:44-28098...Txt:45-2809a...Txt:46-2809c...Txt:47-2809e...
+
+Txt:48-280a0...Txt:49-280a2...Txt:4a-280a4...Txt:4b-280a6...Txt:4c-280a8...Txt:4d-280aa...Txt:4e-280ac...Txt:4f-280ae...
+
+Txt:50-280b0...Txt:51-280b2...Txt:52-280b4...Txt:53-280b6...Txt:54-280b8...Txt:55-280ba...Txt:56-280bc...Txt:57-280be...
+
+Txt:58-280c0...Txt:59-280c2...Txt:5a-280c4...Txt:5b-280c6...Txt:5c-280c8...Txt:5d-280ca...Txt:5e-280cc...Txt:5f-280ce...
+
+Txt:60-280d0...Txt:61-280d2...Txt:62-280d4...Txt:63-280d6...Txt:64-280d8...Txt:65-280da...Txt:66-280dc...Txt:67-280de...
+
+Txt:68-280e0...Txt:69-280e2...Txt:6a-280e4...Txt:6b-280e6...Txt:6c-280e8...Txt:6d-280ea...Txt:6e-280ec...Txt:6f-280ee...
+
+Txt:70-280f0...Txt:71-280f2...Txt:72-280f4...Txt:73-280f6...Txt:74-280f8...Txt:75-280fa...Txt:76-280fc...Txt:77-280fe...
+
+Txt:78-28100...Txt:79-28102...Txt:7a-28104...Txt:7b-28106...Txt:7c-28108...Txt:7d-2810a...Txt:7e-2810c...Txt:7f-2810e...
+
+Txt:80-28110...Txt:81-28112...Txt:82-28114...Txt:83-28116...Txt:84-28118...Txt:85-2811a...Txt:86-2811c...Txt:87-2811e...
+
+Txt:88-28120...Txt:89-28122...Txt:8a-28124...Txt:8b-28126...Txt:8c-28128...Txt:8d-2812a...Txt:8e-2812c...Txt:8f-2812e...
+
+Txt:90-28130...Txt:91-28132...Txt:92-28134...Txt:93-28136...Txt:94-28138...Txt:95-2813a...Txt:96-2813c...Txt:97-2813e...
+
+Txt:98-28140...Txt:99-28142...Txt:9a-28144...Txt:9b-28146...Txt:9c-28148...Txt:9d-2814a...Txt:9e-2814c...Txt:9f-2814e...
+
+Txt:a0-28150...Txt:a1-28152...Txt:a2-28154...Txt:a3-28156...Txt:a4-28158...Txt:a5-2815a...Txt:a6-2815c...Txt:a7-2815e...
+
+Txt:a8-28160...Txt:a9-28162...Txt:aa-28164...Txt:ab-28166...Txt:ac-28168...Txt:ad-2816a...Txt:ae-2816c...Txt:af-2816e...
+
+Txt:b0-28170...Txt:b1-28172...Txt:b2-28174...Txt:b3-28176...Txt:b4-28178...Txt:b5-2817a...Txt:b6-2817c...Txt:b7-2817e...
+
+Txt:b8-28180...Txt:b9-28182...Txt:ba-28184...Txt:bb-28186...Txt:bc-28188...Txt:bd-2818a...Txt:be-2818c...Txt:bf-2818e...
+
+Txt:c0-28190...Txt:c1-28192...Txt:c2-28194...Txt:c3-28196...Txt:c4-28198...Txt:c5-2819a...Txt:c6-2819c...Txt:c7-2819e...
+
+Txt:c8-281a0...Txt:c9-281a2...Txt:ca-281a4...Txt:cb-281a6...Txt:cc-281a8...Txt:cd-281aa...Txt:ce-281ac...Txt:cf-281ae...
+
+Txt:d0-281b0...Txt:d1-281b2...Txt:d2-281b4...Txt:d3-281b6...Txt:d4-281b8...Txt:d5-281ba...Txt:d6-281bc...Txt:d7-281be...
+
+Txt:d8-281c0...Txt:d9-281c2...Txt:da-281c4...Txt:db-281c6...Txt:dc-281c8...Txt:dd-281ca...Txt:de-281cc...Txt:df-281ce...
+
+Txt:e0-281d0...Txt:e1-281d2...Txt:e2-281d4...Txt:e3-281d6...Txt:e4-281d8...Txt:e5-281da...Txt:e6-281dc...Txt:e7-281de...
+
+Txt:e8-281e0...Txt:e9-281e2...Txt:ea-281e4...Txt:eb-281e6...Txt:ec-281e8...Txt:ed-281ea...Txt:ee-281ec...Txt:ef-281ee...
+
+Txt:f0-281f0...Txt:f1-281f2...Txt:f2-281f4...Txt:f3-281f6...Txt:f4-281f8...Txt:f5-281fa...Txt:f6-281fc...Txt:f7-281fe...
+
+Txt:f8-28200...Txt:f9-28202...Txt:fa-28204...Txt:fb-28206...Txt:fc-28208...Txt:fd-2820a...Txt:fe-2820c...Txt:ff-2820e...
+
+
+
+
+
+
+
+
+
+
+

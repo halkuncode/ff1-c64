@@ -1,0 +1,299 @@
+$0d = non-zero (usually bit 7) means in room, and bit 0 set means show "in room" sprites
+$0e,$0f = VRAM address of door, for closing when you step out
+$14,$15 = VRAM scroll?
+$20 = usually used for button presses
+$21 = ditto, preserving arrows
+$22 = select counter
+$23 = start counter
+$24 = A counter
+$25 = B counter
+$26 = sprite counter
+$27,$28 = party position on world map (minus 7,7)
+$29,$2a = party position on map (minus 7,7)
+$2d = bit 0 set if in a map
+$2e,$2f = Map offset of upper-left corner of the screen?
+$34 = speed for subtile scrolling; larger is faster
+$35,$36 = subtile scrolling (?)
+$42 = method of transport?
+$46 = method of transport?
+$48 = current map
+$49 = current map tileset
+$4a = ???
+$4b = current music to start/being started
+$4c = current music channel being started
+$4d = offset of current music channel struct
+$57 = current bank
+$7c = current background music?
+$7e = Cycles to not output channel S2
+
+$b0-f = S1 channel settings
+$c0-f = S2 channel settings
+  +0-1: Pointer to current note/command in song
+  +2-3: pointer to "Instrument" (volume envelope shape)
+  +4:   index into p[+2]
+  +5:   Note length counter
+  +6-7: pointer to octave
+  +8-9: pointer to note length set
+  +a:   How fast +b is increased
+  +b:   xxxxx.xxx delta for +4
+  +c:   volume, 0-15; set via the "Instrument"
+  +d:   Looping counter
+  +e-f: period (determines note pitch). +f bit 7 selects whether the period
+        should be written or not.
+
+$d0-f = T channel settings??
+  +0-1: pointer to current note/command in song
+  +2-3: N/A
+  +4:   N/A
+  +5:   Note length counter
+  +6-7: pointer to octave
+  +8-9: pointer to note length set
+  +a:   N/A
+  +b:   N/A
+  +c:   N/A
+  +d:   Looping counter
+  +e-f: period (determines note pitch). +f bit 7 selects whether the period
+        should be written or not.
+
+$e0-f = N channel settings??
+
+$c0-f = S2 channel as above
+$cd = ???
+$dd = ???
+$ed = ???
+
+$f0 = ???
+$f1 = ???
+$f4 = ???
+
+$f5 = steps PRNG?
+$f6 = steps PRNG?
+$f7 = battle number PRNG index
+$f8 = map battle frequency?
+$fd = value for $2000 (?)
+$ff = value for $2000
+
+0200-02ff = mirror of sprite RAM
+03c0-03cf = normal BG palettes
+03d0-03df = sprite palettes
+03e0-03ef = in-room BG palettes
+03f0-03ff = used for palette cycling
+0400-04ff = map tile data (world map or current map)
+0500-06ff = map pattern data
+0700-077f = map tile palette assignments
+0780-07af = map palettes
+
+$6000   = 1 if ship gotten
+$6001   = ship X position
+$6002   = ship Y position
+$6004   = 1 if airship gotten
+$6005   = airship X position
+$6006   = airship Y position
+$6008   = 1 if bridge constructed
+$6009   = bridge X position?
+$600a   = bridge Y position?
+$600c   = 1 if canal plug visible
+$600d   = plug X position?
+$600e   = plug Y position?
+$6010   = world map X position
+$6011   = world map Y position
+$6012   = 1 if canoe gotten
+$6014   = method of transport?
+          01 = on foot
+          02 = canoe?
+          04 = ship?
+          08 = airship
+$6016   = ???
+$601c-e = gold
+
+$6020-603b = items
+$6032 = orb
+$6033 = orb
+$6034 = orb
+$6035 = earth orb
+
+$6100-ff = Out-of-battle Player Structs
+
+$6200-ff = bit 0: Sprite visibilities
+           bit 1: event flags
+           bit 2: treasure chest flags
+
+$6300-ff = warrior magic data
+           +00-+02 = level 1 spells (0-7)
+           +03     = always 0
+           +04-+06 = level 2 spells (0-7)
+           +07     = always 0
+           ...
+           +1c-+1e = level 7 spells (0-7)
+           +1f     = always 0
+           +20-+27 = Current charges per level
+           +28-+2f = Max charges per level
+           +30-+3f = unused?
+
+$6400-$67ff = saved copies of $6000-$63ff
+  $64fd   = changed to ensure correct checksum
+  $64fe-f = Always $55 $aa
+
+$6800-6847 = in-battle player structs
+$6848-6854 = battle order
+$6856-6889 = in-battle variables
+$688a      = battle PRNG index
+$688b-?    = more in-battle variables
+$6b87-6ba6 = battle palettes
+$6ba8-6bab = in-battle player palettes
+$6bac      = in-battle respond rate delay
+$6bae      = in-battle player strike first flag
+$6bb2-6bb6 = ???
+$6bb7-6bbf = in-battle enemy indexes
+$6bc0-6bc9?= in-battle enemy gfx # and palette flag?
+$6bd3-6c86 = in-battle enemy structs
+
+$6d84-6d93 = Copy of the current battle's data (from 11:$8400)
+
+$6f00-ef = in-map sprite data (16 bytes each)
+  +00 = Sprite #, or 0 if sprite not visible
+  +01 = bit 7: "in room"
+        bit 6: "don't move"
+  +02 = X position
+  +03 = Y position
+  +04 = X position moving onto?
+  +05 = Y position moving onto?
+  +06 = sprite X fine-positioning (used ??, if >=8 then cmp +04+1)
+  +07 = sprite Y fine-positioning (used ??, if >=8 then cmp +05+1)
+  +08 = delta-X
+  +09 = delta-Y
+  +0a = Sprite #, even if invisible
+  +0b = Countdown to moving?
+  +0c = moving flag? (forces "don't move"?)
+  +0d = bit 1 set if being "pushed"
+        bit 7 set if being talked to?
+  +0e-f = Pointer to layout flags (usually to table at $e7ab)
+
+8 pos, 9 pos == (4,5)
+8 pos, 9 neg == (4,5+1)
+8 neg == (4+1,5)
+
+$7000-$7fff = decompressed map
+
+
+===========================
+Out-of-battle Player Struct
+===========================
+
+$82 or $92
+
+0x40 bytes
+Stored at $6100, $6140, $6180, $61C0
+Pointer-table at r18_9F5D, r19_B67C
+
+00:    Class ID (00=FT, 0B=BW)
+01:    Status
+02-05: Name
+06:    [unused?]
+07-09: Exp
+0a-0b: HP
+0c-0d: Max HP
+0e:    [unused?]
+0f:    [unused?]
+10:    Str
+11:    Agl
+12:    Int
+13:    Vit
+14:    Luck
+15:    [unused?]
+16-17: Exp for level up
+18-1b: Weapons
+1c-1f: Armor
+20:    Damage
+21:    Hit %
+22:    Absorb
+23:    Evade %
+24:    Elemental Resistances
+25:    MagDef
+26:    Level-1
+27-3f: [unused?]
+
+=======================
+In-battle Player Struct
+=======================
+
+$80 or $90
+
+0x12 bytes
+Stored at $6800, $6812, $6824, $6836
+Pointer-table at r18_9F65, r19_B674
+
+00:    player idx 0-3
+01:    class
+02:    Status
+03-04: HP
+05:    Hit %
+06:    MagDef
+07:    Evade %
+08:    Absorb
+09:    Damage
+0a:    Elemental Resistances
+0b:    FAST multiplier
+0c:    Number of hits (Hit%/32+1)
+0d:    0 (bug, supposed to be category attack byte)
+0e:    0 (bug, supposed to be elemental attack byte)
+0f:    Equipped weapon number (bug, supposed to be critical hit rate)
+10:    Weapon GFX block
+11:    Weapon palette
+
+========================
+Monster permanent struct
+========================
+
+$86 or $92 or $9c
+
+0x14 bytes
+
+00-01: exp gained for defeating
+02-03: gold gained for defeating
+04-05: MaxHP
+06:    "courage"
+07:    AI
+08:    Evade %
+09:    Absorb
+0a:    number of hits
+0b:    Hit %
+0c:    Damage
+0d:    critical hit chance
+0e:    status attack elemental
+0f:    attack status
+10:    category
+11:    MagDef
+12:    Elemental weakness
+13:    Elemental resistance
+
+
+========================
+Monster in-battle struct
+========================
+
+$84 or $90 or $9a
+
+0x14 bytes
+Stored starting at 0x6BD3?
+
+00-01: ptr to monster permanent struct
+02-03: HP
+04:    absorb
+05:    hit multiplier
+06:    status ailments
+07:    AI magic index
+08:    AI special attack index
+09:    "courage"
+0a:    Evade %
+0b:    damage
+0c:    AI (bug?)
+0d:    exp
+0e:    exp
+0f:    gold
+10:    gold
+11:    monster index number
+12:    Max HP low byte, used in curing sleep
+13:    0 (bug, should be MaxHP high byte), used in curing sleep
+**:    need elemental resistances
+**:    need hit%

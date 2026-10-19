@@ -1,0 +1,1297 @@
+
+
+
+
+....................X0---Overview
+....................X1---Magic, Enemy Special attacks, Items
+....................X2---Outside of Battle, Base, and Range
+....................X3---Effect
+....................X4---Apply/Cure Status, Element/Resistance (Checkbox Options)
+....................X5---Learned by (Checkbox Options)
+....................X6---Graphics and Palettes
+....................X7---Battle Message
+....................X8---Text -----------Items, Magic, Enemy Attacks, Battle Message
+....................X9---Text Pointers - Items, Magic, Enemy Attacks, Battle Message
+...................X10---Prices
+
+
+
+******************************************************---X0---***********************************************************
+*************************************************************************************************************************
+
+_____________________________________________________-Overview-__________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........Everything concerning the Magic and Attack Editor has to be done with a Hex editor. Initially it seemed
+..........that some of it could be done with Hackster, but data gets shifted around and therefore cant be used.
+
+..........Editing Magic is a little more complicating then the other sections. If you are just going to change the Power 
+..........of any direct type Spells like Cure, Fire, or Protect, then this will be easy. Creating your own Spells will
+..........require you to pay close attention to how each Spell functions. 
+
+..........Direct Damage/Healing Magic - Effectivity is the strength of the Spell, and Hit% is set high to always work.
+
+..........Status Inflicting/Resistance Magic - Effectivity is a Checkbox Option, which is listed in that section below.
+
+..........Spells that use a Checkbox Option instead of having Direct Damage or Healing for Effectivity will have a (star)*
+..........A few exceptions will be both Direct and a Checkbox Option, which will have (two stars)**
+
+..........On the right of certain Spells you will see the Outside of Battle command associated with it. If you move where
+..........these are assigned, then you have to change the data in that spell slot to match it. 
+
+
+
+******************************************************---X1---***********************************************************
+*************************************************************************************************************************
+
+________________________________________-Magic, Enemy Special Attacks, Items-____________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+.......................Hex Editor set to 7 wide
+
+
+.........Targeting----02-One Enemy---01-All Enemies---04-Spell Caster---10-One Party Member---08-Whole Party
+
+----------------------|Hit%|-----|Effectivity|---|Element|----|Targeting|----|Effect|-----|Graphics|-----|Palette|
+-----------------------(05)----------(06)----------(00)----------(01)----------(02)----------(03)----------(04)---
+
+301f0-Cure(1)...........00............18............00............10............07............c0............2c....CURE
+301f7-Dia(1)............fe............10............00............01............02............c8............26....
+301fe-Protect(1)........00............08............00............10............09............b0............27....
+30205-Invisible(1)......00............50............00............04............10............b0............26....
+
+3020c-Fire(1)...........fe............07............10............01............01............d0............27....
+30213-Sleep(1)..........20............20*...........01............01............03*...........e8............22....
+3021a-Poison(1).........20............04**..........02............01............14**..........b8............2a....
+30221-Thunder(1)........fe............07............40............01............01............c8............28....
+
+.........Targeting----02-One Enemy---01-All Enemies---04-Spell Caster---10-One Party Member---08-Whole Party
+
+----------------------|Hit%|-----|Effectivity|---|Element|----|Targeting|----|Effect|-----|Graphics|-----|Palette|
+-----------------------(05)----------(06)----------(00)----------(01)----------(02)----------(03)----------(04)---
+
+30228-Poisona(2)........00............04*...........00............10............08*...........e0............2a....PURE
+3022f-Silence(2)........30............40*...........01............01............03*...........e8............24....
+30236-Fear(2)...........20............40............08............01............05............e8............28....
+3023d-Float(2)..........00............80*...........00............08............15*...........b8............24....
+
+30244-Blizzard(2).......fe............0b............20............01............01............d0............2c....
+3024b-Darkness(2).......30............08*...........01............01............03*...........e8............23....
+30252-Strike(2).........08............0a............00............10............0d............b8............25....
+30259-Slow(2)...........30............00............05............01............04............e8............22....
+
+---------(Targeting)---02-One Enemy---01-All Enemies---04-Spell Caster---10-One Party Member---08-Whole Party
+
+----------------------|Hit%|-----|Effectivity|---|Element|----|Targeting|----|Effect|-----|Graphics|-----|Palette|
+-----------------------(05)----------(06)----------(00)----------(01)----------(02)----------(03)----------(04)---
+
+30260-Cura(3)...........00............30............00............10............07............c0............21....CUR2
+30267-Diara(3)..........fe............20............00............01............02............c8............27....
+3026e-A.Spell(3)........00............01*...........00............10............19*...........b0............2b....
+30275-Stona(3)..........ff............00............00............10............00............00............20....SOfT
+
+3027c-Fira(3)...........fe............10............10............01............01............d0............26....
+30283-Hold(3)...........38............10*...........01............02............03*...........e8............28....
+3028a-Thundara(3).......fe............10............40............01............01............c8............2c....
+30291-Sleepra(3)........00............20*...........01............02............12*...........e8............21....
+
+.........Targeting----02-One Enemy---01-All Enemies---04-Spell Caster---10-One Party Member---08-Whole Party
+
+----------------------|Hit%|-----|Effectivity|---|Element|----|Targeting|----|Effect|-----|Graphics|-----|Palette|
+-----------------------(05)----------(06)----------(00)----------(01)----------(02)----------(03)----------(04)---
+
+30298-Tornado(4)........20............00............08............02............18............b8............2c....
+3029f-Heal(4)...........00............18............00............08............07............c0............21....HEAL
+302a6-A.Element(4)......00............70*...........00............08............0a*...........b0............23....
+302ad-Raise(4)..........ff............00............00............10............00............00............20....LIFE
+
+3b03e-LIFE Restores XX HP - ea ea ea ea ea -> a9 XX 9d 0a 61
+3fe8d-Tornado reduces HP to XX Amount
+
+
+302b4-Quake(4)..........fe............18............80............01............16............b8............27....
+302bb-Haste(4)..........00............00............00............10............0c............b8............26....
+302c2-Confuse(4)........30............80*...........01............01............03*...........e8............27....
+302c9-Blizzara(4).......fe............16............20............01............01............d0............21....
+
+---------(Targeting)---02-One Enemy---01-All Enemies---04-Spell Caster---10-One Party Member---08-Whole Party
+
+----------------------|Hit%|-----|Effectivity|---|Element|----|Targeting|----|Effect|-----|Graphics|-----|Palette|
+-----------------------(05)----------(06)----------(00)----------(01)----------(02)----------(03)----------(04)---
+
+302d0-Curaga(5).........00............60............00............10............07............c0............22....CUR3
+302d7-Ruin(5)...........40............10............00............01............13............e8............26....
+302de-Diaga(5)..........fe............40............00............01............02............c8............28....
+302e5-A.Death(5)........00............0a*...........00............08............0a*...........b0............2c....
+
+302ec-Firaga(5).........fe............20............10............01............01............d0............25....
+302f3-Scourge(5)........20............01*...........02............01............03*...........b8............29....
+302fa-Teleport(5).......00............00............00............04............06............dc............25....WARP
+30301-Slowra(5).........48............00............04............02............04............e8............23....
+
+.........Targeting----02-One Enemy---01-All Enemies---04-Spell Caster---10-One Party Member---08-Whole Party
+
+----------------------|Hit%|-----|Effectivity|---|Element|----|Targeting|----|Effect|-----|Graphics|-----|Palette|
+-----------------------(05)----------(06)----------(00)----------(01)----------(02)----------(03)----------(04)---
+
+30308-Healara(6)........00............30............00............08............07............c0............22....HEL2
+3030f-Silega(6).........00............40*...........01............01............12*...........e8............25....
+30316-Protera(6)........00............0c............00............08............09............b0............28....
+3031d-Invisira(6).......00............3c............00............08............10............b0............27....
+
+30324-Thundaga(6).......fe............28............40............01............01............c8............22....
+3032b-Death(6)..........38............01*...........08............02............03*...........d8............2b....
+30332-Chasm(6)..........28............01*...........80............01............17*...........b8............28....
+30339-Stun(6)...........00............10*...........01............02............12*...........e8............29....
+
+---------(Targeting)---02-One Enemy---01-All Enemies---04-Spell Caster---10-One Party Member---08-Whole Party
+
+----------------------|Hit%|-----|Effectivity|---|Element|----|Targeting|----|Effect|-----|Graphics|-----|Palette|
+-----------------------(05)----------(06)----------(00)----------(01)----------(02)----------(03)----------(04)---
+
+30340-Curaja(7).........00............00............00............10............0f............c0............23....CUR4
+30347-Diaja(7)..........fe............70............00............01............02............c8............20....
+3034e-Exit(7)...........28............01*...........04............02............03*...........dc............28....EXIT
+30355-Arise(7)..........ff............00............00............10............00............00............20....LIF2
+
+3035c-Blizzaga(7).......fe............30............20............01............01............d0............22....
+30363-Break(7)..........38............02*...........02............02............03*...........d8............20....
+3036a-Sever(7)..........0a............08............00............08............0d............b8............26....
+30371-Bio(7)............38............2c**..........03............01............14**..........e8............29....
+
+.........Targeting----02-One Enemy---01-All Enemies---04-Spell Caster---10-One Party Member---08-Whole Party
+
+----------------------|Hit%|-----|Effectivity|---|Element|----|Targeting|----|Effect|-----|Graphics|-----|Palette|
+-----------------------(05)----------(06)----------(00)----------(01)----------(02)----------(03)----------(04)---
+
+30378-Healaga(8)........00............60............00............08............07............c0............23....HEL3
+3037f-Holy(8)...........fe............a0............00............02............01............c8............2b....
+30386-Barrier(8)........00............ff*...........00............10............0a*...........b0............20....
+3038d-Dispel(8).........48............00............00............02............11............b8............2c....
+
+30394-Flare(8)..........fe............b0............00............02............01............d0............28....
+3039b-Stop(8)...........60............10*...........04............02............03*...........e8............24....
+303a2-Banish(8).........30............01*...........04............01............03*...........d8............25....
+303a9-Kill(8)...........00............01*...........08............01............12*...........d8............2c....
+
+
+---------(Targeting)---02-One Enemy---01-All Enemies---04-Spell Caster---10-One Party Member---08-Whole Party
+
+----------------------|Hit%|-----|Effectivity|---|Element|----|Targeting|----|Effect|-----|Graphics|-----|Palette|
+-----------------------(05)----------(06)----------(00)----------(01)----------(02)----------(03)----------(04)---
+
+
+
+........................Enemy Special Attacks
+
+
+303be-Cold Breath.......fe............08............20............01............01............00............00....
+303c5-Fire Breath.......fe............10............10............01............01............00............00....
+303cc-Stone Gaze........20............02*...........02............02............03*...........00............00....
+303d3-Absolute 0........fe............40............20............01............01............00............00....
+303da-Meteor............fe............60............80............01............01............00............00....
+303e1-Eruption..........fe............60............10............01............01............00............00....
+303e8-Earthquake........20............01*...........80............01............17*...........00............00....
+
+.........Targeting----02-One Enemy---01-All Enemies---04-Spell Caster---10-One Party Member---08-Whole Party
+
+----------------------|Hit%|-----|Effectivity|---|Element|----|Targeting|----|Effect|-----|Graphics|-----|Palette|
+-----------------------(05)----------(06)----------(00)----------(01)----------(02)----------(03)----------(04)---
+
+303ef-Death Gaze........20............01*...........08............02............03*...........00............00....
+303f6-Fierce Gaze.......fe............30............00............02............01............00............00....
+303fd-Banish Gaze.......40............01*...........04............02............03*...........00............00....
+30404-Ice Storm.........fe............20............20............01............01............00............00....
+3040b-Firestorm.........fe............28............10............01............01............00............00....
+30412-Meltdown..........fe............48............10............01............01............00............00....
+30419-Pyro Breath.......fe............18............10............01............01............00............00....
+
+---------(Targeting)---02-One Enemy---01-All Enemies---04-Spell Caster---10-One Party Member---08-Whole Party
+
+----------------------|Hit%|-----|Effectivity|---|Element|----|Targeting|----|Effect|-----|Graphics|-----|Palette|
+-----------------------(05)----------(06)----------(00)----------(01)----------(02)----------(03)----------(04)---
+
+30420-Stone Gas.........20............02*...........02............01............03*...........00............00....
+30427-Mind Blast........00............10*...........00............01............03*...........00............00....
+3042e-Poison Gas........fe............38............02............01............01............00............00....
+30435-Lightning.........fe............40............40............01............01............00............00....
+3043c-Fatal Gas.........60............01*...........08............01............03*...........00............00....
+30443-Dark Breath.......60............08*...........01............02............03*...........00............00....
+3044a-Ultima Beam.......60............7c**..........00............01............14**..........00............00....
+
+.........Targeting----02-One Enemy---01-All Enemies---04-Spell Caster---10-One Party Member---08-Whole Party
+
+----------------------|Hit%|-----|Effectivity|---|Element|----|Targeting|----|Effect|-----|Graphics|-----|Palette|
+-----------------------(05)----------(06)----------(00)----------(01)----------(02)----------(03)----------(04)---
+
+30451-Octopus Ink.......60............08*...........01............01............03*...........00............00....
+30458-Poison Darts......40............04**..........02............01............14**..........00............00....
+3045f-Stun Gaze.........40............10*...........01............02............03*...........00............00....
+30466-Tsunami...........fe............58............20............01............01............00............00....
+3046d-Cyclone...........fe............58............40............01............01............00............00....
+30474-Megaflare.........fe............78............00............01............01............00............00....
+
+---------(Targeting)---02-One Enemy---01-All Enemies---04-Spell Caster---10-One Party Member---08-Whole Party
+
+----------------------|Hit%|-----|Effectivity|---|Element|----|Targeting|----|Effect|-----|Graphics|-----|Palette|
+-----------------------(05)----------(06)----------(00)----------(01)----------(02)----------(03)----------(04)---
+
+
+
+.......................Items (In Battle)
+
+
+303b0-Heal Potion.......00............20............00............10............07............00............00....
+303b7-Pure Potion.......00............04*...........00............10............08*...........00............00....
+
+3b345-Heal Potion.......Out of Battle Amount
+
+
+
+.................Hex Editor set to 16 wide.
+
+
+3a4f0-Item Cap
+
+There are 2 catches with the Item Cap.
+
+FF gives a cap of 254, and 00 doesnt give you a 255 cap. 00 and 01 will not allow you to hold any items.
+There is a rollover effect when you use the "Buy 10" option.
+ 
+Buy 100 and get A0, then again for K0, and again gives you 44.
+K0=200. Add 56, then 44 more, and its add 100 to get 44.
+
+However, when you buy individual items one at a time, it will cap off at the desired amount.
+
+
+
+.................Consumables Parameters
+
+
+
+Phoenix Down Effectivity - Restore XX HP
+
+3895d/65: (zeros) -> a9 XX 9d 0a 61 20 0d b3 60
+3b2a8/a9: 0d b3 -> 4d 89
+
+
+
+Sleeping Bag - Restore XX HP to One Character
+
+38a58/5c: bd 0c 61 9d 0a -> a9 XX 20 61 b5 
+
+
+
+Tent - Restore XX HP (but no MP)
+
+3b2d5/da: 20 73 84 20 d2 -> a9 XX 20 3f b5
+
+
+
+.....Note: All 4 stat boosting items are off by 1. Putting 01 will give you 2 pts, 04 gives 5, ect.
+
+
+3f179-Mind Plus Effectivity
+3f15f-Stamina Plus Effectivity
+38b15-Luck Plus Effectivity
+3dfef-Spellbook Effectivity
+
+
+
+******************************************************---X2---***********************************************************
+*************************************************************************************************************************
+
+________________________________________-Outside of Battle, Base, and Range-_____________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........You can assign all of the Outside of Battle spell commands only once, and to any spell slot you like. Once you
+..........set these spell commands, you need to change that data to match up. For an example, if you choose to have
+..........CURE (3af0a) set to b7, which is where the Thunder Spell is (30221), then you need to put the Cure data there.
+
+..........301f0-Cure-----00--18--00--10--07--c0--2c--
+..........30221-Thunder--fe--07--40--01--01--c8--28--
+
+
+
+...............Outside of Battle Spells
+
+...............Hex Editor set to 7 wide
+
+
+3af0a-CURE.....3af11-CUR2.....3af18-CUR3.....3af1f-CUR4.....3af26-HEAL.....3af2d-HEL3.....3af34-HEL2.....
+
+3af3b-PURE.....3af42-LIFE.....3af49-LIF2.....3af50-WARP.....3af57-SOFT.....3af5e-EXIT.....
+
+
+...............Spell slot selection
+
+
+b0-Cure........b1-Dia.........b2-Protect.....b3-Invisible...b4-Fire........b5-Sleep.......b6-Poison......b7-Thunder.....
+
+b8-Poisona.....b9-Silence.....ba-Fear........bb-Float.......bc-Blizzard....bd-Darkness....be-Strike......bf-Slow........
+
+c0-Cura........c1-Diara.......c2-A.Spell.....c3-Stona.......c4-Fira........c5-Hold........c6-Thundara....c7-Sleepra.....
+
+c8-Tornado.....c9-Heal........ca-A.Element...cb-Raise.......cc-Quake.......cd-Haste.......ce-Confuse.....cf-Blizzara....
+
+d0-Curaga......d1-Ruin........d2-Diaga.......d3-A.Death.....d4-Firaga......d5-Scourge.....d6-Teleport....d7-Slowra......
+
+d8-Healara.....d9-Silega......da-Protera.....db-Invisira....dc-Thundaga....dd-Death.......de-Chasm.......df-Stun........
+
+e0-Curaja......e1-Diaja.......e2-Exit........e3-Arise.......e4-Blizzaga....e5-Break.......e6-Sever.......e7-Bio.........
+
+e8-Healaga.....e9-Holy........ea-Barrier.....eb-Dispel......ec-Flare.......ed-Stop........ee-Banish......ef-Kill........
+
+
+
+..............Base and Range Effectivity for CURE and HEAL Spells
+
+..............Hex Editor set to 8 wide
+
+
+..............Base...........Range.......... 
+CURE..........3af71..........3af6f..........
+CUR2..........3af79..........3af77..........
+CUR3..........3af81..........3af7f..........
+
+HEAL..........3aff2..........3afef..........
+HEL2..........3affb..........3aff8..........
+HEL3..........3b004..........3b001..........
+
+
+
+******************************************************---X3---***********************************************************
+*************************************************************************************************************************
+
+______________________________________________________-Effect-________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+-----------------------------------------------------------------------Effect------------------------------
+----------------(05)----------(06)----------(00)----------(01)----------(02)----------(03)----------(04)---
+
+
+338a4/08-Effect 00: Ineffective
+
+33916/72-Effect 01: Damage
+3da96/b3-Effect 16: Damage........................Quake
+3385d/a2-Effect 14: Damage and Status Effect......Poison, Bio, Poison Darts, and Ultima Beam..........Checkbox Option
+3fe86/98-Effect 18: Set HP to 1...................Tornado
+3390a/14-Effect 02: Undead Damage
+33974/ae-Effect 07: HP Up
+339b0/c0-Effect 0f: CUR4
+
+33a6b/7f-Effect 0d: Damage and Hit% Up.........Will only increase Hit% once, but Damage will continue to stack
+3ebc5/0c-Effect 0c: Hit Multiplier Up..........Stack Hit% to the desired amount, for specific levels. Check INT X2
+33a18/32-Effect 04: Hit Multiplier Down
+33a56/5b-Effect 09: Defense Up
+33a81/87-Effect 0b: Defense Down
+33a64/69-Effect 10: Evade Up
+33a5d/62-Effect 0e: Evade Down
+33a4f/54-Effect 05: Courage Down
+33af1/94-Effect 13: Lower Stats...................Ruin
+33a88/ef-Effect 06: Warp and Escape Battle........Teleport
+
+33a04/16-Effect 08: Cure Status
+33852/5c-Effect 19: Resist Status and Cures*
+339c2/dd-Effect 03: Apply Status 
+339df/02-Effect 12: Apply Status if HP<400
+3fe9a/cd-Effect 17: Apply Status .................Chasm and Earthquake.......Checkbox Option
+
+Effect 12's HP Limit
+339e8-Low byte (0-255)
+339ed-High byte (256+)
+
+33a43/4d-Effect 0a: Grant Elemental Resistance
+32331/4e-Effect 15: Resist Earth.........................Float...............Checkbox Option
+33a34/41-Effect 11: Remove Elemental Resistance
+
+
+
+................Effect Routine Pointers
+
+
+33817/18-Effect:00..........33819/1a-Effect:01..........3381b/1c-Effect:02..........3381d/1e-Effect:03..........
+
+3381f/20-Effect:04..........33821/22-Effect:05..........33823/24-Effect:06..........33825/26-Effect:07..........
+
+33827/28-Effect:08..........33829/2a-Effect:09..........3382b/2c-Effect:0a..........3382d/2e-Effect:0b..........
+
+3382f/30-Effect:0c..........33831/32-Effect:0d..........33833/34-Effect:0e..........33835/36-Effect:0f..........
+
+33837/38-Effect:10..........33839/3a-Effect:11..........3383b/3c-Effect:12..........3383d/3e-Effect:13..........
+
+3383f/40-Effect:14..........33841/42-Effect:15..........33843/44-Effect:16..........33845/46-Effect:17..........
+
+33847/48-Effect:18..........33849/4a-Effect:19..........3384b/50-?
+
+
+
+******************************************************---X4---***********************************************************
+*************************************************************************************************************************
+
+_______________________________________-Apply/Cure Status, Element/Resistance-___________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+-----------------------------Effectivity---------------------------------Effect------------------------------
+------------------(05)----------(06)----------(00)----------(01)----------(02)----------(03)----------(04)---
+
+
+..........If the Effect byte is 03, 08, 0a, 12, 14, 15, or 19, then the Effectivity byte will be a Checkbox Option.
+..........Effect #14 has two features. It uses both a Checkbox Option, and does Direct Damage.
+
+
+..........Checkbox Options
+
+3385d/a2-Effect 14: Damage and Status Effect......Poison, Bio, Poison Darts, and Ultima Beam
+3fe9a/cd-Effect 17: Apply Status .................Chasm and Earthquake
+339c2/dd-Effect 03: Apply Status 
+339df/02-Effect 12: Apply Status if HP<400
+
+33a04/16-Effect 08: Cure Status
+33852/5c-Effect 19: Resist Status and Cures
+
+Effect 12's HP Limit
+339e8-Low byte (0-255)
+339ed-High byte (256+)
+
+33a43/4d-Effect 0a: Grant Elemental Resistance
+32331/4e-Effect 15: Resist Earth...........................Float
+33a34/41-Effect 11: Remove Elemental Resistance
+
+
+
+...Reference....(03)-Apply Status Ailment....(08)-Cure Status Ailment.....(0a)-.....Element......
+....[G][K]......(12).[Death..][Stun...]......(19).[Death..][Stun...]......(11).[Status.][Fire...]
+....[H][L]......(14).[Stone..][Sleep..]...........[Stone..][Sleep..]......(15).[Poi/Sto][Ice....]
+....[I][M]......(17).[Poison.][Mute...]...........[Poison.][Mute...]...........[Time...][Lit....]
+....[J][N]...........[Dark...][Conf...]...........[Dark...][Conf...]...........[Death..][Earth..]
+
+
+..........All the Checkbox Options follow the same byte order, so here is the easiest way to find the option you want.
+..........At the top of the page in Notepad Options, go to (Edit), then choose (Find), and then type in the letters that
+..........correspond to your choice(s). Im using G-N because 0-9 and A-F are used in all the hex locations.
+..........Make sure you type in the letters like this, g/h/i, ect. Capitol/noncapitol doesnt matter, the / does. 
+
+
+00-None...01-G...02-H...03-G/H...04-I...05-G/I...06-H/I...07-G/H/I...08-J...09-G/J...0a-H/J...0b-G/H/J...0c-I/J..0d-G/I/J
+0e-H/I/J...0f-G/H/I/J...10-K...11-G/K...12-H/K...13-G/H/K...14-I/K...15-G/I/K...16-H/I/K...17-G/H/I/K...18-J/K...19-G/J/K
+1a-H/J/K....1b-G/H/J/K....1c-I/J/K....1d-G/I/J/K...1e-H/I/J/K...1f-G/H/I/J/K...20-L...21-G/L...22-H/L...23-G/H/L...24-I/L
+25-G/I/L....26-H/I/L....27-G/H/I/L....28-J/L....29-G/J/L....2a-H/J/L....2b-G/H/J/L....2c-I/J/L....2d-G/I/J/L...2e-H/I/J/L
+2f-G/H/I/J/L....30-K/L....31-G/K/L...32-H/K/L...33-G/H/K/L...34-I/K/L...35-G/I/K/L...36-H/I/K/L...37-G/H/I/K/L...38-J/K/L
+39-G/J/K/L....3a-H/J/K/L....3b-G/H/J/K/L....3c-I/J/K/L....3d-G/I/J/K/L....3e-H/I/J/K/L....3f-G/H/I/J/K/L....40-M...41-G/M
+42-H/M....43-G/H/M....44-I/M....45-G/I/M....46-H/I/M....47-G/H/I/M...48-J/M...49-G/J/M...4a-H/J/M...4b-G/H/J/M...4c-I/J/M
+4d-G/I/J/M....4e-H/I/J/M....4f-G/H/I/J/M...50-K/M...51-G/K/M...52-H/K/M...53-G/H/K/M...54-I/K/M...55-G/I/K/M...56-H/I/K/M
+57-G/H/I/K/M...58-J/K/M...59-G/J/K/M...5a-H/J/K/M...5b-G/H/J/K/M..5c-I/J/K/M...5d-G/I/J/K/M..5e-H/I/J/K/M..5f-G/H/I/J/K/M
+60-L/M....61-G/L/M....62-H/L/M....63-G/H/L/M....64-I/L/M...65-G/I/L/M...66-H/I/L/M...67-G/H/I/L/M...68-J/L/M...69-G/J/L/M
+6a-H/J/L/M...6b-G/H/J/L/M...6c-I/J/L/M...6d-G/I/J/L/M...6e-H/I/J/L/M...6f-G/H/I/J/L/M...70-K/L/M...71-G/K/L/M..72-H/K/L/M
+73-G/H/K/L/M....74-I/K/L/M....75-G/I/K/L/M....76-H/I/K/L/M....77-G/H/I/K/L/M....78-J/K/L/M....79-G/J/K/L/M...7a-H/J/K/L/M
+7b-G/H/J/K/L/M....7c-I/J/K/L/M....7d-G/I/J/K/L/M....7e-H/I/J/K/L/M...7f-G/H/I/J/K/L/M...80-N...81-G/N...82-H/N...83-G/H/N
+84-I/N...85-G/I/N...86-H/I/N...87-G/H/I/N...88-J/N...89-G/J/N...8a-H/J/N...8b-G/H/J/N...8c-I/J/N...8d-G/I/J/N..8e-H/I/J/N
+8f-G/H/I/J/N....90-K/N....91-G/K/N...92-H/K/N...93-G/H/K/N...94-I/K/N...95-G/I/K/N...96-H/I/K/N...97-G/H/I/K/N...98-J/K/N
+99-G/J/K/N....9a-H/J/K/N....9b-G/H/J/K/N....9c-I/J/K/N...9d-G/I/J/K/N...9e-H/I/J/K/N...9f-G/H/I/J/K/N...a0-L/N...a1-G/L/N
+a2-H/L/N...a3-G/H/L/N...a4-I/L/N...a5-G/I/L/N...a6-H/I/L/N...a7-G/H/I/L/N..a8-J/L/N..a9-G/J/L/N..aa-H/J/L/N..ab-G/H/J/L/N
+ac-I/J/L/N...ad-G/I/J/L/N...ae-H/I/J/L/N...af-G/H/I/J/L/N...b0-K/L/N...b1-G/K/L/N...b2-H/K/L/N...b3-G/H/K/L/N..b4-I/K/L/N
+b5-G/I/K/L/N....b6-H/I/K/L/N....b7-G/H/I/K/L/N...b8-J/K/L/N...b9-G/J/K/L/N...ba-H/J/K/L/N...bb-G/H/J/K/L/N...bc-I/J/K/L/N
+bd-G/I/J/K/L/N....be-H/I/J/K/L/N....bf-G/H/I/J/K/L/N....c0-M/N...c1-G/M/N...c2-H/M/N...c3-G/H/M/N...c4-I/M/N...c5-G/I/M/N
+c6-H/I/M/N....c7-G/H/I/M/N...c8-J/M/N...c9-G/J/M/N...ca-H/J/M/N...cb-G/H/J/M/N...cc-I/J/M/N...cd-G/I/J/M/N...ce-H/I/J/M/N
+cf-G/H/I/J/M/N...d0-K/M/N...d1-G/K/M/N...d2-H/K/M/N..d3-G/H/K/M/N..d4-I/K/M/N..d5-G/I/K/M/N..d6-H/I/K/M/N..d7-G/H/I/K/M/N
+d8-J/K/M/N...d9-G/J/K/M/N...da-H/J/K/M/N...db-G/H/J/K/M/N..dc-I/J/K/M/N..dd-G/I/J/K/M/N..de-H/I/J/K/M/N..df-G/H/I/J/K/M/N
+e0-L/M/N...e1-G/L/M/N...e2-H/L/M/N...e3-G/H/L/M/N...e4-I/L/M/N...e5-G/I/L/M/N...e6-H/I/L/M/N...e7-G/H/I/L/M/N..e8-J/L/M/N
+e9-G/J/L/M/N...ea-H/J/L/M/N...eb-G/H/J/L/M/N...ec-I/J/L/M/N..ed-G/I/J/L/M/N..ee-H/I/J/L/M/N..ef-G/H/I/J/L/M/N..f0-K/L/M/N
+f1-G/K/L/M/N...f2-H/K/L/M/N..f3-G/H/K/L/M/N..f4-I/K/L/M/N..f5-G/I/K/L/M/N..f6-H/I/K/L/M/N..f7-G/H/I/K/L/M/N..f8-J/K/L/M/N
+f9-G/J/K/L/M/N...fa-H/J/K/L/M/N..fb-G/H/J/K/L/M/N..fc-I/J/K/L/M/N..fd-G/I/J/K/L/M/N..fe-H/I/J/K/L/M/N..ff-G/H/I/J/K/L/M/N
+
+
+
+******************************************************---X5---***********************************************************
+*************************************************************************************************************************
+
+____________________________________________________-Learned by-_________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........Who learns what Magic also follows a Checkbox Option. All 8 Spells for each level are grouped together.
+..........Choose which Character/Spell level you want, and use the reference below.
+
+..............................Hex Editor set to 16 wide.
+
+
+3ad28-FighterLv1..............3ad29-FighterLv2..............3ad2a-FighterLv3..............3ad2b-FighterLv4..............
+3ad2c-FighterLv5..............3ad2d-FighterLv6..............3ad2e-FighterLv7..............3ad2f FighterLv8..............
+3ad58-KnightLv1...............3ad59-KnightLv2...............3ad5a-KnightLv3...............3ad5b-KnightLv4...............
+3ad5c-KnightLv5...............3ad5d-KnightLv6...............3ad5e-KnightLv7...............3ad5f-KnightLv8...............
+
+3ad30-ThiefLv1................3ad31-ThiefLv2................3ad32-ThiefLv3................3ad33-ThiefLv4................
+3ad34-ThiefLv5................3ad35-ThiefLv6................3ad36-ThiefLv7................3ad37-ThiefLv8................
+3ad60-NinjaLv1................3ad61-NinjaLv2................3ad62-NinjaLv3................3ad63-NinjaLv4................
+3ad64-NinjaLv5................3ad65-NinjaLv6................3ad66-NinjaLv7................3ad67-NinjaLv8................
+
+3ad38-BlackBeltLv1............3ad39-BlackBeltLv2............3ad3a-BlackBeltLv3............3ad3b-BlackBeltLv4............
+3ad3c-BlackBeltLv5............3ad3d-BlackBeltLv6............3ad3e-BlackBeltLv7............3ad3f-BlackBeltLv8............
+3ad68-MasterLv1...............3ad69-MasterLv2...............3ad6a-MasterLv3...............3ad6b-MasterLv4...............
+3ad6c-MasterLv5...............3ad6d-MasterLv6...............3ad6e-MasterLv7...............3ad6f-MasterLv8...............
+
+3ad40-RedMageLv1..............3ad41-RedMageLv2..............3ad42-RedMageLv3..............3ad43-RedMageLv4..............
+3ad44-RedMageLv5..............3ad45-RedMageLv6..............3ad46-RedMageLv7..............3ad47-RedMageLv8..............
+3ad70-RedWizardLv1............3ad71-RedWizardLv2............3ad72-RedWizardLv3............3ad73-RedWizardLv4............
+3ad74-RedWizardLv5............3ad75-RedWizardLv6............3ad76-RedWizardLv7............3ad77-RedWizardLv8............
+
+3ad48-WhiteMageLv1............3ad49-WhiteMageLv2............3ad4a-WhiteMageLv3............3ad4b-WhiteMageLv4............
+3ad4c-WhiteMageLv5............3ad4d-WhiteMageLv6............3ad4e-WhiteMageLv7............3ad4f-WhiteMageLv8............
+3ad78-WhiteWizardLv1..........3ad79-WhiteWizardLv2..........3ad7a-WhiteWizardLv3..........3ad7b-WhiteWizardLv4..........
+3ad7c-WhiteWizardLv5..........3ad7d-WhiteWizardLv6..........3ad7e-WhiteWizardLv7..........3ad7f-WhiteWizardLv8..........
+
+3ad50-BlackMageLv1............3ad51-BlackMageLv2............3ad52-BlackMageLv3............3ad53-BlackMageLv4............
+3ad54-BlackMageLv5............3ad55-BlackMageLv6............3ad56-BlackMageLv7............3ad57-BlackMageLv8............
+3ad80-BlackWizardLv1..........3ad81-BlackWizardLv2..........3ad82-BlackWizardLv3..........3ad83-BlackWizardLv4..........
+3ad84-BlackWizardLv5..........3ad85-BlackWizardLv6..........3ad86-BlackWizardLv7..........3ad87-BlackWizardLv8..........
+
+
+
+..........All the Checkbox Options follow the same byte order, so here is the easiest way to find the option you want.
+..........at the top of the page in Notepad Options, go to (Edit), then choose (Find), and then type in the letters that
+..........correspond to your choice(s). Im using G-N because 0-9 and A-F are used in all the hex locations.
+..........Make sure you type in the letters like this, g/h/i, ect. Capitol/noncapitol doesnt matter, the / does.
+
+
+...Reference.............Lv 1.......................Lv 2.......................Lv 3.......................Lv 4........
+....[G][K].........[Cure...][Fire...].........[Poisona][Blizzrd].........[Cura...][Fira...].........[Tornado][Quake..]
+....[H][L].........[Dia....][Sleep..].........[Silence][Darknes].........[Diara..][Hold...].........[Heal...][Haste..]
+....[I][M].........[Protect][Poison.].........[Fear...][Strike.].........[A.Spell][Thundra].........[A.Elem.][Confuse]
+....[J][N].........[Invis..][Thunder].........[Float..][Slow...].........[Stona..][Sleepra].........[Raise..][Blizzra]
+
+...Reference.............Lv 5.......................Lv 6.......................Lv 7.......................Lv 8........
+....[G][K].........[Curaga.][Firaga.].........[Healara][Thundga].........[Curaja.][Blizzga].........[Healaga][Flare..]
+....[H][L].........[Ruin...][Scourge].........[Silega.][Death..].........[Diaja..][Break..].........[Holy...][Stop...]
+....[I][M].........[Diaga..][Telepor].........[Protera][Chasm..].........[Exit...][Sever..].........[Barrier][Banish.]
+....[J][N].........[A.Death][Slowra.].........[Invisra][Stun...].........[Arise..][Bio....].........[Dispel.][Kill...]
+
+
+ff-None...7f-G...bf-H...3f-G/H...df-I...5f-G/I...9f-H/I...1f-G/H/I...ef-J...6f-G/J...af-H/J...2f-G/H/J...cf-I/J..4f-G/I/J
+8f-H/I/J...0f-G/H/I/J...f7-K...77-G/K...b7-H/K...37-G/H/K...d7-I/K...57-G/I/K...97-H/I/K...17-G/H/I/K...e7-J/K...67-G/J/K
+a7-H/J/K....27-G/H/J/K....c7-I/J/K....47-G/I/J/K...87-H/I/J/K...07-G/H/I/J/K...fb-L...7b-G/L...bb-H/L...3b-G/H/L...db-I/L
+5b-G/I/L....9b-H/I/L....1b-G/H/I/L....eb-J/L....6b-G/J/L....ab-H/J/L....2b-G/H/J/L....cb-I/J/L....4b-G/I/J/L...8b-H/I/J/L
+0b-G/H/I/J/L....f3-K/L....73-G/K/L...b3-H/K/L...33-G/H/K/L...d3-I/K/L...53-G/I/K/L...93-H/I/K/L...13-G/H/I/K/L...e3-J/K/L
+63-G/J/K/L....a3-H/J/K/L....23-G/H/J/K/L....c3-I/J/K/L....43-G/I/J/K/L....83-H/I/J/K/L....03-G/H/I/J/K/L....fd-M...7d-G/M
+bd-H/M....3d-G/H/M....dd-I/M....5d-G/I/M....9d-H/I/M....1d-G/H/I/M...ed-J/M...6d-G/J/M...ad-H/J/M...2d-G/H/J/M...cd-I/J/M
+4d-G/I/J/M....8d-H/I/J/M....0d-G/H/I/J/M...f5-K/M...75-G/K/M...b5-H/K/M...35-G/H/K/M...d5-I/K/M...55-G/I/K/M...95-H/I/K/M
+15-G/H/I/K/M...e5-J/K/M...65-G/J/K/M...a5-H/J/K/M...25-G/H/J/K/M..c5-I/J/K/M...45-G/I/J/K/M..85-H/I/J/K/M..05-G/H/I/J/K/M
+f9-L/M....79-G/L/M....b9-H/L/M....39-G/H/L/M....d9-I/L/M...59-G/I/L/M...99-H/I/L/M...19-G/H/I/L/M...e9-J/L/M...69-G/J/L/M
+a9-H/J/L/M...29-G/H/J/L/M...c9-I/J/L/M...49-G/I/J/L/M...89-H/I/J/L/M...09-G/H/I/J/L/M...f1-K/L/M...71-G/K/L/M..b1-H/K/L/M
+31-G/H/K/L/M....d1-I/K/L/M....51-G/I/K/L/M....91-H/I/K/L/M....11-G/H/I/K/L/M....e1-J/K/L/M....61-G/J/K/L/M...a1-H/J/K/L/M
+21-G/H/J/K/L/M....c1-I/J/K/L/M....41-G/I/J/K/L/M....81-H/I/J/K/L/M...01-G/H/I/J/K/L/M...fe-N...7e-G/N...be-H/N...3e-G/H/N
+de-I/N...5e-G/I/N...9e-H/I/N...1e-G/H/I/N...ee-J/N...6e-G/J/N...ae-H/J/N...2e-G/H/J/N...ce-I/J/N...4e-G/I/J/N..8e-H/I/J/N
+0e-G/H/I/J/N....f6-K/N....76-G/K/N...b6-H/K/N...36-G/H/K/N...d6-I/K/N...56-G/I/K/N...96-H/I/K/N...16-G/H/I/K/N...e6-J/K/N
+66-G/J/K/N....a6-H/J/K/N....26-G/H/J/K/N....c6-I/J/K/N...46-G/I/J/K/N...86-H/I/J/K/N...06-G/H/I/J/K/N...fa-L/N...7a-G/L/N
+ba-H/L/N...3a-G/H/L/N...da-I/L/N...5a-G/I/L/N...9a-H/I/L/N...1a-G/H/I/L/N..ea-J/L/N..6a-G/J/L/N..aa-H/J/L/N..2a-G/H/J/L/N
+ca-I/J/L/N...4a-G/I/J/L/N...8a-H/I/J/L/N...0a-G/H/I/J/L/N...f2-K/L/N...72-G/K/L/N...b2-H/K/L/N...32-G/H/K/L/N..d2-I/K/L/N
+52-G/I/K/L/N....92-H/I/K/L/N....12-G/H/I/K/L/N...e2-J/K/L/N...62-G/J/K/L/N...a2-H/J/K/L/N...22-G/H/J/K/L/N...c2-I/J/K/L/N
+42-G/I/J/K/L/N....82-H/I/J/K/L/N....02-G/H/I/J/K/L/N....fc-M/N...7c-G/M/N...bc-H/M/N...3c-G/H/M/N...dc-I/M/N...5c-G/I/M/N
+9c-H/I/M/N....1c-G/H/I/M/N...ec-J/M/N...6c-G/J/M/N...ac-H/J/M/N...2c-G/H/J/M/N...cc-I/J/M/N...4c-G/I/J/M/N...8c-H/I/J/M/N
+0c-G/H/I/J/M/N...f4-K/M/N...74-G/K/M/N...b4-H/K/M/N..34-G/H/K/M/N..d4-I/K/M/N..54-G/I/K/M/N..94-H/I/K/M/N..14-G/H/I/K/M/N
+e4-J/K/M/N...64-G/J/K/M/N...a4-H/J/K/M/N...24-G/H/J/K/M/N..c4-I/J/K/M/N..44-G/I/J/K/M/N..84-H/I/J/K/M/N..04-G/H/I/J/K/M/N
+f8-L/M/N...78-G/L/M/N...b8-H/L/M/N...38-G/H/L/M/N...d8-I/L/M/N...58-G/I/L/M/N...98-H/I/L/M/N...18-G/H/I/L/M/N..e8-J/L/M/N
+68-G/J/L/M/N...a8-H/J/L/M/N...28-G/H/J/L/M/N...c8-I/J/L/M/N..48-G/I/J/L/M/N..88-H/I/J/L/M/N..08-G/H/I/J/L/M/N..f0-K/L/M/N
+70-G/K/L/M/N...b0-H/K/L/M/N..30-G/H/K/L/M/N..d0-I/K/L/M/N..50-G/I/K/L/M/N..90-H/I/K/L/M/N..10-G/H/I/K/L/M/N..e0-J/K/L/M/N
+60-G/J/K/L/M/N...a0-H/J/K/L/M/N..20-G/H/J/K/L/M/N..c0-I/J/K/L/M/N..40-G/I/J/K/L/M/N..80-H/I/J/K/L/M/N..00-G/H/I/J/K/L/M/N
+
+
+
+******************************************************---X6---***********************************************************
+*************************************************************************************************************************
+
+______________________________________________-Graphics and Palettes-____________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........Magic Graphics use 2 frames, so each of these should be kept together. If you use the second one, b4, bc, ect, ..........it will cause a graphic overlap of 2 different Spell types, and the results dont match up too well.
+
+..........Once you choose the Graphics, the Palette order is easier to decide on then with Weapons.
+
+
+-------------------------------------------------------------------------------------------Graphics-------Palette-
+-----------------------(05)----------(06)----------(00)----------(01)----------(02)----------(03)----------(04)---
+
+
+
+b0-Bar Of Light 1...............(Mix of 1 and 3)
+
+b4-Bar Of Light 2...............(1-Center)(2-Outer Center)(3-Outer)
+
+
+b8-4 Sparkles 1.................(1-Center)(2-Outer Center)(3-Outer)
+
+bc-4 Sparkles 2.................(1-Center)(2-Outer Center)(3-Outer)
+
+
+c0-Stars 1......................(1-Center)(2-Outer Center)(3-Outer)
+
+c4-Stars 2......................(1-Center)(2-Outer Center)(3-Outer)
+
+
+c8-Energy Beam 1................(1-Outer wrap around)(2-Center)(3-Outer Center) 
+
+cc-Energy Beam 2................(1-Outer wrap around)(2-Center)(3-Outer Center)
+
+
+d0-Energy Flare.................(1-Center, very large)(2-Outer Ring of Center)(3-Outer Fringes)
+
+d4-Energy Flare 2...............(1-Center, very large)(2-Outer Ring of Center)(3-Outer Fringes)
+
+
+d8-Glowing Ball.................(1-Center, very large)(2-Outer Ring of Center)(3-Outer Fringes)
+
+dc-Glowing Ball 2...............(1-Center, very large)(2-Outer Ring of Center)(3-Outer Fringes)
+
+
+e0-Lg Sparkle 1.................(1-Center)(3-Outer Particles)
+
+e4-Lg Sparkle 2.................(Mix of all 3)
+
+
+e8-Spark Hand 1.................(1-Center, very large)(2-Outer Ring of Center)(3-Outer Fringes)
+
+ec-Spark Hand 2.................(1-Center, very large)(2-Outer Ring of Center)(3-Outer Fringes)
+
+
+
+-------------------------------------------------------------------------------------------Graphics-------Palette-
+-----------------------(05)----------(06)----------(00)----------(01)----------(02)----------(03)----------(04)---
+
+
+..........Colors used - White, Yellow, Orange, Red, Green, Blue, Purple, Brown, Black, Grey, Light, and Dark.
+........................Wh.....Yw......Or......Rd...Gr.....Bl....Pr......Br.....Bl.....Gr....Lt.........Dk...
+
+..........Abbreviations - Green or Grey, and Blue or Black. These will be fully spelled out at least once per byte.
+..........If the colors are (Blue,BlueGreen,LtBlGr), then Bl and Gr will clearly be Blue and Green. Occasionally I will
+..........only use the first letter because of space restraints. DkPurpleRed,LtLtPR,LtPR. PR is PurpleRed, Pr is Purple.
+
+..........Each set of bytes 00-0f, 10-1f, 20-2f, and 30-3f, each display colors in a different sequence.
+..........There are similarities in each set. 05, 15, 25, and 35 all have PurpleRed in them, and 08, 18, 28, and 38 
+..........have GreenOrange/GreenBrown. As you are looking for the color you want, follow this pattern.
+
+..........Nestopia and VirtuaNeS were used for color determination. They each display the colors a little bit different.
+..........The top byte is for Nestopia, and the bottom is for VirtuaNeS. Palette options in Hackster display incorrectly
+..........for Magic, even in an unpatched rom. Hackster is close for some, and way off for others.
+
+..........each color is described as best as possible.
+
+
+00-White,DkGrey,White.........01-White,DkBlue,LtBlue........02-White,DkBlue,LtPurple......03-White,DkBlue,LtPurple......
+00-White,Grey,White...........01-White,DkBlue,LtBlue........02-White,DkBlue,LtPurple......03-White,DkPurpleBlue,LtPr....
+
+04-White,DkPurple,LtPurple....05-White,DkRedPurple,LtRdPr...06-White,RedBrown,LtOrange....07-White,Brown,LtOrange.......
+04-White,DkRedPurple,LtPr.....05-White,DkRedOrange,LtRdPr...06-White,Brown,LtOrange.......07-White,Brown,LtOrange.......
+
+08-White,GreenBrown,LtLtGr....09-White,DkGreen,LtGreen......0a-White,DkGreen,LtGreen......0b-White,DkGreenBlue,LtGrBl...
+08-White,GreenBrown,Yellow....09-White,DkGreen,LtLtGreen....0a-White,DkGreen,LtGreen......0b-White,DkGreenBlue,LtGrBl...
+
+0c-White,DkBlueGreen,LtBlGr...0d-White,Black,Grey...........0e-White,Black,Black..........0f-White,Black,Black..........
+0c-White,DkBlueGreen,LtBlGr...0d-White,Black,Grey...........0e-White,Black,Black..........0f-White,Black,Black..........
+
+------------------------------------------------------------------------------------------------------------------------
+
+10-White,LtGrey,Grey..........11-White,Blue,DkBlue..........12-White,BluePurple,DkBlue....13-White,Purple,DkBluePr......
+10-White,LtGrey,Grey..........11-White,LtBlue,DkBlue........12-White,LtBlue,DkBlue........13-White,LtPurple,DkPr........
+
+14-White,Purple,DkPr..........15-White,RedPurple,DkRdPr.....16-White,DkOrange,DkBrown.....17-White,Brown,DkBrown........
+14-White,LtPurple,DkPr........15-White,RedPurple,DkRdPr.....16-White,Orange,Brown.........17-White,LtBrown,DkBrown......
+
+18-White,GreenOrange,DkGrOr...19-White,Green,DkGreen........1a-White,Green,DkGreen........1b-White,GreenBlue,DkGrBl.....
+18-White,GreenOrange,DkGrOr...19-White,LtGreen,DkGreen......1a-White,LtGreen,DkGreen......1b-White,LtGreenBlue,DkGrBl...
+
+1c-White,BlueGreen,DkBlGr.....1d-White,Black,Black..........1e-White,Black,Black..........1f-White,Black,Black..........
+1c-White,LtBlueGreen,DkBlGr...1d-White,Black,Black..........1e-White,Black,Black..........1f-White,Black,Black..........
+
+------------------------------------------------------------------------------------------------------------------------
+
+20-White,White,Grey...........21-White,LtBlue,Blue..........22-White,LtPurple,BluePr......23-White,LtPurple,PrBlue......
+20-White,White,LtGrey.........21-White,LtBlue,Blue..........22-White,LtBlue,Blue..........23-White,LtPurple,Purple......
+
+24-White,LtPurple,Purple......25-White,LtRed,RedPurple......26-White,Orange,Red...........27-White,LtBrown,Brown........
+24-White,LtPurple,PrRed.......25-White,LtRed,RedPurple......26-White,Orange,DkOr..........27-White,Orange,Brown.........
+
+28-White,LtGreenOrange,GrOr...29-White,LtGreen,Green........2a-White,LtGreen,Green........2b-White,LtGreenBlue,GrBl.....
+28-White,LtOrangeGreen,GrOr...29-White,LtGreen,Green........2a-White,LtGreen,Green........2b-White,LtGreenBlue,GrBl.....
+
+2c-White,LtBlueGrey,BlGr......2d-White,DkGrey,Black.........2e-White,Black,Black..........2f-White,Black,Black..........
+2c-White,LtBlueGrey,BlGr......2d-White,DkGrey,Black.........2e-White,Black,Black..........2f-White,Black,Black..........
+
+------------------------------------------------------------------------------------------------------------------------
+
+30-White,White,White..........31-White,LtLtBlue,LtBlue......32-White,LtLtPurple,LtPr......33-White,LtLtPurple,LtPr......
+30-White,White,White..........31-White,LtLtBlue,LtBlue......32-White,LtLtPurple,LtBlue....33-White,LtLtPurple,LtPr......
+
+34-White,LtLtPurpleRed,LtPrRd.35-White,LtLtRedPurple,LtRP...36-White,LtLtOrange,LtOr......37-White,LtLtOrange,Orange....
+34-White,LtLtPurpleRed,LtPrRd.35-White,LtLtRedPurple,LtRP...36-White,LtLtOrange,LtOr......37-White,LtLtOrange,Orange....
+
+38-White,LtLtGreen.LtGreen....39-White,LtLtGreen,LtGr.......3a-White,LtLtGreenBlue,LtGr...3b-White,LtLtBlueGreen,LtGrBl.
+38-White,LtLtGreen,LtGrOrange.39-White,LtLtGreen,LtGr.......3a-White,LtLtGreenBlue,LtGr...3b-White,LtLtBlueGreen,LtGrBl.
+
+3c-White,LtLtBlue,LtBlue......3d-White,Grey,DkGrey..........3e-White,Black,Black..........3f-White,Black,Black..........
+3c-White,LtLtBlueGrey,LtBlGr..3d-White,Grey,DkGrey..........3e-White,Black,Black..........3f-White,Black,Black..........
+
+
+
+******************************************************---X7---***********************************************************
+*************************************************************************************************************************
+
+__________________________________________________-Battle Message-_______________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........For battle messages there are 2 different variables. The message you select will be displayed when the spell is
+..........effective. Other messages will display on their own when certain effects take place.
+
+
+
+..............................Spell and Ability list
+ 
+
+30490-Cure(01)................30491-Dia(00).................30492-Protect(02).............30493-Invisible(03)...........
+30494-Fire(00)................30495-Sleep(00)...............30496-Poison(00)..............30497-Thunder(00).............
+
+30498-Poisona(00).............30499-Silence(00).............3049a-Fear(0f)................3049b-Float(08)...............
+3049c-Blizzard(00)............3049d-Darkness(00)............3049e-Strike(1b)..............3049f-Slow(0b)................
+
+304a0-Cura(01)................304a1-Diara(00)...............304a2-A.Spell(0c).............304a3-Stona(4a)...............
+304a4-Fira(00)................304a5-Hold(00)................304a6-Thundara(00)............304a7-Sleepra(00).............
+
+304a8-Tornado(4f).............304a9-Heal(01)................304aa-A.Element(10)...........304ab-Raise(4a)...............
+304ac-Quake(00)...............304ad-Haste(12)...............304ae-Confuse(00).............304af-Blizzara................
+
+304b0-Curaga(01)..............304b1-Ruin(0a)................304b2-Diaga(00)...............304b3-A.Death(19).............
+304b4-Firaga(00)..............304b5-Scourge(4d).............304b6-Teleport(4a)............304b7-Slowra(0b)..............
+
+304b8-Healara(01).............304b9-Silega(00)..............304ba-Protera(02).............304bb-Invisira(03)............
+304bc-Thundaga(00)............304bd-Death(15)...............304be-Chasm(16)...............304bf-Stun(00)................
+ 
+304c0-Curaja(18)..............304c1-Diaja(00)...............304c2-Exit(1f)................304c3-Arise(4a)...............
+304c4-Blizzaga(00)............304c5-Break(00)...............304c6-Sever(1b)...............304c7-Bio(00).................
+
+304c8-Healaga(01).............304c9-Holy(00)................304ca-Barrier(1c).............304cb-Dispel(1d)..............
+304cc-Flare(00)...............304cd-Stop(1e)................304ce-Banish(1f)..............304cf-Kill(15)................
+
+
+304d0-Heal Potion(01).........304d1-Pure Potion(00).........
+
+
+304d2-Cold Breath(00).........304d3-Fire Breath(00).........304d4-Stone Gaze(00)..........304d5-Absolute 0(00)..........
+304d6-Meteor(00)..............304d7-Eruption(00)............304d8-Earthquake(16)..........304d9-Death Gaze(00)..........
+304da-Fierce Gaze(00).........304db-Banish Gaze(1f).........304dc-Ice Storm(00)...........304dd-Firestorm(00)...........
+304de-Meltdown(00)............304df-Pyro Breath(00).........304e0-Stone Gas(00)...........304e1-Mind Blast(00)..........
+304e2-Poison Gas(00)..........304e3-Lightning(00)...........304e4-Fatal Gas(00)...........304e5-Dark Breath(00).........
+304e6-Ultima Beam(00).........304e7-Octopus Ink(00).........304e8-Poison Darts(00)........304e9-Stun Gaze(00)...........
+304ea-Tsunami(00).............304eb-Cyclone(00).............Megaflare - No Message option
+
+
+
+...............Battle Messages
+
+...............The ones in parenthesis are Messages connected to one of the Spells in the list.
+
+
+01-(HP recovered).............18-(Fully recovered)..........31-HP max.....................
+
+1b-(Attack up)................2e-.damage....................
+
+12-(Hit rate up)..............0b-(Hit rate down)............2c-Critical hit...............2b-.hits......................
+
+02-(Defense up)...............41-Defense down...............0a-(Weakened).................
+
+03-(Evasion up)...............05-Evasion down...............
+
+
+10-(Resist fire/bliz/thun)....08-(Resist Earth).............0c-(Resist drk/stn/slp/mut)...19-(Resist death/stone/pois)..
+
+1c-(Resist all)...............1d-(Resistances removed)......
+
+
+14-Poisoned...................43-Poison.....................0e-Poison neutralized.........
+
+04-Fell asleep................28-Sleeping...................46-Asleep.....................27-Woke up....................
+
+47-Mute.......................07-Silenced...................4b-Silenced...................11-Silence broken.............
+
+44-Dark.......................09-Sight obscured.............06-Sight restored.............
+
+45-Stun.......................4c-Stunned....................17-Unable to move.............2a-Able to move again.........
+
+13-Confused...................0f-(Frightened)...............29-Came to senses.............
+
+42-Stone......................2f-Sealed in stone............1e-(Time stopped).............
+
+4d-(Poisonous cloud)..........16-(Fell into a chasm)........1f-(Banished to another dim)..
+
+4f-(Near death)...............15-(Spirit fled)..............3f-Defeated...................20-Slain......................
+
+
+40-Missed!....................21-Ineffective................
+
+4a-(Nothing happens)..........4e-Nothing happens.../........2d-Nothing happens.../........00-(Nothing)..................
+
+
+22-Chance to act first........23-Taken by surprise..........
+
+26-Escaped....................24-No way out.................25-Cannot escape this battle..
+
+3d-Won the battle.............3e-.and the others failed.../.
+
+
+49-Experience up..............30-Level up...................
+
+33-Strength...................34-Agility....................35-Intellect..................
+
+36-Vitality...................37-Luck.......................48-HP.........................
+
+
+32-.points....................38-.up........................3b-.up........................
+
+0d-?..........................1a-?..........................
+
+39-...........................3a-...........................3c-...........................
+
+
+
+******************************************************---X8---***********************************************************
+*************************************************************************************************************************
+
+__________________________________-Text - Items, Magic, Enemy Attacks, Battle Message-___________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........All text needs to be done with a Hex Editor. Set to 16 wide
+
+..........The last byte for anything you rename must end with 00, before the next Pointer.
+..........The words will bleed into each other if the (00) is removed.
+
+..........One aspect that has a little bit of a complication. Each thing that is renamed has to take up the same amount
+..........space as before, or it will appear wrong in a Shop.
+ 
+..........There is single space text, 7a, 80-ff, and there is double space text 03-79, and one triple space text 69. 
+..........7B-7F are used in a few select words, and areas of text that use these should be left unchanged.
+..........Some byte options from be-ff are either single or double. I didnt test the non usable ones.
+
+..........There is an alternate letter "A" (e6), which is used in - ASpell, AElement, and ADeath.
+
+
+
+..............................Items
+
+
+2bd3d/47-Heal Potion..........2bd49/53-Pure Potion..........2bd55/5f-Gold Needle..........2bd19/23-Phoenix Down.........
+
+2bd25/2f-Sleeping Bag.........2bd31/3b-Tent.................2bcf5/ff-Mind Plus............2bd01/0b-Stamina Plus.........
+
+2bd0d/17-Luck Plus............2bce9/f3-Spellbook............
+
+
+2bc54/5b-Sara's Lute..........2bc5d/65-Royal Crown..........2bc67/6e-Crystal Eye..........2bc70/7a-Wake-up Herb.........
+
+2bc7c/83-Mystic Key...........2bc85/8c-Nitro Powder.........2bc8e/94-Adamantite...........2bc96/9f-Rosetta Stone........
+
+2bca1/a8-Star Ruby............2bcaa/b0-Earth Rod............2bcb2/b7-Floatstone...........2bcb9/c3-Tintinnabulum........
+
+2bcc5/cb-Rat's Tail...........2bccd/d3-Warp Cube............2bfb7/be-Mystery Jar..........2bcdb/e2-Fairy Water..........
+
+2bce4/e7-Canoe................
+
+
+
+..............................Magic
+
+
+2b44e/53-Cure.................2b455/5b-Dia..................2b45d/62-Protect..............2b464/6c-Invisible............
+2b46e/73-Fire.................2b475/7b-Sleep................2b47d/82-Poison...............2b484/8a-Thunder..............
+
+2b48c/92-Poisona..............2b494/99-Silence..............2b49b/a0-Fear.................2b4a2/a7-Float................
+2b4a9/af-Blizzard.............2b4b1/b6-Darkness.............2b4b8/be-Strike...............2b4c0/c5-Slow.................
+
+2b4c7/cc-Cura.................2b4ce/d4-Diara................2b4d6/dc-A.Spell..............2b4de/e4-Stona................
+2b4e6/eb-Fira.................2b4ed/f2-Hold.................2b4f4/fa-Thundara.............2b4fc/02-Sleepra..............
+
+2b504/09-Tornado..............2b50d/12-Heal.................2b514/1a-A.Element............2b51c/21-Raise................
+2b523/29-Quake................2b52b/30-Haste................2b532/38-Confuse..............2b53a/40-Blizzara.............
+
+2b542/48-Curaga...............2b54a/4f-Ruin.................2b551/58-Diaga................2b55a/5f-A.Death..............
+2b561/67-Firaga...............2b569/6f-Scourge..............2b571/77-Teleport.............2b579/7e-Slowra...............
+
+2b580/86-Healara..............2b588/8e-Silega...............2b590/95-Protera..............2b597/9d-Invisira.............
+2b59f/a6-Thundaga.............2b5a8/ad-Death................2b5af/b5-Chasm................2b5b7/bd-Stun.................
+
+2b5bf/c5-Curaja...............2b5c7/ce-Diaja................2b5d0/d5-Exit.................2b5d7/dc-Arise................
+2b5e0/e7-Blizzaga.............2b5e9/ef-Break................2b5f1/f6-Sever................2b5f8/fd-Bio..................
+
+2b5ff/06-Healaga..............2b608/0e-Holy.................2bfc0/c5-Barrier..............2bfc7/cc-Dispel...............
+2bfce/d3-Flare................2bfd5/da-Stop.................2bfdc/e1-Banish...............2bfe3/e8-Kill.................
+
+
+
+..............................Enemy Attacks
+
+
+2b3bd/c5-Cold Breath..........2b64d/55-Fire Breath..........2b656/5e-Stone Gaze...........2b65f/68-Absolute 0...........
+
+2b669/6c-Meteor...............2b66e/73-Eruption.............2b675/7c-Earthquake...........2b67e/86-Death Gaze...........
+
+2b687/8f-Fierce Gaze..........2b691/99-Banish Gaze..........2b3d5/db-Ice Storm............2b6a2/a7-Firestorm............
+
+2b6a9/ae-Meltdown.............2b6b0/b7-Pyro Breath..........2b6b9/be-Stone Gas............2b6c0/c6-Mind Blast...........
+
+2b6c8/ce-Poison Gas...........2b6d0/d5-Lightning............2b6d7/dc-Fatal Gas............2b6de/e5-Dark Breath..........
+
+2b6e7/ee-Ultima Beam..........2b6f0/f8-Octopus Ink..........2b6fa/02-Poison Darts.........2b704/0b-Stun Gaze............
+
+2bfeb/f0-Tsunami..............2bff2/f6-Cyclone..............2b3c6/cd-Megaflare............
+
+
+
+..............................Battle Message
+
+
+2cc50/58-(HP recovered).......2cd3f/48-(Fully recovered)....2ce1b/1f-HP max...............
+
+2cd5d/64-(Attack up)..........2ce06/09-.damage..............
+
+2ccf6/fd-(Hit rate up)........2cca5/ac-(Hit rate down)......2cdfd/04-Critical hit.........2cdf9/fb-.hits................
+
+2cc5a/61-(Defense up).........2ce84/8c-Defense down.........2cc9f/a3-(Weakened)...........
+
+2cc63/6a-(Evasion up).........2cc74/7b-Evasion down.........
+
+
+2ccd9/eb-(Resist fire/bliz/thun).......2cc8c/92-(Resist Earth)................2ccae/c1-(Resist drk/stn/slp/mut).........
+
+2cd4a/59-(Resist death/stone/pois).....2cd66/6f-(Resist all)..................2cd71/7c-(Resistances removed)............
+
+
+2cd0d/11-Poisoned.............2ce6c/6f-Poison...............2ccc5/d0-Poison neutralized...
+
+2cc6c/72-Fell asleep..........2cde9/ee-Sleeping.............2ce7a/7e-Asleep...............2cde2/e7-Woke up..............
+
+2ce80/82-Mute.................2cc86/8a-Silenced.............2cced/f4-Silence broken.......
+
+2ce71/73-Dark.................2cc94/9d-Sight obscured.......2cc7d/84-Sight restored.......
+
+2ce75/78-Stun.................2cd06/0b-Stunned..............2cd27/30-Unable to move.......2cd32/3d-Able to move again...
+
+2ccff/04-Confused.............2ccd2/d7-(Frightened).........2cdf0/f7-Came to senses.......
+
+2ce68/6a-Stone................2ce0b/12-Sealed in stone......2cd7e/85-(Time stopped).......
+
+2ceb7/c0-(Poisonous cloud)....2cd1c/25-(Fell into a chasm)..2cd87/97-(Banished to another dim)........
+
+2cec2/c7-(Near death).........2cd13/1a-(Spirit fled)........2ce5a/60-Defeated.............2cd99/9d-Slain................
+
+
+2ce62/66-Missed!..............2cd9f/a7-Ineffective..........2d000/0a-Nothing happens.../...
+
+2cda9/b4-Chance to act first..2cdb6/c0-Taken by surprise....
+
+2cddc/e0-Escaped..............2cdc2/c7-No way out...........2cdc9/da-Cannot escape this battle.....
+
+2ce42/4a-Won the battle.......2ce4c/58-.and the others failed.../
+
+
+2ce9e/a7-Experience up........2ce14/19-Level up.............
+
+2ce21/25-Strength.............2ce27/2b-Agility..............2ce2d/33-Intellect............
+
+2ce35/39-Vitality.............2e040/42-Luck.................2ce91/96-HP...................
+
+2ce98/9c-.points..............2ce3b/3d-.up..................
+
+2ccc3-?.......................2cd5b-?.......................
+
+
+
+*******************************************************---X9---**********************************************************
+*************************************************************************************************************************
+
+_______________________________-Text Pointers - Items, Magic, Enemy Attacks, Battle Message-_____________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........Changing Pointers is a little tricky. Here is what to look for.
+
+
+..........8....|9|....A....|B|....For Banks 00-14, the Pointer will be 8-b. 
+..........C.....D....(E)....F.....For Bank 15, it will be c-f
+
+..........0.....1.....2.....3
+..........4....|5|....6.....7
+..........8.....9.....A....|B|
+..........C.....D....(E)....F
+
+..........The ones in parenthesis or brackets are for the following text examples.
+..........Directly above those is what determines the Pointer.
+
+..........2(5d)3d = 2D 9D
+..........3(ed)3d = 2D ED
+..........2(bd)3d = 2D BD
+
+..........Here is an sample, so you can see what to look for. Notice the last one requires a subtraction.
+
+..........2bd3d-Heal Potion-2D BD.......2b44e-Cure-3E B4..............2bd01-Stamina Plus-F1 BC......
+
+
+
+..............................Items
+
+
+2b734/35-Heal Potion.........2b736/37-Pure Potion.........2b738/39-Gold Needle.........2b73a/3b-Phoenix Down........
+
+2b744/45-Sleeping Bag........2b746/47-Tent................2b73e/3f-Mind Plus...........2b740/41-Stamina Plus........
+
+2b742/43-Luck Plus...........2b73c/3d-Spellbook...........
+
+
+2b712/13-Sara's Lute.........2b714/15-Royal Crown.........2b716/17-Crystal Eye.........2b718/19-Wake-up Herb.........
+
+2b71a/1b-Mystic Key..........2b71c/1d-Nitro Powder........2b71e/1f-Adamantite..........2b720/21-Rosetta Stone........
+
+2b722/23-Star Ruby...........2b724/25-Earth Rod...........2b726/27-Floatstone..........2b728/29-Tintinnabulum........
+
+2b72a/2b-Rat's Tail..........2b72c/2d-Warp Cube...........2b72e/2f-Mystery Jar.........2b730/31-Fairy Water..........
+
+2b732/33-Canoe...............
+
+
+
+..............................Magic
+
+
+2b870/71-Cure.................2b872/73-Dia..................2b874/75-Protect..............2b876/77-Invisible............
+2b878/79-Fire.................2b87a/7b-Sleep................2b87c/7d-Poison...............2b87e/7f-Thunder..............
+
+2b780/81-Poisona..............2b782/83-Silence..............2b784/85-Fear.................2b786/87-Float................
+2b788/89-Blizzard.............2b78a/8b-Darkness.............2b78c/8d-Strike...............2b78e/8f-Slow.................
+
+2b890/91-Cura.................2b892/93-Diara................2b894/95-A.Spell..............2b896/97-Stona................
+2b898/99-Fira.................2b89a/9b-Hold.................2b89c/9d-Thundara.............2b89e/9f-Sleepra..............
+
+2b8a0/a1-Tornado..............2b8a2/a3-Heal.................2b8a4/a5-A.Element............2b8a6/a7-Raise................
+2b8a8/a9-Quake................2b8aa/ab-Haste................2b8ac/ad-Confuse..............2b8ae/af-Blizzara.............
+
+2b8b0/b1-Curaga...............2b8b2/b3-Ruin.................2b8b4/b5-Diaga................2b8b6/b7-A.Death...........
+2b8b8/b9-Firaga...............2b8ba/bb-Scourge..............2b8bc/bd-Teleport.............2b8be/bf-Slowra............
+
+2b8c0/c1-Healara..............2b8c2/c3-Silega...............2b8c4/c5-Protera..............2b8c6/c7-Invisira..........
+2b8c8/c9-Thundaga.............2b8ca/cb-Death................2b8cc/cd-Chasm................2b8ce/cf-Stun..............
+
+2b8d0/d1-Curaja...............2b8d2/d3-Diaja................2b8d4/d5-Exit.................2b8d6/d7-Arise................
+2b8d8/d9-Blizzaga.............2b8da/db-Break................2b8dc/dd-Sever................2b8de/df-Bio..................
+
+2b8e0/e1-Healaga..............2b8e2/e3-Holy.................2b8e4/e5-Barrier..............2b8e6/e7-Dispel...............
+2b8e8/e9-Flare................2b8ea/eb-Stop.................2b8ec/ed-Banish...............2b8ee/ef-Kill.................
+
+
+
+..............................Enemy Attacks
+
+
+2b610/11-Cold Breath..........2b612/13-Fire Breath..........2b614/15-Stone Gaze...........2b616/17-Absolute 0...........
+
+2b618/19-Meteor...............2b61a/1b-Eruption.............2b61c/1d-Earthquake...........2b61e/1f-Death Gaze...........
+
+2b620/21-Fierce Gaze..........2b622/23-Banish Gaze..........2b624/25-Ice Storm............2b626/27-Firestorm............
+
+2b628/29-Meltdown.............2b62a/2b-Pyro Breath..........2b62c/2d-Stone Gas............2b62e/2f-Mind Blast...........
+
+2b630/31-Poison Gas...........2b632/33-Lightning............2b634/35-Fatal Gas............2b636/37-Dark Breath..........
+
+2b638/39-Ultima Beam..........2b63a/3b-Octopus Ink..........2b63c/3d-Poison Darts.........2b63e/3f-Stun Gaze............
+
+2b640/41-Tsunami..............2b642/43-Cyclone..............2b644/45-Megaflare............
+
+
+
+..............................Battle Message
+
+
+2cf60/61-(HP recovered).......2cf8e/8f-(Fully recovered)....2cfc0/c1-HP max...............
+
+2cf94/95-(Attack up)..........2cfba/bb-.damage..............
+
+2cf82/83-(Hit rate up)........2cf74/75-(Hit rate down)......2cfb6/b7-Critical hit.........2cfb4/b5-.hits................
+
+2cf62/63-(Defense up).........2cfe0/e1-Defense down.........2cf72/73-(Weakened)...........
+
+2cf64/65-(Evasion up).........2cf68/69-Evasion down.........
+
+
+2cf7e/7f-(Resist fire/bliz/thun).......2cf6e/6f-(Resist Earth)................2cf76/77-(Resist drk/stn/slp/mut).........
+
+2cf90/91-(Resist death/stone/pois).....2cf96/97-(Resist all)..................2cf98/99-(Resistances removed)............
+
+
+2cf86/87-Poisoned.............2cfe4/e5-Poison...............2cf7a/7b-Poison neutralized...
+
+2cf66/67-Fell asleep..........2cfae/af-Sleeping.............2cfea/eb-Asleep...............2cfac/ad-Woke up..............
+
+2cfec/ed-Mute.................2cf6c/6d-Silenced.............2cf80/81-Silence broken.......
+
+2cfe6/e7-Dark.................2cf70/71-Sight obscured.......2cf6a/6b-Sight restored.......
+
+2cfe8/e9-Stun.................2cff6/f7-Stunned..............2cf8c/8d-Unable to move.......2cfb2/b3-Able to move again...
+
+2cf84/85-Confused.............2cf7c/7d-(Frightened).........2cfb0/b1-Came to senses.......
+
+2cfe2/e3-Stone................2cfbc/bd-Sealed in stone......2cf9a/9b-(Time stopped).......
+
+2cff8/f9-(Poisonous cloud)....2cf8a/8b-(Fell into a chasm)..2cf9c/9d-(Banished to another dim)........
+
+2cffc/fd-(Near death).........2cf88/89-(Spirit fled)........2cfdc/dd-Defeated.............2cf9e/9f-Slain................
+
+
+2cfde/df-Missed!..............2cfa0/a1-Ineffective..........2cfb8/b9-Nothing happens.../..
+
+
+2cfa2/a3-Chance to act first..2cfa4/a5-Taken by surprise....
+
+2cfaa/ab-Escaped..............2cfa6/a7-No way out...........2cfa8/a9-Cannot escape this battle.....
+
+2cfd8/d9-Won the battle.......2cfda/db-.and the others failed.../....
+
+
+2cff0/f1-Experience up........2cfbe/bf-Level up.............
+
+2cfc4/c5-Strength.............2cfc6/c7-Agility..............2cfc8/c9-Intellect............
+
+2cfca/cb-Vitality.............2cfcc/cd-Luck.................2cfee/ef-HP..???..............
+
+
+2cfc2/c3-.points..............2cfce/cf-.up..................
+
+2cf78/79-?....................2cf92/93-?....................
+
+
+
+******************************************************---X10---**********************************************************
+*************************************************************************************************************************
+
+_______________________________________________________-Prices-__________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........Prices consist of 2 bytes. The first byte is low (0-255), and the second is high (256 for every 1). 
+..........If your price is (01 00), than it will be $1. If your price is (00 01), than it will be $256.
+
+..........I decided to list out the common ones, so hopefully this makes it easier.
+
+
+
+0500-5.....0800-8.....0a00-10....0f00-15....1400-20....1900-25....1e00-30....2800-40....3200-50....3c00-60....4600-70
+
+4b00-75....5000-80....5a00-90....6400-100...7800-120...7d00-125...9600-150...a000-160...af00-175...b400-180...c800-200
+
+e100-225...f000-240...fa00-250...1301-275...1801-280...2c01-300...4001-320...4501-325...5e01-350...6801-360...7701-375
+
+9001-400...a901-425...c201-450...db01-475...f401-500...0d02-525...2602-550...3f02-575...5802-600...7102-625...8a02-650
+
+a302-675...bc02-700...d502-725...ee02-750...0703-775...2003-800...3903-825...5203-850...6b03-875...8403-900...b603-950
+
+------------------------------------------------------------------------------------------------------------------------
+
+e803-1000....1a04-1050....4c04-1100....7e04-1150....b004-1200....e204-1250....1405-1300....4605-1350....7805-1400
+
+aa05-1450....dc05-1500....0e06-1550....4006-1600....7206-1650....a406-1700....d606-1750....0807-1800....3a07-1850
+
+d007-2000....3408-2100....ca08-2250....6009-2400....c409-2500....8c0a-2700....be0a-2750....f00a-2800....220b-2850
+
+b80b-3000....800c-3200....b20c-3250....ac0d-3500....100e-3600....a60e-3750....a00f-4000....6810-4200....9a10-4250
+
+9411-4500....8e12-4750....c012-4800....8813-5000....5014-5200....1815-5400....7c15-5500....e015-5600....a816-5800
+
+7017-6000....9c18-6300....0019-6400....6419-6500....901a-6800....581b-7000....201c-7200....4c1d-7500....b01d-7600
+
+781e-7800....401f-8000....d020-8400....3421-8500....6022-8800....2823-9000....f023-9200....1c25-9500....8025-9600
+
+------------------------------------------------------------------------------------------------------------------------
+
+4826-9800....ac26-9900....1027-10000...0429-10500...302a-10800...f82a-11000...ec2c-11500...e02e-12000...d430-12500
+
+c832-13000...bc34-13500...b036-14000...a438-14500...983a-15000...8c3c-15500...803e-16000...7440-16500...6842-17000
+
+5c44-17500...5046-18000...4448-18500...204e-20000...0852-21000...e457-22500...c05d-24000...a861-25000...7869-27000
+
+6c6b-27500...606d-28000...3075-30000...007d-32000...f47e-32500...b888-35000...a08c-36000...7c92-37500...409c-40000
+
+10a4-42000...04a6-42500...c8af-45000...8cb9-47500...80bb-48000...50c3-50000...20cb-52000...f0d2-54000...d8d6-55000
+
+c0da-56000...90e2-58000...60ea-60000...18f6-63000...00fa-64000...e8fd-65000...ffff-65535
+
+
+
+..............................Items
+
+
+37c34/35-Heal Potion..........37c36/37-Pure Potion..........37c38/39-Gold Needle..........37c3a/3b-Phoenix Down.........
+
+37c3e/3f-Mind Plus............37c40/41-Stamina Plus.........37c42/43-Luck Plus............37c3c/3d-Spellbook............
+
+37c44/45-Sleeping Bag.........37c46/47-Tent.................37c2e/2f-Mystery Jar..........
+
+
+37c12/13-Sara's Lute..........37c14/15-Royal Crown..........37c16/17-Crystal Eye..........37c18/19-Wake-up Herb.........
+
+37c1a/1b-Mystic Key...........37c1c/1d-Nitro Powder.........37c1e/1f-Adamantite...........37c20/21-Rosetta Stone........
+
+37c22/23-Star Ruby............37c24/25-Earth Rod............37c26/27-Floatstone...........37c28/29-Tintinnabulum........
+
+37c2a/2b-Rat's Tail...........37c2c/2d-Warp Cube............37c30/31-Fairy Water..........37c32/33-Canoe................
+
+
+
+..............................Magic
+
+
+37d70/71-Cure.................37d72/73-Dia..................37d74/75-Protect..............37d76/77-Invisible............
+37d78/79-Fire.................37d7a/7b-Sleep................37d7c/7d-Poison...............37d7e/7f-Thunder..............
+
+37d80/81-Poisona..............37d82/83-Silence..............37d84/85-Fear.................37d86/87-Float................
+37d88/89-Blizzard.............37d8a/8b-Darkness.............37d8c/8d-Strike...............37d8e/8f-Slow.................
+
+37d90/91-Cura.................37d92/93-Diara................37d94/95-A.Spell..............37d96/97-Stona................
+37d98/99-Fira.................37d9a/9b-Hold.................37d9c/9d-Thundara.............37d9e/9f-Sleepra..............
+
+37da0/a1-Tornado..............37da2/a3-Heal.................37da4/a5-A.Element............37da6/a7-Raise................
+37da8/a9-Quake................37daa/ab-Haste................37dac/ad-Confuse..............37dae/af-Blizzara.............
+
+37db0/b1-Curaga...............37db2/b3-Ruin.................37db4/b5-Diaga................37db6/b7-A.Death..............
+37db8/b9-Firaga...............37dba/bb-Scourge..............37dbc/bd-Teleport.............37dbe/bf-Slowra...............
+
+37dc0/c1-Healara..............37dc2/c3-Silega...............37dc4/c5-Protera..............37dc6/c7-Invisira.............
+37dc8/c9-Thundaga.............37dca/cb-Death................37dcc/cd-Chasm................37dce/cf-Stun.................
+ 
+37dd0/d1-Curaja...............37dd2/d3-Diaja................37dd4/d5-Exit.................37dd6/d7-Arise................
+37dd8/d9-Blizzaga.............37dda/db-Break................37ddc/dd-Sever................37dde/df-Bio..................
+
+37de0/e1-Healaga..............37de2/e3-Holy.................37de4/e5-Barrier..............37de6/e7-Dispel...............
+37de8/e9-Flare................37dea/eb-Stop.................37dec/ed-Banish...............37dee/ef-Kill.................
+
+
+
+
+
+
+
+                                                                                                                                
+
+

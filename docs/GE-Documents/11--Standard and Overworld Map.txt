@@ -1,0 +1,535 @@
+
+
+
+
+
+....................X0---Overview
+....................X1---Available KAB
+....................X2---New Features
+....................X3---Palette Sets
+....................X4---Palette Options
+....................X5---Palettes for each Area
+
+
+
+
+******************************************************---X0---***********************************************************
+*************************************************************************************************************************
+
+_____________________________________________________-Overview-__________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+
+
+******************************************************---X1---***********************************************************
+*************************************************************************************************************************
+
+__________________________________________________-Available KAB-________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........Any map editing, will tempoarily create graphical errors, 
+..........on the Title Screen, Menu Screen, and Bahamut Graphics.
+..........(Repair Title and Bahamut) will completely fix this each time.
+
+..........Make sure you have above (3043 KAB). If it goes lower, then some of the Standard Maps
+..........will be effected when you use (Repair Title and Bahamut).
+
+..........Out of around 48000 KAB total, 3043 less isnt too bad for the addition of Bahamut.
+
+
+
+******************************************************---X2---***********************************************************
+*************************************************************************************************************************
+
+___________________________________________________-New Features-________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........There is a nice extra feature in GFF, that gives more options when choosing Palettes.
+..........With the 3rd set of Palettes (going from top to bottom), they are assigned to a new feature.
+..........This new feature is having 5 Palette sequences to cycle through.
+..........Along with the new cycling effect, it is also usually connected with another added feature, animated tiles.
+..........Some of the tiles now have animated effects, which adds tremendously to the aesthetics of the game.
+
+..........Getting the right Palette combo to make it look good is a little tricky, but definately adds new life to FF1.
+
+
+..........Here are a few examples of where this new feature is used.
+
+..........Animated ocean, along with cycling, gives a moving shoreline effect.
+..........Animated lava tiles and cycling.
+..........Animated ice tiles and cycling.
+
+..........Then there are the animated tiles with no cycling.
+..........Rivers in castles and towns, and water in any Sea Shrine area.
+
+
+
+******************************************************---X3---***********************************************************
+*************************************************************************************************************************
+
+___________________________________________________-Palette Sets-________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........In Hackster, when you double click on (any tile), you are given the choice to assign that tile 
+..........to any one of the 4 Palette sets. Each set consists of 3 colors, and all sets share 1 common color.
+..........This common color is usually black for Standard Maps, but with the Overworld Map it is green.
+
+..........Even though the Standard Map Palettes were moved, you can still assign the 4 Palette sets,
+..........to each tile with Hackster. If you choose the 3rd set, just make sure it will work out
+..........the way you want on that given map.
+
+
+
+******************************************************---X4---***********************************************************
+*************************************************************************************************************************
+
+_________________________________________________-Palette Options-_______________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........For starters, Standard Map Palettes were moved from 2010/2b7f to 27010/27f4f.
+..........GFF adds a 4th row, which are the 5 Palette sets that will cycle if you choose.
+
+..........The in game Mini Map was switched around with Standard Map Palettes in GFF. 
+..........The 2 patches (Temporary Map Palettes) and (Repair Mini Map), are because of this fact.
+
+..........If you decide to change a bunch of Palettes, then its probably best to never use (Repair Mini Map),
+..........until you are done with your hack. Using (Temporary Map Palettes) would patch over any new choices,
+..........that would be visible through Hackster. If you dont change any Palettes, 
+..........then switching back and forth between these 2 patches will never be an issue. 
+                                
+..........While (Temporary Map Palettes) is in effect, the Mini Map will not work at all.
+..........Use (View Mini Map) in Hackster, which is not effected, except for the colors.
+
+
+..........Here is the layout, and what to look for.
+
+..........Coneria
+
+27010-----0F 1A 28 18 - 0F 00 1A 10 - 0F 30 2C 1C - 0F 00 02 30-----Standard
+27020-----0F 0F 12 36 - 0F 0F 27 36 - 0F 0F 27 36 - 0F 0F 16 36-----Control/Sprites
+27030-----0F 1A 28 18 - 0F 00 1A 10 - 0F 30 2C 1C - 0F 00 02 30-----In Rooms
+27040-----0F (30 2C 1C)(30 2C 1C)(30 2C 1C)(30 2C 1C)(30 2C 1C)-----Palettes that will cycle
+
+..........As you see, the 3rd Palette set 27019/1b and 27039/3b are 30 2C 1C.
+..........On the last row, 27040, it is repeated all 5 times, which means nothing cycles on this map.
+
+
+..........Waterfall
+
+27490-----0F 31 31 31 - 0F 31 31 21 - 0F 11 21 31 - 0F 00 02 3D-----Standard
+274a0-----0F 0F 12 36 - 0F 0F 27 36 - 0F 08 18 15 - 0F 08 17 15-----Control/Sprites
+274b0-----0F 10 17 0F - 0F 0F 11 11 - 0F 11 21 31 - 0F 00 02 3D-----In Rooms
+274c0-----0F (31 11 21)(21 31 11)(11 21 31)(31 11 21)(21 31 11)-----Palettes that will cycle
+
+..........On this map, you can see that 11 21 31 cycles through, giving a moving water effect.
+
+
+..........Overworld Map Palettes can be chosen completely with Hackster, but if you change the 3rd set, or assign
+..........a tile to the 3rd set, then you will need to make sure you have the desired results.
+..........The 5 cycling Palettes, just like any other map, has to be done with a Hex Editor.
+
+
+
+******************************************************---X5---***********************************************************
+*************************************************************************************************************************
+
+______________________________________________-Palettes for each Area-___________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........The following section, is for any changes you will make to Standard Map Palettes while using Hackster.
+..........You will need to copy and paste the 3 rows of Palettes from their original location, to the new one in GFF. 
+
+
+
+390/3af----World Map (Palettes)
+3c0/3cf----World Map (Palette options that are cycled through) 
+
+
+2010/3f----Coneria (temporary spot for use in Hackster)
+27010/3f---Coneria (transfer 2010/3f to here)
+27019/1b---Coneria (Palette set (Standard) that will cycle)
+27039/3b---Coneria (Palette set (In Rooms) that will cycle)
+27040/4f---Coneria (Palette options that are cycled through)
+
+2040/6f----Provoka (temporary spot for use in Hackster)
+27050/7f---Provoka (transfer 2040/6f to here)
+27059/5b---Provoka (Palette set (Standard) that will cycle)
+27079/7b---Provoka (Palette set (In Rooms) that will cycle)
+27080/8f---Provoka (Palette options that are cycled through)
+
+2070/9f----Elfland (temporary spot for use in Hackster)
+27090/bf---Elfland (transfer 2070/9f to here)
+27099/9b---Elfland (Palette set (Standard) that will cycle)
+270b9/bb---Elfland (Palette set (In Rooms) that will cycle)
+270c0/cf---Elfland (Palette options that are cycled through)
+
+20a0/cf----Melmond (temporary spot for use in Hackster)
+270d0/ff---Melmond (transfer 20a0/cf to here)
+270d9/db---Melmond (Palette set (Standard) that will cycle)
+270f9/fb---Melmond (Palette set (In Rooms) that will cycle)
+27100/0f---Melmond (Palette options that are cycled through)
+
+20d0/ff----Crescent (temporary spot for use in Hackster)
+27110/3f---Crescent (transfer 20d0/ff to here)
+27119/1b---Crescent (Palette set (Standard) that will cycle)
+27139/3b---Crescent (Palette set (In Rooms) that will cycle)
+27140/4f---Crescent (Palette options that are cycled through)
+
+2100/2f----Gaia (temporary spot for use in Hackster)
+27150/7f---Gaia (transfer 2100/2f to here)
+27159/5b---Gaia (Palette set (Standard) that will cycle)
+27179/7b---Gaia (Palette set (In Rooms) that will cycle)
+27180/8f---Gaia (Palette options that are cycled through)
+
+2130/5f----Onrac (temporary spot for use in Hackster)
+27190/bf---Onrac (transfer 2130/5f to here)
+27199/9b---Onrac (Palette set (Standard) that will cycle)
+271b9/bb---Onrac (Palette set (In Rooms) that will cycle)
+271c0/cf---Onrac (Palette options that are cycled through)
+
+2160/8f----Leifen (temporary spot for use in Hackster)
+271d0/ff---Leifen (transfer 2160/8f to here)
+271d9/db---Leifen (Palette set (Standard) that will cycle)
+271f9/fb---Leifen (Palette set (In Rooms) that will cycle)
+27200/0f---Leifen (Palette options that are cycled through)
+
+2190/bf----Coneria Castle 1F (temporary spot for use in Hackster)
+27210/3f---Coneria Castle 1F (transfer 2190/bf to here)
+27219/1b---Coneria Castle 1F (Palette set (Standard) that will cycle)
+27239/3b---Coneria Castle 1F (Palette set (In Rooms) that will cycle)
+27240/4f---Coneria Castle 1F (Palette options that are cycled through)
+
+21c0/ef----Elfland Castle (temporary spot for use in Hackster)
+27250/7f---Elfland Castle (transfer 21c0/ef to here)
+27259/5b---Elfland Castle (Palette set (Standard) that will cycle)
+27279/7b---Elfland Castle (Palette set (In Rooms) that will cycle)
+27280/8f---Elfland Castle (Palette options that are cycled through)
+
+21f0/1f----Northwest Castle (temporary spot for use in Hackster)
+27290/bf---Northwest Castle (transfer 21f0/1f to here)
+27299/9b---Northwest Castle (Palette set (Standard) that will cycle)
+272b9/bb---Northwest Castle (Palette set (In Rooms) that will cycle)
+272c0/cf---Northwest Castle (Palette options that are cycled through)
+
+2220/4f----Castle of Ordeals 1F (temporary spot for use in Hackster)
+272d0/ff---Castle of Ordeals 1F (transfer 2220/4f to here)
+272d9/db---Castle of Ordeals 1F (Palette set (Standard) that will cycle)
+272f9/fb---Castle of Ordeals 1F (Palette set (In Rooms) that will cycle)
+27300/0f---Castle of Ordeals 1F (Palette options that are cycled through)
+
+2250/7f----Temple of Fiends (temporary spot for use in Hackster)
+27310/3f---Temple of Fiends (transfer 2250/7f to here)
+27319/1b---Temple of Fiends (Palette set (Standard) that will cycle)
+27339/3b---Temple of Fiends (Palette set (In Rooms) that will cycle)
+27340/4f---Temple of Fiends (Palette options that are cycled through)
+
+2280/af----Earth Cave B1 (temporary spot for use in Hackster)
+27350/7f---Earth Cave B1 (transfer 2280/af to here)
+27359/5b---Earth Cave B1 (Palette set (Standard) that will cycle)
+27379/7b---Earth Cave B1 (Palette set (In Rooms) that will cycle)
+27380/8f---Earth Cave B1 (Palette options that are cycled through)
+
+22b0/df----Gurgu Volcano B1 (temporary spot for use in Hackster)
+27390/bf---Gurgu Volcano B1 (transfer 22b0/df to here)
+27399/9b---Gurgu Volcano B1 (Palette set (Standard) that will cycle)
+273b9/bb---Gurgu Volcano B1 (Palette set (In Rooms) that will cycle)
+273c0/cf---Gurgu Volcano B1 (Palette options that are cycled through)
+
+22e0/0f----Ice Cave B1 (temporary spot for use in Hackster)
+273d0/ff---Ice Cave B1 (transfer 22e0/0f to here)
+273d9/db---Ice Cave B1 (Palette set (Standard) that will cycle)
+273f9/fb---Ice Cave B1 (Palette set (In Rooms) that will cycle)
+27400/0f---Ice Cave B1 (Palette options that are cycled through)
+
+2310/3f----Cardia (temporary spot for use in Hackster)
+27410/3f---Cardia (transfer 2310/3f to here)
+27419/1b---Cardia (Palette set (Standard) that will cycle)
+27439/3b---Cardia (Palette set (In Rooms) that will cycle)
+27440/4f---Cardia (Palette options that are cycled through)
+
+2340/6f----Earthgift Forest (temporary spot for use in Hackster)
+27450/7f---Earthgift Forest (transfer 2340/6f to here)
+27459/5b---Earthgift Forest (Palette set (Standard) that will cycle)
+27479/7b---Earthgift Forest (Palette set (In Rooms) that will cycle)
+27480/8f---Earthgift Forest (Palette options that are cycled through)
+
+2370/9f----Waterfall (temporary spot for use in Hackster)
+27490/bf---Waterfall (transfer 2370/9f to here)
+27499/9b---Waterfall (Palette set (Standard) that will cycle)
+274b9/bb---Waterfall (Palette set (In Rooms) that will cycle)
+274c0/cf---Waterfall (Palette options that are cycled through)
+
+23a0/cf----Dwarf Cave (temporary spot for use in Hackster)
+274d0/ff---Dwarf Cave (transfer 23a0/cf to here)
+274d9/db---Dwarf Cave (Palette set (Standard) that will cycle)
+274f9/fb---Dwarf Cave (Palette set (In Rooms) that will cycle)
+27500/0f---Dwarf Cave (Palette options that are cycled through)
+
+23d0/ff----Matoya's Cave (temporary spot for use in Hackster)
+27510/3f---Matoya's Cave (transfer 23d0/ff to here)
+27519/1b---Matoya's Cave (Palette set (Standard) that will cycle)
+27539/3b---Matoya's Cave (Palette set (In Rooms) that will cycle)
+27540/4f---Matoya's Cave (Palette options that are cycled through)
+
+2400/2f----Sardas Cave (temporary spot for use in Hackster)
+27550/7f---Sarda's Cave (transfer 2400/2f to here)
+27559/5b---Sarda's Cave (Palette set (Standard) that will cycle)
+27579/7b---Sarda's Cave (Palette set (In Rooms) that will cycle)
+27580/8f---Sarda's Cave (Palette options that are cycled through)
+
+2430/5f----Marsh Cave B1 (temporary spot for use in Hackster)
+27590/bf---Marsh Cave B1 (transfer 2430/5f to here)
+27599/9b---Marsh Cave B1 (Palette set (Standard) that will cycle)
+275b9/bb---Marsh Cave B1 (Palette set (In Rooms) that will cycle)
+275c0/cf---Marsh Cave B1 (Palette options that are cycled through)
+
+2460/8f----Mirage Tower 1F (temporary spot for use in Hackster)
+275d0/ff---Mirage Tower 1F (transfer 2460/8f to here)
+275d9/db---Mirage Tower 1F (Palette set (Standard) that will cycle)
+275f9/fb---Mirage Tower 1F (Palette set (In Rooms) that will cycle)
+27600/0f---Mirage Tower 1F (Palette options that are cycled through)
+
+2490/bf----Coneria Castle 2F (temporary spot for use in Hackster)
+27610/3f---Coneria Castle 2F (transfer 2490/bf to here)
+27619/1b---Coneria Castle 2F (Palette set (Standard) that will cycle)
+27639/3b---Coneria Castle 2F (Palette set (In Rooms) that will cycle)
+27640/4f---Coneria Castle 2F (Palette options that are cycled through)
+
+24c0/ef----Castle of Ordeals 2F (temporary spot for use in Hackster)
+27650/7f---Castle of Ordeals 2F (transfer 24c0/ef to here)
+27659/5b---Castle of Ordeals 2F (Palette set (Standard) that will cycle)
+27679/7b---Castle of Ordeals 2F (Palette set (In Rooms) that will cycle)
+27680/8f---Castle of Ordeals 2F (Palette options that are cycled through)
+
+24f0/1f----Castle of Ordeals 3F (temporary spot for use in Hackster)
+27690/bf---Castle of Ordeals 3F (transfer 24f0/1f to here)
+27699/9b---Castle of Ordeals 3F (Palette set (Standard) that will cycle)
+276b9/bb---Castle of Ordeals 3F (Palette set (In Rooms) that will cycle)
+276c0/cf---Castle of Ordeals 3F (Palette options that are cycled through)
+
+2520/4f----Marsh Cave B2 (temporary spot for use in Hackster)
+276d0/ff---Marsh Cave B2 (transfer 2520/4f to here)
+276d9/db---Marsh Cave B2 (Palette set (Standard) that will cycle)
+276f9/fb---Marsh Cave B2 (Palette set (In Rooms) that will cycle)
+27700/0f---Marsh Cave B2 (Palette options that are cycled through)
+
+2550/7f----Marsh Cave B3 (temporary spot for use in Hackster)
+27710/3f---Marsh Cave B3 (transfer 2550/7f to here)
+27719/1b---Marsh Cave B3 (Palette set (Standard) that will cycle)
+27739/3b---Marsh Cave B3 (Palette set (In Rooms) that will cycle)
+27740/4f---Marsh Cave B3 (Palette options that are cycled through)
+
+2580/a9----Earth Cave B2 (temporary spot for use in Hackster)
+27750/7f---Earth Cave B2 (transfer 2580/a9 to here)
+27759/5b---Earth Cave B2 (Palette set (Standard) that will cycle)
+27779/7b---Earth Cave B2 (Palette set (In Rooms) that will cycle)
+27780/8f---Earth Cave B2 (Palette options that are cycled through)
+
+25b0/df----Earth Cave B3 (temporary spot for use in Hackster)
+27790/bf---Earth Cave B3 (transfer 25b0/df to here)
+27799/9b---Earth Cave B3 (Palette set (Standard) that will cycle)
+277b9/bb---Earth Cave B3 (Palette set (In Rooms) that will cycle)
+277c0/cf---Earth Cave B3 (Palette options that are cycled through)
+
+25e0/0f----Earth Cave B4 (temporary spot for use in Hackster)
+277d0/ff---Earth Cave B4 (transfer 25e0/0f to here)
+277d9/db---Earth Cave B4 (Palette set (Standard) that will cycle)
+277f9/fb---Earth Cave B4 (Palette set (In Rooms) that will cycle)
+27800/0f---Earth Cave B4 (Palette options that are cycled through)
+
+2610/3f----Earth Cave B5 (temporary spot for use in Hackster)
+27810/3f---Earth Cave B5 (transfer 2610/3f to here)
+27819/1b---Earth Cave B5 (Palette set (Standard) that will cycle)
+27839/3b---Earth Cave B5 (Palette set (In Rooms) that will cycle)
+27840/4f---Earth Cave B5 (Palette options that are cycled through)
+
+2640/6f----Gurgu Volcano B2 (temporary spot for use in Hackster)
+27850/7f---Gurgu Volcano B2 (transfer 2640/6f to here)
+27859/5b---Gurgu Volcano B2 (Palette set (Standard) that will cycle)
+27879/7b---Gurgu Volcano B2 (Palette set (In Rooms) that will cycle)
+27880/8f---Gurgu Volcano B2 (Palette options that are cycled through)
+
+2670/9f----Gurgu Volcano B3 (temporary spot for use in Hackster)
+27890/bf---Gurgu Volcano B3 (transfer 2670/9f to here)
+27899/9b---Gurgu Volcano B3 (Palette set (Standard) that will cycle)
+278b9/bb---Gurgu Volcano B3 (Palette set (In Rooms) that will cycle)
+278c0/cf---Gurgu Volcano B3 (Palette options that are cycled through)
+
+26a0/cf----Gurgu Volcano B4 (temporary spot for use in Hackster)
+278d0/ff---Gurgu Volcano B4 (transfer 26a0/cf to here)
+278d9/db---Gurgu Volcano B4 (Palette set (Standard) that will cycle)
+278f9/fb---Gurgu Volcano B4 (Palette set (In Rooms) that will cycle)
+27900/0f---Gurgu Volcano B4 (Palette options that are cycled through)
+
+26d0/ff----Gurgu Volcano B5 (temporary spot for use in Hackster)
+27910/3f---Gurgu Volcano B5 (transfer 26d0/ff to here)
+27919/1b---Gurgu Volcano B5 (Palette set (Standard) that will cycle)
+27939/3b---Gurgu Volcano B5 (Palette set (In Rooms) that will cycle)
+27940/4f---Gurgu Volcano B5 (Palette options that are cycled through)
+
+2700/2f----Ice Cave B2 (temporary spot for use in Hackster)
+27950/7f---Ice Cave B2 (transfer 2700/2f to here)
+27959/5b---Ice Cave B2 (Palette set (Standard) that will cycle)
+27979/7b---Ice Cave B2 (Palette set (In Rooms) that will cycle)
+27980/8f---Ice Cave B2 (Palette options that are cycled through)
+
+2730/5f----Ice Cave B3 (temporary spot for use in Hackster)
+27990/bf---Ice Cave B3 (transfer 2730/5f to here)
+27999/9b---Ice Cave B3 (Palette set (Standard) that will cycle)
+279b9/bb---Ice Cave B3 (Palette set (In Rooms) that will cycle)
+279c0/cf---Ice Cave B3 (Palette options that are cycled through)
+
+2760/8f----Bahamut's Room (temporary spot for use in Hackster)
+279d0/ff---Bahamut's Room (transfer 2760/8f to here)
+279d9/db---Bahamut's Room (Palette set (Standard) that will cycle)
+279f9/fb---Bahamut's Room (Palette set (In Rooms) that will cycle)
+27a00/0f---Bahamut's Room (Palette options that are cycled through)
+
+2790/bf----Mirage Tower 2F (temporary spot for use in Hackster)
+27a10/3f---Mirage Tower 2F (transfer 2790/bf to here)
+27a19/1b---Mirage Tower 2F (Palette set (Standard) that will cycle)
+27a39/3b---Mirage Tower 2F (Palette set (In Rooms) that will cycle)
+27a40/4f---Mirage Tower 2F (Palette options that are cycled through)
+
+27c0/ef----Mirage Tower 3F (temporary spot for use in Hackster)
+27a50/7f---Mirage Tower 3F (transfer 27c0/ef to here)
+27a59/5b---Mirage Tower 3F (Palette set (Standard) that will cycle)
+27a79/7b---Mirage Tower 3F (Palette set (In Rooms) that will cycle)
+27a80/8f---Mirage Tower 3F (Palette options that are cycled through)
+
+27f0/1f----Sea Shrine B5 (temporary spot for use in Hackster)
+27a90/bf---Sea Shrine B5 (transfer 27f0/1f to here)
+27a99/9b---Sea Shrine B5 (Palette set (Standard) that will cycle)
+27ab9/bb---Sea Shrine B5 (Palette set (In Rooms) that will cycle)
+27ac0/cf---Sea Shrine B5 (Palette options that are cycled through)
+
+2820/4f----Sea Shrine B4 (temporary spot for use in Hackster)
+27ad0/ff---Sea Shrine B4 (transfer 2820/4f to here)
+27ad9/db---Sea Shrine B4 (Palette set (Standard) that will cycle)
+27af9/fb---Sea Shrine B4 (Palette set (In Rooms) that will cycle)
+27b00/0f---Sea Shrine B4 (Palette options that are cycled through)
+
+2850/7f----Sea Shrine B3 (temporary spot for use in Hackster)
+27b10/3f---Sea Shrine B3 (transfer 2850/7f to here)
+27b19/1b---Sea Shrine B3 (Palette set (Standard) that will cycle)
+27b39/3b---Sea Shrine B3 (Palette set (In Rooms) that will cycle)
+27b40/4f---Sea Shrine B3 (Palette options that are cycled through)
+
+2880/af----Sea Shrine B2 (temporary spot for use in Hackster)
+27b50/7f---Sea Shrine B2 (transfer 2880/af to here)
+27b59/5b---Sea Shrine B2 (Palette set (Standard) that will cycle)
+27b79/7b---Sea Shrine B2 (Palette set (In Rooms) that will cycle)
+27b80/8f---Sea Shrine B2 (Palette options that are cycled through)
+
+28b0/df----Sea Shrine B1 (temporary spot for use in Hackster)
+27b90/bf---Sea Shrine B1 (transfer 28b0/df to here)
+27b99/9b---Sea Shrine B1 (Palette set (Standard) that will cycle)
+27bb9/bb---Sea Shrine B1 (Palette set (In Rooms) that will cycle)
+27bc0/cf---Sea Shrine B1 (Palette options that are cycled through)
+
+28e0/0f----Sky Palace 1F (temporary spot for use in Hackster)
+27bd0/ff---Sky Palace 1F (transfer 28e0/0f to here)
+27bd9/db---Sky Palace 1F (Palette set (Standard) that will cycle)
+27bf9/fb---Sky Palace 1F (Palette set (In Rooms) that will cycle)
+27c00/0f---Sky Palace 1F (Palette options that are cycled through)
+
+2910/3f----Sky Palace 2F (temporary spot for use in Hackster)
+27c10/3f---Sky Palace 2F (transfer 2910/3f to here)
+27c19/1b---Sky Palace 2F (Palette set (Standard) that will cycle)
+27c39/3b---Sky Palace 2F (Palette set (In Rooms) that will cycle)
+27c40/4f---Sky Palace 2F (Palette options that are cycled through)
+
+2940/6f----Sky Palace 3F (temporary spot for use in Hackster)
+27c50/7f---Sky Palace 3F (transfer 2940/6f to here)
+27c59/5b---Sky Palace 3F (Palette set (Standard) that will cycle)
+27c79/7b---Sky Palace 3F (Palette set (In Rooms) that will cycle)
+27c80/8f---Sky Palace 3F (Palette options that are cycled through)
+
+2970/9f----Sky Palace 4F (temporary spot for use in Hackster)
+27c90/bf---Sky Palace 4F (transfer 2970/9f to here)
+27c99/9b---Sky Palace 4F (Palette set (Standard) that will cycle)
+27cb9/bb---Sky Palace 4F (Palette set (In Rooms) that will cycle)
+27cc0/cf---Sky Palace 4F (Palette options that are cycled through)
+
+29a0/cf----Sky Palace 5F (temporary spot for use in Hackster)
+27cd0/ff---Sky Palace 5F (transfer 29a0/cf to here)
+27cd9/db---Sky Palace 5F (Palette set (Standard) that will cycle)
+27cf9/fb---Sky Palace 5F (Palette set (In Rooms) that will cycle)
+27d00/0f---Sky Palace 5F (Palette options that are cycled through)
+
+29d0/ff----ToF 1F (temporary spot for use in Hackster)
+27d10/3f---ToF 1F (transfer 29d0/ff to here)
+27d19/1b---ToF 1F (Palette set (Standard) that will cycle)
+27d39/3b---ToF 1F (Palette set (In Rooms) that will cycle)
+27d40/4f---ToF 1F (Palette options that are cycled through)
+
+2a00/2f----ToF 2F (temporary spot for use in Hackster)
+27d50/7f---ToF 2F (transfer 2a00/2f to here)
+27d59/5b---ToF 2F (Palette set (Standard) that will cycle)
+27d79/7b---ToF 2F (Palette set (In Rooms) that will cycle)
+27d80/8f---ToF 2F (Palette options that are cycled through)
+
+2a30/5f----ToF 3F (temporary spot for use in Hackster)
+27d90/bf---ToF 3F (transfer 2a30/5f to here)
+27d99/9b---ToF 3F (Palette set (Standard) that will cycle)
+27db9/bb---ToF 3F (Palette set (In Rooms) that will cycle)
+27dc0/cf---ToF 3F (Palette options that are cycled through)
+
+2a60/8f----ToF Earth (temporary spot for use in Hackster)
+27dd0/ff---ToF Earth (transfer 2a60/8f to here)
+27dd9/db---ToF Earth (Palette set (Standard) that will cycle)
+27df9/fb---ToF Earth (Palette set (In Rooms) that will cycle)
+27e00/0f---ToF Earth (Palette options that are cycled through)
+
+2a90/bf----ToF Fire (temporary spot for use in Hackster)
+27e10/3f---ToF Fire (transfer 2a90/bf to here)
+27e19/1b---ToF Fire (Palette set (Standard) that will cycle)
+27e39/3b---ToF Fire (Palette set (In Rooms) that will cycle)
+27e40/4f---ToF Fire (Palette options that are cycled through)
+
+2ac0/ef----ToF Water (temporary spot for use in Hackster)
+27e50/7f---ToF Water (transfer 2ac0/ef to here)
+27e59/5b---ToF Water (Palette set (Standard) that will cycle)
+27e79/7b---ToF Water (Palette set (In Rooms) that will cycle)
+27e80/8f---ToF Water (Palette options that are cycled through)
+
+2af0/1f----ToF Air (temporary spot for use in Hackster)
+27e90/bf---ToF Air (transfer 2af0/1f to here)
+27e99/9b---ToF Air (Palette set (Standard) that will cycle)
+27eb9/bb---ToF Air (Palette set (In Rooms) that will cycle)
+27ec0/cf---ToF Air (Palette options that are cycled through)
+
+2b20/4f----ToF Chaos (temporary spot for use in Hackster)
+27ed0/ff---ToF Chaos (transfer 2b20/4f to here)
+27ed9/db---ToF Chaos (Palette set (Standard) that will cycle)
+27ef9/fb---ToF Chaos (Palette set (In Rooms) that will cycle)
+27f00/0f---ToF Chaos (Palette options that are cycled through)
+
+2b50/7f----Titan's Tunnel (temporary spot for use in Hackster)
+27f10/3f---Titan's Tunnel (transfer 2b50/7f to here)
+27f19/1b---Titan's Tunnel (Palette set (Standard) that will cycle)
+27f39/3b---Titan's Tunnel (Palette set (In Rooms) that will cycle)
+27f40/4f---Titan's Tunnel (Palette options that are cycled through)
+
+
+
+
+
+
+
+
+
+
+

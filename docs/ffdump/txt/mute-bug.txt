@@ -1,0 +1,77 @@
+;;; PART 1 A
+a385: 4c ba b3     JMP $b3ba
+
+;;; PART 1 B
+a393: 4c b5 b3     JMP $b3b5
+
+;;; PART 1 C
+a3b5: 4c bf b3     JMP $b3bf
+
+;;; PART 1
+; ITEM!
+b3b5: 48           PHA
+b3b6: a9 02        LDA #$02
+b3b8: d0 08        BNE +$08  [$b3c2]  ; always branches, because of the LDA
+
+; DRINK!
+b3ba: 48           PHA
+b3bb: a9 01        LDA #$01
+b3bd: d0 03        BNE +$03  [$b3c2]  ; always branches, because of the LDA
+
+; MAGIC!!
+b3bf: 48           PHA
+b3c0: a9 00        LDA #$00
+
+; all three end up here
+b3c2: 8d 8f 6c     STA $6c8f
+b3c5: 68           PLA
+b3c6: 8d 8c 6c     STA $6c8c
+b3c9: 98           TYA
+b3ca: 29 03        AND #$03
+b3cc: 09 80        ORA #$80
+b3ce: 48           PHA
+b3cf: 8d 89 6c     STA $6c89
+b3d2: 8d d1 6b     STA $6bd1
+b3d5: 8e 8a 6c     STX $6c8a
+b3d8: a9 00        LDA #$00
+b3da: 8d a7 6d     STA $6da7
+b3dd: 20 0c b0     JSR $b00c
+b3e0: 20 5e b0     JSR $b05e   ; Draw attacker name
+b3e3: 20 74 b0     JSR $b074   ; Draw spell name
+b3e6: 68           PLA
+b3e7: 20 eb b5     JSR $b5eb   ; Set pointers for warrior A: p[$92]=permanent, p[$90]=in-battle
+b3ea: ad 8f 6c     LDA $6c8f   ; This does the magic: check the ITEM/DRINK/MAGIC flag
+b3ed: c9 00        CMP #$00
+b3ef: d0 0d        BNE +$0d  [$b3fe]
+b3f1: a0 01        LDY #$01    ; MUTEd? Fail in casting
+b3f3: b1 92        LDA ($92),Y
+b3f5: 29 40        AND #$40
+b3f7: f0 05        BEQ +$05  [$b3fe]
+b3f9: a9 03        LDA #$03
+b3fb: 4c 8e b2     JMP $b28e   ; Display message in A and close window?
+b3fe: a9 00        LDA #$00
+b400: 8d 94 6d     STA $6d94
+b403: 20 5c b3     JSR $b35c   ; p[$98]=spell in $6c8c and load spell data
+b406: 20 0c b4     JSR $b40c   ; Do player magic command
+b409: 4c 0e b5     JMP $b50e   ; restore some stuff?
+
+; Do player magic command
+b40c: 20 84 b6     JSR $b684   ; GFX and load caster data for player
+b40f: a0 03        LDY #$03    ; spell targeting
+b411: b1 98        LDA ($98),Y
+b413: 4a           LSR
+b414: 90 03        BCC +$03  [$b419]
+b416: 4c 95 b4     JMP $b495   ; Target all enemies
+b419: 4a           LSR
+b41a: 90 03        BCC +$03  [$b41f]
+b41c: 4c 80 b4     JMP $b480   ; Target one enemy
+b41f: 4a           LSR
+b420: b0 05        BCS +$05  [$b427]
+b422: 4a           LSR
+b423: 90 12        BCC +$12  [$b437]  ; $b437
+b425: b0 21        BCS +$21  [$b448]  ; $b448
+b427: 20 3d b5     JSR $b53d   ; Target caster!
+b42a: 20 b4 b0     JSR $b0b4   ; Print target name
+b42d: 4c ad b5     JMP $b5ad   ; Load, cast, and save player magic target
+
+;b430

@@ -1,0 +1,90 @@
+;;; BANK 12
+
+; The formula for waking is supposed to be "MaxHP > [0..80]". For enemies,
+; though, the game completely screws this up and the test always passes:
+;  * The game tries to load the MaxHP from RAM instead of ROM, but the buggy
+;    setup routine only copies the low byte (the high byte is 0)
+;  * But then it subtracts the random number from the wrong word
+;  * And finally, it checks the high byte of what is supposed to be the
+;    "MaxHP-[0..80]" (negative == stay asleep). Even if the subtraction had
+;    used the right word, the subtraction routine clamps all negative numbers
+;    to zero so it still wouldn't have worked.
+; In addition to fixing the above, the patch just loads MaxHP from ROM which
+; frees up two bytes for other bugfixes.
+
+; Also, if the last enemy kills itself due to CONF the game will not notice
+; until either the end of the round or one of your warriors tries to attack an
+; enemy.
+
+; The patch is so big because we have to move an 11-byte chunk of code from
+; $b22b to $b1a4. Most of the rest is just shifted 11 bytes down.
+
+; just before this, p[$9a]=in-RAM data
+b1a4: a0 00        LDY #$00    ; p[$9c]=in-ROM data
+b1a6: b1 9a        LDA ($9a),Y
+b1a8: 85 9c        STA $9c
+b1aa: c8           INY
+b1ab: b1 9a        LDA ($9a),Y
+b1ad: 85 9d        STA $9d
+b1af: a9 02        LDA #$02
+b1b1: 8d a7 6d     STA $6da7
+b1b4: 20 0c b0     JSR $b00c
+b1b7: a9 00        LDA #$00
+b1b9: 8d 8f 6c     STA $6c8f
+b1bc: a0 06        LDY #$06    ; Is enemy asleep/paralyzed?
+b1be: b1 9a        LDA ($9a),Y
+b1c0: 29 30        AND #$30
+b1c2: f0 48        BEQ +$48  [$b20c]
+b1c4: 20 5e b0     JSR $b05e   ; draw attacker name
+b1c7: 29 20        AND #$20
+b1c9: d0 14        BNE +$14  [$b1df]
+b1cb: 20 27 f2     JSR $f227   ;; Try to cure stop  ; A = RND (0 .. 255) ??
+b1ce: c9 19        CMP #$19    ; 9.8% chance?
+b1d0: b0 09        BCS +$09  [$b1db]
+b1d2: a9 ef        LDA #$ef
+b1d4: 20 90 b1     JSR $b190   ; AND enemy status with A
+b1d7: a9 10        LDA #$10    ; cured message?
+b1d9: d0 2e        BNE +$2e  [$b209]
+b1db: a9 01        LDA #$01    ; not cured message?
+b1dd: d0 2a        BNE +$2a  [$b209]
+
+; This part is actually changed
+b1df: a0 04        LDY #$04    ;; Try to cure sleep
+b1e1: b1 9c        LDA ($9c),Y ; Load MaxHP from ROM
+b1e3: 8d 56 68     STA $6856
+b1e6: c8           INY
+b1e7: b1 9c        LDA ($9c),Y
+b1e9: 8d 57 68     STA $6857
+b1ec: a9 00        LDA #$00
+b1ee: a2 50        LDX #$50
+b1f0: 20 5d ae     JSR $ae5d   ; A = RND (A .. X)
+b1f3: aa           TAX
+b1f4: a9 00        LDA #$00
+b1f6: 20 0a af     JSR $af0a   ; w[A] = clamp(w[A] - X)
+b1f9: 20 3c af     JSR $af3c   ; w[A]<=0 (sets flags NZ)
+b1fc: f0 09        BEQ +$09  [$b207]
+; end changed code
+
+b1fe: a9 df        LDA #$df
+b200: 20 90 b1     JSR $b190   ; AND enemy status with A
+b203: a9 0f        LDA #$0f    ; cured message?
+b205: d0 02        BNE +$02  [$b209]
+b207: a9 02        LDA #$02    ; not cured message?
+b209: 4c 8e b2     JMP $b28e   ; display message and return
+b20c: a0 06        LDY #$06    ;; is CONFed?
+b20e: b1 9a        LDA ($9a),Y
+b210: 10 24        BPL +$24  [$b236]
+b212: 20 27 f2     JSR $f227   ; A = RND (0 .. 255) ??
+b215: c9 40        CMP #$40    ; 25% chance of curing CONF
+b217: b0 0c        BCS +$0c  [$b225]
+b219: a9 7f        LDA #$7f
+b21b: 20 90 b1     JSR $b190   ; AND enemy status with A
+b21e: 20 5e b0     JSR $b05e   ; Draw attacker name
+b221: a9 0d        LDA #$0d    ; cured message?
+b223: d0 e4        BNE +$e4  [$b209] ; go display message and return
+b225: 20 5e b0     JSR $b05e   ; Draw attacker name
+b228: a9 04        LDA #$04    ; FIRE spell?
+b22a: 8d 8c 6c     STA $6c8c
+b22d: 20 5c b3     JSR $b35c   ; p[$98]=spell in $6c8c and load spell data (huh?)
+b230: 20 4d b5     JSR $b54d   ; Enemy target one enemy
+b233: 4c 0e b5     JMP $b50e   ;;; This is the fix for the CONF bug

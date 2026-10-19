@@ -1,0 +1,11 @@
+;;; BANK 14
+;;; PART 1
+947d: ad 31 60     LDA $6031
+;;; PART 2
+9487: ee 31 60     INC $6031
+;;; PART 3
+9533: ad 31 60     LDA $6031
+
+;;; BANK 15
+;;; PART 4
+c5ec: ad 31 60     LDA $6031

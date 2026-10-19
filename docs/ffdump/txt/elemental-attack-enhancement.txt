@@ -1,0 +1,54 @@
+;;; This patch adds an elemental resistance penalty to elemental weapons
+
+;; PART 1
+a6d4: ad 6e 68     LDA $686e   ; abuse Status element as "no penalty" flag
+a6d7: 29 01        AND #$01
+a6d9: d0 16        BNE +$16  [$a6f1]
+a6db: ad 6e 68     LDA $686e   ; if elemental resistance hit,
+a6de: 2d 7b 68     AND $687b   ;  w[0]=w[0]-40 and w[1]=clamp(w[1]-4)
+a6e1: f0 0e        BEQ +$0e  [$a6f1]
+a6e3: a9 00        LDA #$00
+a6e5: a2 28        LDX #$28
+a6e7: 20 0a af     JSR $af0a   ; w[A] = clamp(w[A] - X)
+a6ea: a9 01        LDA #$01
+a6ec: a2 04        LDX #$04
+a6ee: 20 0a af     JSR $af0a   ; w[A] = clamp(w[A] - X)
+
+;; PART 2
+a53b: a0 13        LDY #$13
+a53d: b1 86        LDA ($86),Y
+a53f: 8d 7b 68     STA $687b   ; target elemental resistance
+
+; bump all this down a bit
+a542: a0 0a        LDY #$0a
+a544: b1 84        LDA ($84),Y
+a546: 8d 78 68     STA $6878   ; target evade %
+a549: a0 04        LDY #$04
+a54b: b1 84        LDA ($84),Y
+a54d: 8d 79 68     STA $6879   ; target absorb
+a550: a0 02        LDY #$02
+a552: b1 84        LDA ($84),Y
+a554: 8d 7c 68     STA $687c   ; target HP
+a557: c8           INY
+a558: b1 84        LDA ($84),Y
+a55a: 8d 7d 68     STA $687d
+a55d: ad 84 68     LDA $6884   ; player indicator in $6c89
+a560: 09 80        ORA #$80
+a562: 8d 89 6c     STA $6c89
+a565: 20 7b a6     JSR $a67b   ; Do physical attack
+a568: a0 06        LDY #$06
+a56a: ad 89 68     LDA $6889   ; save new target status
+a56d: 91 84        STA ($84),Y
+a56f: a0 02        LDY #$02    ; save new target HP
+a571: ad 7c 68     LDA $687c
+a574: 91 84        STA ($84),Y
+a576: c8           INY
+a577: ad 7d 68     LDA $687d
+a57a: 91 84        STA ($84),Y
+
+a57c: ea           NOP
+a57d: ea           NOP
+a57e: ea           NOP
+a57f: ea           NOP
+
+a580: 60           RTS

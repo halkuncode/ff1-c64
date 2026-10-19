@@ -1,0 +1,17 @@
+;;; BANK 15
+
+; The original sets "Nothing here" for WARP, teleporting, 02, 06, 0a, 0e, 12,
+; 16, 1a, and 1e. Only teleporting, 02, and 0a really need it, though.
+
+cbe5: a6 45        LDX $45
+cbe7: a5 44        LDA $44
+cbe9: 30 0c        BMI +$0c  [$cbf7] ; If bit 7 is set, return "Nothing here" (teleport).
+cbeb: 29 1e        AND #$1e    ; Extract the action code
+cbed: f0 0a        BEQ +$0a  [$cbf9] ; Code 00/01 => message
+cbef: c9 08        CMP #$08    ; Treasure chest => open it
+cbf1: f0 08        BEQ +$08  [$cbfb]
+cbf3: 29 14        AND #$14    ; Zero for 00, 02, 08, 0a; we've handled 00 and 0a, so just 02 and 0a are left.
+cbf5: d0 02        BNE +$02  [$cbf9]
+cbf7: a2 00        LDX #$00
+cbf9: 8a           TXA
+cbfa: 60           RTS

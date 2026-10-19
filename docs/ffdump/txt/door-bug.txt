@@ -1,0 +1,18 @@
+;;; PART 1 A
+; Hijack JSR
+ca34: 20 f1 fd     JSR $fdf1
+
+;;; PART 1 B
+; Hijack JSR
+ca4b: 20 f1 fd     JSR $fdf1
+
+
+;;; PART 2
+; Correct VRAM pointer
+fdf1: a5 0e       LDA $0e
+fdf3: 29 c0       AND #$c0
+fdf5: 85 0e       STA $0e
+fdf7: a5 0f       LDA $0f
+fdf9: 29 fb       AND #$fb
+fdfb: 85 0f       STA $0f
+fdfd: 4c 94 cb    JMP $cb94

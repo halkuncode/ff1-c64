@@ -1,0 +1,36 @@
+;;; BANK 12
+;;; PART 1
+; Player
+a437: a9 00        LDA #$00
+a439: a2 c8        LDX #$c8
+a43b: 20 5d ae     JSR $ae5d   ; A = RND (A..X)
+a43e: c9 c8        CMP #$c8    ; = 200? fail
+a440: f0 25        BEQ +$25  [$a467]
+a442: 38           SEC         ; < 50? wake
+a443: e9 32        SBC #$32
+a445: 90 25        BCC +$25  [$a46c]
+a447: a0 06        LDY #$06    ; < 50+MagDef? wake
+a449: f1 80        SBC ($80),Y
+a44b: 90 1f        BCC +$1f  [$a46c]
+a44d: b0 18        BCS +$18  [$a467] ; otherwise, fail
+a44f: ea
+a450: ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea ea
+a460: ea ea ea ea ea ea ea
+;a467
+
+;;; PART 2
+; Enemy. Apply over enemy-waking-bug.ips
+b1df: a9 00        LDA #$00
+b1e1: a2 c8        LDX #$c8
+b1e3: 20 5d ae     JSR $ae5d   ; A = RND (A..X)
+b1e6: c9 c8        CMP #$c8    ; = 200? fail
+b1e8: f0 1d        BEQ +$1d  [$b207]
+b1ea: 38           SEC         ; < 50? wake
+b1eb: e9 32        SBC #$32
+b1ed: 90 0f        BCC +$0f  [$b1fe]
+b1ef: a0 11        LDY #$11    ; < 50+MagDef? wake
+b1f1: f1 9c        SBC ($9c),Y
+b1f3: 90 09        BCC +$09  [$b1fe]
+b1f5: b0 10        BCS +$10  [$b207] ; otherwise fail
+b1f7: ea ea ea ea ea ea ea
+;b1fe

@@ -1,0 +1,59 @@
+* You should be able to walk faster when holding a button (B).
++ dash-enhancement.ips
+
+* If you attack a fire enemy with a fire weapon, it should penalize you.
+! Requires evade-bugs.ips, and weapon-data-bugs.ips to be useful.
++ elemental-attack-enhancement.ips
+
+* Mag Def should be shown in the status screen.
++ magdef-status-enhancement.ips
+
+* The default respond rate should be higher.
++ respond-rate.ips
+
+* Potions would be easier to use if they stayed on the "use" screen
++ potion-stay.ips
+
+* Rearrange the item screen to put commonly-used items at the top
++ rearrange-items.ips
+
+* Make CONF do something vaguely resembling an actual attack (can miss, and
+  damage [D..2D]-A).
++ CONF-attack-enhancement.ips
+
+* We did all this work, we should get some credit.
++ give-us-credit.ips
+
+* Bitmap armor types. This has no effect on the actual game, but might be
+  useful for a hack.
++ armor-type-bitmap-enhancement.ips
+
+* This rearranges the teleport coordinate tables to allow for more of each
+  kind. This has no effect on the actual game, but might be useful for a hack.
++ extra-teleports.ips
+
+* Replace the crappy PRNG with a slightly better one
++ randomness-enhancement.2.ips
+
+* This adds a "Buy 10" option to the item shop menu.
++ item-shop-enhancement.ips
+
+* This creates a magic Effect for a "RUN" spell, and assigns it to EXIT.
+! This requires magic-bugs.2.ips to be applied first
++ EXIT-does-run-enhancement.ips
+
+* Nerf the BB by reducing DMG to Level+STR/2, Crit% to Lv/2, and only giving
+  #hits*2 to Ma.
+! Conflicts with bb-armor-bug.ips
+! Conflicts with bb-antheosis.2.ips
++ bb-antheosis.1.ips
+
+* Nerf the BB by reducing DMG to Level+STR/2, and Crit% to Lv/4 for BB and Lv/2
+  for Ma.
+! Conflicts with bb-armor-bug.ips
+! Conflicts with bb-antheosis.1.ips
++ bb-antheosis.2.ips
+
+* Allow all battle numbers except 0x80 to be used as spiked squares, instead of
+  only 00-7f.
++ spiked-square-enhancement.ips 

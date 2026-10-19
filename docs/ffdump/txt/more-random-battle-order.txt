@@ -1,0 +1,34 @@
+; The standard turn order uses a fairly poor shuffling algorithm. This uses the
+; standard one-pass shuffle algorithm instead.
+
+;;; BANK 12
+;;; PART 1
+
+; Execute a round of battle
+a17a: 8c 8e 68     STY $688e
+a17d: 98           TYA         ;; Next, iterate through the list and swap each
+a17e: a2 0c        LDX #$0c    ;; element with one after it.
+a180: 20 5d ae     JSR $ae5d   ; A = RND (A .. X)
+a183: aa           TAX
+a184: b9 48 68     LDA $6848,Y
+a187: 48           PHA
+a188: bd 48 68     LDA $6848,X
+a18b: 99 48 68     STA $6848,Y
+a18e: 68           PLA
+a18f: 9d 48 68     STA $6848,X
+a192: c8           INY
+a193: c0 0c        CPY #$0c
+a195: d0 e6        BNE +$e6  [$a17d]
+a197: f0 0b        BEQ +$0b  [$a1a4] ; skip nops
+a199: ea           NOP
+a19a: ea           NOP
+a19b: ea           NOP
+a19c: ea           NOP
+a19d: ea           NOP
+a19e: ea           NOP
+a19f: ea           NOP
+a1a0: ea           NOP
+a1a1: ea           NOP
+a1a2: ea           NOP
+a1a3: ea           NOP
+;a1a4

@@ -1,0 +1,15 @@
+;;; BANK 14
+; Plot (canoe sage): if(!canoe && earth orb){ give CANOE; d[$11] } else { d[$12] }
+947d: ad 12 60     LDA $6012
+9480: d0 05        BNE +$05  [$9487]
+9482: ad 35 60     LDA $6035
+9485: d0 03        BNE +$03  [$948a]
+9487: a5 12        LDA $12
+9489: 60           RTS
+948a: ee 12 60     INC $6012
+948d: ee 31 60     INC $6031
+9490: e6 7d        INC $7d
+
+; Dialog $11
+9492: a5 11        LDA $11
+9494: 60           RTS

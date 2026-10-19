@@ -1,0 +1,893 @@
+
+
+
+
+
+....................X0---Quick Overview
+....................X1---Physical Attack Parameters
+....................X2---Weapon Data
+....................X3---Weapon Graphics and Palettes
+....................X4---Armor Data
+....................X5---Armor Bitmask (Checkbox Options)
+....................X6---Weapon Element, Weapon Hurt Category, Armor Special Defense (Checkbox Options)
+....................X7---Spell Cast for both Weapons and Armor
+....................X8---Who can Equip
+....................X9---Text
+...................X10---Text Pointers
+...................X11---Prices
+
+
+
+
+******************************************************---X0---***********************************************************
+*************************************************************************************************************************
+
+
+
+..........It is nearly impossible to read any text in GFF when (View with DTE) is off.
+
+..........Hackster can be used for most of the editing of Weapons and Armor.
+..........There are more options here though, like Armor Bitmask and more Palette options.
+
+..........The Unknown next to Spell Cast in Hackster, is for Critical Hit.
+..........The Unknown in the Hurt Category, is for Evil enemies. The Were category in now Beast.
+
+
+
+******************************************************---X1---***********************************************************
+*************************************************************************************************************************
+
+____________________________________________-Physical Attack Parameters-_________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+326a0-Base hit chance: 168
+326bc-Attacker Dark penalty: 64
+32733-Target Dark bonus: 64
+326dc-Category/element bonus to damage: 10
+326d3-Category/element bonus to hit chance: 32
+326fd-Damage penalty vs. resisted element*: 5
+326f6-Hit rate penalty vs. resisted element*: 16
+
+*Weapons with the Status Element receive no penalty
+
+
+
+******************************************************---X2---***********************************************************
+*************************************************************************************************************************
+
+___________________________________________________-Weapon Data-_________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+................................Set the Hex editor 8 wide
+
+
+--------------------------------Hit%--Damage--Crit---Spell--Elem---Hurt----Gfx----Pal------------
+---------------------------------00-----01-----02-----03-----04-----05-----06-----07-------------
+
+30028-Short Sword----(09,05).....05.....09.....05.....00.....00.....00.....90.....10.....Sword 5
+30038-Broad Sword----(15,10).....0a.....0f.....05.....00.....00.....00.....80.....10.....Sword 1
+30070-Claymore-------(20,10).....0a.....14.....05.....00.....00.....00.....8c.....10.....Sword 4
+30118-Vorpal Blade---(22,20).....14.....16.....1e.....00.....05.....00.....88.....10.....Sword 3
+30090-Silver Sword---(24,15).....0f.....18.....05.....00.....00.....00.....8c.....2c.....Sword 4
+30130-Razor Edge-----(24,25).....19.....18.....0a.....26.....03.....00.....90.....29.....Sword 5
+300a8-Flametongue----(26,20).....15.....1a.....05.....00.....10.....80.....88.....26.....Sword 3
+300b0-Icebrand-------(29,19).....13.....1d.....05.....00.....20.....00.....8c.....21.....Sword 4
+30108-Defender-------(30,35).....23.....1e.....05.....04.....00.....00.....a8.....28.....Sword 6
+300c8-Gaia Blade-----(32,30).....1e.....20.....05.....2f.....80.....00.....8c.....28.....Sword 4
+30140-Excalibur------(45,35).....23.....2d.....0a.....00.....f0.....7f.....a8.....2a.....Sword 6
+300e8-SaveTheQueen---(47,47).....2f.....2f.....0f.....57.....00.....00.....a8.....10.....Sword 6
+
+--------------------------------Hit%--Damage--Crit---Spell--Elem---Hurt----Gfx----Pal------------
+---------------------------------00-----01-----02-----03-----04-----05-----06-----07-------------
+
+30068-Cutlass--------(15,05).....05.....0f.....05.....00.....00.....00.....84.....10.....Sword 2
+300d0-Coral Sword----(18,15).....0f.....12.....0a.....00.....40.....00.....88.....25.....Sword 3
+300e0-Rune Blade-----(18,15).....0f.....12.....0a.....00.....00.....41.....90.....23.....Sword 5
+300b8-Dragonslayer---(19,15).....0f.....13.....0a.....00.....00.....02.....84.....2b.....Sword 2
+30138-Katana---------(28,35).....23.....1c.....14.....00.....00.....00.....84.....26.....Sword 2
+30148-Masamune-------(45,45).....2d.....2d.....14.....00.....09.....00.....84.....22.....Sword 2
+
+30040-Battle Axe-----(18,05).....05.....12.....03.....00.....00.....00.....9c.....10.....Axe
+30078-Titans Axe-----(24,07).....07.....18.....03.....00.....00.....04.....9c.....25.....Axe
+300a0-Silver Axe-----(29,10).....0a.....1d.....03.....00.....00.....00.....9c.....2c.....Axe
+300f0-Sacred Axe-----(34,15).....0f.....22.....03.....02.....00.....08.....9c.....23.....Axe
+
+--------------------------------Hit%--Damage--Crit---Spell--Elem---Hurt----Gfx----Pal------------
+---------------------------------00-----01-----02-----03-----04-----05-----06-----07-------------
+
+30010-Iron Fist------(09,06).....06.....09.....0c.....00.....00.....00.....ac.....10.....Hands
+30050-Burning Fist---(12,08).....08.....0c.....10.....00.....10.....00.....ac.....26.....Hands
+30060-Dragon Claw----(15,10).....0a.....0f.....14.....00.....70.....02.....ac.....2b.....Hands
+30080-Tiger Fangs----(18,12).....0c.....12.....18.....00.....03.....10.....ac.....27.....Hands
+30048-Kaiser Fist----(24,16).....10.....18.....20.....00.....00.....00.....ac.....2c.....Hands
+
+30030-Heavy Mallet---(09,00).....00.....09.....01.....00.....00.....00.....94.....27.....Hammer
+300d8-Beast Killer---(23,07).....07.....17.....01.....00.....00.....10.....94.....24.....Hammer
+30128-Mjolnir--------(29,15).....0f.....1d.....01.....17.....40.....00.....94.....28.....Hammer
+
+--------------------------------Hit%--Damage--Crit---Spell--Elem---Hurt----Gfx----Pal------------
+---------------------------------00-----01-----02-----03-----04-----05-----06-----07-------------
+
+30018-Battle Knife---(05,10).....0a.....05.....05.....00.....00.....00.....98.....10.....Knife
+30058-Baselard-------(07,10).....0a.....07.....07.....00.....00.....00.....98.....10.....Knife
+30088-Silver Knife---(10,15).....0f.....0a.....0a.....00.....00.....00.....98.....2c.....Knife
+300c0-Cleaver--------(16,15).....0f.....10.....0f.....00.....00.....20.....98.....22.....Knife
+30120-Orichalcum-----(16,40).....28.....10.....0a.....00.....01.....00.....98.....26.....Knife
+
+30020-Cypress Cane---(04,00).....00.....04.....0a.....00.....00.....00.....a0.....27.....Staff 1
+300f8-Healing Staff--(06,00).....00.....06.....0a.....1a.....00.....08.....a0.....22.....Staff 1
+30100-Mages Wand-----(12,10).....0a.....0c.....0a.....15.....00.....00.....a4.....25.....Staff 2
+30098-Silver Staff---(15,05).....05.....0f.....0a.....00.....00.....00.....a4.....2c.....Staff 2
+30110-Wizards Wand---(15,15).....0f.....0f.....0a.....52.....00.....00.....a4.....23.....Staff 2
+
+--------------------------------Hit%--Damage--Crit---Spell--Elem---Hurt----Gfx----Pal------------
+---------------------------------00-----01-----02-----03-----04-----05-----06-----07-------------
+
+
+
+******************************************************---X3---***********************************************************
+*************************************************************************************************************************
+
+__________________________________________-Weapon Graphics and Palettes-_________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........Using original names from an unpatched rom, there are a few weapons that are mentioned for each. This way you
+..........can visually determine which color type you might want. Sword 6 is new, and is larger in size then Sword 1.
+..........Sword 6 replaces Nunchuck.
+
+..........In the next section you will select the Palettes that are applied to each Weapon.
+..........The numbers are the Palette order, and how they are applied to each weapon.
+
+---------------------------------------------------------Gfx----Pal------------
+---------------00-----01-----02-----03-----04-----05-----06-----07-------------
+
+
+
+80-Sword 1 (Short, Giant, Defense)...........(1-Outer Blade)(2-Inner Blade)(3-Guard, Handle) 
+
+84-Sword 2 (Scimitar, Masamune)..............(1-Blade)(2-Guard)(3-Handle) 
+
+88-Sword 3 (Falchon, Rune S, Flame S)........(1-Outer Blade)(3-Inner Blade)(3-Guard, Handle)
+ 
+8c-Sword 4 (Silver, Ice, Sun, Xcalber).......(1-Outer Blade)(2-Inner Blade)(3-Guard, Handle)
+
+90-Sword 5 (Rapier, Sabre, Dragon S).........(1-Center and Upper Blade)(2-Lower Blade)(3-Guard, Handle)
+
+a8-Sword 6 (Larger version of Sword 1).......(1-Inner Blade)(2-Outer Blade)(3-Guard, Handle)
+
+
+9c-Axe.........(1-Blade, part of Shaft)(2-Cheek, Head, part of Shaft, part of Eye)(3-Handle, part of Cheek, part of Eye)
+
+ac-Fist........(2-Knuckle,top of Hand, Arm)(3-inside of Fingers, Sleeve)
+
+94-Hammer......(1-back of Shaft, Eye)(2-front and upper Head, front of Shaft, Handle)(3-back and lower Head, Handle)
+
+98-Knife.......(1-back of Blade)(2-very front edge of Blade)(3-Handle)
+
+
+a0-Staff 1.....(Wooden Cane, Power Staff)....(2-back of Shaft, outer Hook)(3-front of Shaft, inner Hook, Handle)
+
+a4-Staff 2.....(Iron Staff, Mage's Wand).....(1-Neck)(2-lower Head, very back of Shaft)(3-upper Head, front of Shaft)
+
+
+
+..................................................................Gfx....Pal............
+........................00.....01.....02.....03.....04.....05.....06.....07.............
+
+
+..........Colors used - White, Yellow, Orange, Red, Green, Blue, Purple, Brown, Black, Grey, Light, and Dark.
+........................Wh.....Yw......Or......Rd...Gr.....Bl....Pr......Br.....Bl.....Gr....Lt.........Dk...
+
+..........Abbreviations - Green or Grey, and Blue or Black. These will be fully spelled out at least once per byte.
+..........If the colors are (Blue,BlueGreen,LtBlGr), then Bl and Gr will clearly be Blue and Green. Occasionally I will
+..........only use the first letter because of space restraints. DkPurpleRed,LtLtPR,LtPR. PR is PurpleRed, Pr is Purple.
+
+..........Each set of bytes 00-0f, 10-1f, 20-2f, and 30-3f, each display colors in a different sequence.
+..........There are similarities in each set. 05, 15, 25, and 35 all have PurpleRed in them, and 08, 18, 28, and 38 
+..........have GreenOrange/GreenBrown. As you are looking for the colors you want, follow this pattern.
+
+..........Nestopia and VirtuaNeS were used for color determination. They each display the colors a little bit different.
+..........The top byte is for Nestopia, and the bottom is for VirtuaNeS. Palette options in Hackster display incorrectly
+..........for Weapons, even in an unpatched rom. Hackster is close for some, and way off for others.
+
+..........each color is described as best as possible.
+
+
+00-Grey,DkGrey,White..........01-Blue,DkBlue,LtBlue.........02-Blue,DkBlue,LtPurple.......03-Blue,DkBlue,LtPurple.......
+00-LtGrey,Grey,White..........01-Blue,DkBlue,LtBlue.........02-Blue,DkBlue,LtPurple.......03-PurpleBlue,DkPrBl,LtPr.....
+
+04-Purple,DkPurple,LtPurple...05-RedPurple,DkRdPr,LtRdPr....06-LtBrown,RedBrown,LtOrange..07-LtBrown,Brown,LtOrange.....
+04-LtRedPurple,DkRdPr,LtPr....05-RedOrange,DkRdOr,LtRdPr....06-Orange,Brown,LtOrange......07-LtBrown,Brown,LtOrange.....
+
+08-LtGreenBrown,GrBr,LtLtGr...09-Green,DkGreen,LtGreen......0a-Green,DkGreen,LtGreen......0b-GreenBlue,DkGrBl,LtGrBl....
+08-LtGreenBrown,GrBr,Yellow...09-Green,DkGreen,LtLtGreen....0a-Green,DkGreen,LtGreen......0b-GreenBlue,DkGrBl,LtGrBl....
+
+0c-BlueGreen,DkBlGr,LtBlGr....0d-Black,Black,Grey...........0e-Black,Black,Black..........0f-Black,Black,Black..........
+0c-Blue,DkBlueGreen,LtBlGr....0d-Black,Black,Grey...........0e-Black,Black,Black..........0f-Black,Black,Black..........
+
+------------------------------------------------------------------------------------------------------------------------
+
+10-White,LtGrey,Grey..........11-LtBlue,Blue,DkBlue.........12-LtBluePurple,BlPr,DkBlue...13-LtPurple,Purple,DkBluePr
+10-White,LtGrey,Grey..........11-LtLtBlue,LtBlue,DkBlue.....12-LtLtBlue,LtBlue,DkBlue.....13-LtLtPurple,LtPr,DkPr.......
+
+14-LtPurple,Pr,DkPr...........15-LtRedPurple,RdPr,DkRdPr....16-Orange,DkOrange,DkBrown....17-Orange,Brown,DkBrown.......
+14-LtLtPurple,LtPr,DkPr.......15-LtRed,RdPr,DkRdPr..........16-LtOrange,Orange,Brown......17-LtOrange,LtBrown,DkBrown...
+
+18-LtGreen,GrOrange,DkGrBrown.19-LtGreen,Green,DkGreen......1a-LtGreen,Green,DkGreen......1b-LtGreenBlue,GrBl,DkGrBl....
+18-LtGreenOrange,GrOr,DkGrOr..19-LtLtGreen,LtGr,DkGreen.....1a-LtLtGreen,LtGr,DkGreen.....1b-LtLtGreenBlue,LtGB,DkGB....
+
+1c-LtBlueGreen,BlGr,DkBlGr....1d-DkGrey,Black,Black.........1e-Black,Black,Black..........1f-Black,Black,Black..........
+1c-LtLtBlueGreen,LtBG,DkBG....1d-DkGrey,Black,Black.........1e-Black,Black,Black..........1f-Black,Black,Black..........
+
+------------------------------------------------------------------------------------------------------------------------
+
+20-White,White,Grey...........21-LtLtBlue,LtBlue,Blue.......22-LtLtPurple,LtPr,BluePr.....23-LtLtPurple,LtPr,PrBlue.....
+20-White,White,LtGrey.........21-LtLtBlue,LtBlue,Blue.......22-LtLtBlue,LtBlue,Blue.......23-LtLtPurple,LtPr,Pr.........
+
+24-LtLtPurple,LtPr,Pr.........25-LtLtRed,LtRed,RedPurple....26-LtLtOrange,Orange,Red......27-LtLtOrange,LtBrown,Brown...
+24-LtLtPurple,LtPr,PrRed......25-LtLtRed,LtRed,RedPurple....26-LtOrange,Orange,DkOr.......27-LtLtOrange,Orange,Brown....
+
+28-LtLtGreenOrange,LtGO,GO....29-LtLtGreen,LtGreen,Green....2a-LtLtGreen,LtGreen,Green....2b-LtLtGreenBlue,LtGrBl,GrBl..
+28-LtLtOrangeGreen,LtOG,GO....29-LtLtGreen,LtGreen,Green....2a-LtLtGreen,LtGreen,Green....2b-LtLtGreenBlue,LtGrBl,GrBl..
+
+2c-LtLtBlueGrey,LtBlGr,BlGr...2d-Grey,DkGrey,Black..........2e-Black,Black,Black..........2f-Black,Black,Black..........
+2c-LtLtBlueGrey,LtBlGr,BlGr...2d-Grey,DkGrey,Black..........2e-Black,Black,Black..........2f-Black,Black,Black..........
+
+------------------------------------------------------------------------------------------------------------------------
+
+30-DkGrey,White,White.........31-DkBlue,LtLtBlue,LtBlue.....32-DkBluePurple,LtLtPr,LtPr...33-DkPurple,LtLtPr,LtPr.......
+30-Grey,White,White...........31-DkBlue,LtLtBlue,LtBlue.....32-DkBlue,LtLtPurple,LtBl.....33-DkPurple,LtLtPr,LtPr.......
+
+34-DkPurpleRed,LtLtPR,LtPR....35-DkRedPurple,LtLtRP,LtRP....36-DkRedBrown,LtLtOrange,LtOr.37-DkBrown,LtLtOrange,Or......
+34-PurpleRed,LtLtPR,LtPR......35-DkRedPurple,LtLtRP,LtRP....36-Brown,LtLtOrange,LtOr......37-Brown,LtLtOrange,Orange....
+
+38-DkGreenBrown,LtLtGr.LtGr...39-DkGreen,LtLtGr,LtGr........3a-DkGreenBlue,LtLtGrBl,LtGr..3b-DkBlueGreen,LtLtBlGr,LtGB..
+38-GreenBrown,LtLtG,LtGOrange.39-DkGreen,LtLtGr,LtGr........3a-DkGreenBlue,LtLtGrBl,LtGr..3b-DkBlueGreen,LtLtBlGr,LtGB..
+
+3c-DkBlue,LtLtBlue,LtBlue.....3d-Black,Grey,DkGrey..........3e-Black,Black,Black..........3f-Black,Black,Black..........
+3c-DkBlue,LtLtBlGrey,LtBlGr...3d-Black,Grey,DkGrey..........3e-Black,Black,Black..........3f-Black,Black,Black..........
+
+
+
+******************************************************---X4---***********************************************************
+*************************************************************************************************************************
+
+____________________________________________________-Armor Data-_________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+....................................Set the Hex Editor to 4 wide
+
+
+------------------------------------Evade-------Defense------Spec Def----Spell Cast
+-------------------------------------00-----------01-----------02-----------03------
+
+30154-Leather Armor------(04,08).....08...........04...........00...........00......
+30158-Chain Armor--------(12,10).....0a...........0c...........00...........00......
+3015c-Iron Armor---------(20,24).....18...........14...........00...........00......
+30164-Silver Armor-------(20,10).....0a...........14...........00...........00......
+30168-Flame Armor--------(32,20).....14...........20...........20...........00......
+3016c-Ice Armor----------(32,20).....14...........20...........10...........00......
+30170-Diamond Armor------(40,24).....18...........28...........40...........00......
+30174-Dragon Armor-------(40,20).....14...........28...........70...........00......
+30160-Maximilian---------(88,32).....20...........58...........00...........00......
+
+------------------------------------Evade-------Defense------Spec Def----Spell Cast
+-------------------------------------00-----------01-----------02-----------03------
+
+30150-Linen Tunic--------(02,02).....02...........02...........00...........00......
+30188-White Robe---------(28,04).....04...........1c...........15...........2c......
+3018c-Black Robe---------(28,04).....04...........1c...........2a...........20......
+
+30178-Bronze Band--------(06,01).....01...........06...........00...........00......
+3017c-Silver Band--------(16,01).....01...........10...........00...........00......
+30180-Ruby Band----------(24,01).....01...........18...........00...........00......
+30184-Pearl Band---------(32,01).....01...........20...........00...........00......
+
+------------------------------------Evade-------Defense------Spec Def----Spell Cast
+-------------------------------------00-----------01-----------02-----------03------
+
+30190-Wooden Shield------(02,+1).....ff...........02...........00...........00......
+30194-Iron Shield--------(04,+2).....fe...........04...........00...........00......
+30198-Silver Shield------(08,+4).....fc...........08...........00...........00......
+3019c-Flame Shield-------(12,+4).....fc...........0c...........20...........00......
+301a0-Ice Shield---------(12,+4).....fc...........0c...........10...........00......
+301a4-Diamond Shield-----(16,+8).....fa...........10...........40...........00......
+301a8-Aegis Shield-------(16,+8).....fa...........10...........02...........00......
+
+301ac-Buckler------------(02,+2).....fe...........02...........00...........00......
+301b0-Fey Mantle---------(08,+8).....f8...........08...........00...........00......
+
+------------------------------------Evade-------Defense------Spec Def----Spell Cast
+-------------------------------------00-----------01-----------02-----------03------
+
+301b8-Bronze Helm--------(02,02).....02...........02...........00...........00......
+301bc-Iron Helm----------(04,04).....04...........04...........00...........00......
+301c0-Silver Helm--------(06,03).....03...........06...........00...........00......
+301c4-Diamond Helm-------(10,05).....05...........0a...........00...........00......
+
+301b4-Felt Hat-----------(01,01).....01...........01...........00...........00......
+301c8-Plumed Hat---------(2,+12).....f4...........02...........00...........00......
+301cc-Ribbon-------------(00,00).....00...........00...........ff...........00......
+
+------------------------------------Evade-------Defense------Spec Def----Spell Cast
+-------------------------------------00-----------01-----------02-----------03------
+
+301d0-Leather Glove------(01,00).....00...........01...........00...........00......
+301d4-Bronze Glove-------(02,02).....01...........02...........00...........00......
+301d8-Iron Glove---------(04,03).....03...........04...........00...........00......
+301dc-Silver Glove-------(06,02).....02...........06...........00...........00......
+301e4-Power Glove--------(06,02).....02...........06...........00...........37......
+301e8-Diamond Glove------(10,04).....04...........0a...........00...........00......
+
+301e0-Magical Ring-------(01,00).....00...........01...........01...........00......
+301ec-Angels Ring--------(08,00).....00...........08...........08...........00......
+
+------------------------------------Evade-------Defense------Spec Def----Spell Cast
+-------------------------------------00-----------01-----------02-----------03------
+
+
+
+*******************************************************---X5---**********************************************************
+*************************************************************************************************************************
+
+___________________________________________________-Armor Bitmask-_______________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+.................Set the Hex Editor to 16 wide
+
+.................This section is for changing any piece of Armor into any type you wish.
+
+
+
+3bce2-Leather Armor---(04,08)
+3bce3-Chain Armor-----(12,10)
+3bce4-Iron Armor------(20,24)
+3bce6-Silver Armor----(20,10)
+3bce7-Flame Armor-----(32,20)
+3bce8-Ice Armor-------(32,20)
+3bce9-Diamond Armor---(40,24)
+3bcea-Dragon Armor----(40,20)
+3bce5-Maximilian------(88,32)
+
+3bce1-Linen Tunic-----(02,02)
+3bcef-White Robe------(28,04)
+3bcf0-Black Robe------(28,04)
+3bceb-Bronze Band-----(06,01)
+3bcec-Silver Band-----(16,01)
+3bced-Ruby Band-------(24,01)
+3bcee-Pearl Band------(32,01)
+
+
+3bcf1-Wooden Shield---(02,+1)
+3bcf2-Iron Shield-----(04,+2)
+3bcf3-Silver Shield---(08,+4)
+3bcf4-Flame Shield----(12,+4)
+3bcf5-Ice Shield------(12,+4)
+3bcf6-Diamond Shield--(16,+8)
+3bcf7-Aegis Shield----(16,+8)
+3bcf8-Buckler---------(02,+2)
+3bcf9-Fey Mantle------(08,+8)
+
+
+3bcfa-Felt Hat--------(01,01)
+3bcff-Plumed Hat------(2,+12)
+3bcfb-Bronze Helm-----(02,02)
+3bcfc-Iron Helm-------(04,04)
+3bcfd-Silver Helm-----(06,03)
+3bcfe-Diamond Helm----(10,05)
+3bd00-Ribbon----------(00,00)
+
+
+3bd01-Leather Glove---(01,00)
+3bd02-Bronze Glove----(02,02)
+3bd03-Iron Glove------(04,03)
+3bd04-Silver Glove----(06,02)
+3bd06-Power Glove-----(06,02)
+3bd07-Diamond Glove---(10,04)
+3bd05-Magical Ring----(01,00)
+3bd08-Angels Ring-----(08,00)
+
+
+
+..........All the checkbox options follow the same byte order, so here is the easiest way to find the option you want.
+..........At the top of the page in Notepad options, go to (Edit), then choose (Find), and then type in the letters that
+..........correspond to your choice(s). Im using G-N because 0-9 and A-F are used in all the hex locations.
+..........Make sure you type in the letters like this, g/h/i, ect. Capitol/noncapitol doesnt matter, the / does.
+
+..........Even thought there is nothing specified, you can create your own new 4 types of Armor if you want.
+ 
+
+......Reference............Armor Type...................................................................................
+.......[G][K]...........[Armor..][.......]..............................................................................
+.......[H][L]...........[Shield.][.......]..............................................................................
+.......[I][M]...........[Helmet.][.......]..............................................................................
+.......[J][N]...........[Glv/Rng][.......]..............................................................................
+
+
+00-None...01-G...02-H...03-G/H...04-I...05-G/I...06-H/I...07-G/H/I...08-J...09-G/J...0A-H/J...0B-G/H/J...0C-I/J..0D-G/I/J
+0E-H/I/J...0F-G/H/I/J...10-K...11-G/K...12-H/K...13-G/H/K...14-I/K...15-G/I/K...16-H/I/K...17-G/H/I/K...18-J/K...19-G/J/K
+1A-H/J/K....1B-G/H/J/K....1C-I/J/K....1D-G/I/J/K...1E-H/I/J/K...1F-G/H/I/J/K...20-L...21-G/L...22-H/L...23-G/H/L...24-I/L
+25-G/I/L....26-H/I/L....27-G/H/I/L....28-J/L....29-G/J/L....2A-H/J/L....2B-G/H/J/L....2C-I/J/L....2D-G/I/J/L...2E-H/I/J/L
+2F-G/H/I/J/L....30-K/L....31-G/K/L...32-H/K/L...33-G/H/K/L...34-I/K/L...35-G/I/K/L...36-H/I/K/L...37-G/H/I/K/L...38-J/K/L
+39-G/J/K/L....3A-H/J/K/L....3B-G/H/J/K/L....3C-I/J/K/L....3D-G/I/J/K/L....3E-H/I/J/K/L....3F-G/H/I/J/K/L....40-M...41-G/M
+42-H/M....43-G/H/M....44-I/M....45-G/I/M....46-H/I/M....47-G/H/I/M...48-J/M...49-G/J/M...4A-H/J/M...4B-G/H/J/M...4C-I/J/M
+4D-G/I/J/M....4E-H/I/J/M....4F-G/H/I/J/M...50-K/M...51-G/K/M...52-H/K/M...53-G/H/K/M...54-I/K/M...55-G/I/K/M...56-H/I/K/M
+57-G/H/I/K/M...58-J/K/M...59-G/J/K/M...5A-H/J/K/M...5B-G/H/J/K/M..5C-I/J/K/M...5D-G/I/J/K/M..5E-H/I/J/K/M..5F-G/H/I/J/K/M
+60-L/M....61-G/L/M....62-H/L/M....63-G/H/L/M....64-I/L/M...65-G/I/L/M...66-H/I/L/M...67-G/H/I/L/M...68-J/L/M...69-G/J/L/M
+6A-H/J/L/M...6B-G/H/J/L/M...6C-I/J/L/M...6D-G/I/J/L/M...6E-H/I/J/L/M...6F-G/H/I/J/L/M...70-K/L/M...71-G/K/L/M..72-H/K/L/M
+73-G/H/K/L/M....74-I/K/L/M....75-G/I/K/L/M....76-H/I/K/L/M....77-G/H/I/K/L/M....78-J/K/L/M....79-G/J/K/L/M...7A-H/J/K/L/M
+7B-G/H/J/K/L/M....7C-I/J/K/L/M....7D-G/I/J/K/L/M....7E-H/I/J/K/L/M...7F-G/H/I/J/K/L/M...80-N...81-G/N...82-H/N...83-G/H/N
+84-I/N...85-G/I/N...86-H/I/N...87-G/H/I/N...88-J/N...89-G/J/N...8A-H/J/N...8B-G/H/J/N...8C-I/J/N...8D-G/I/J/N..8E-H/I/J/N
+8F-G/H/I/J/N....90-K/N....91-G/K/N...92-H/K/N...93-G/H/K/N...94-I/K/N...95-G/I/K/N...96-H/I/K/N...97-G/H/I/K/N...98-J/K/N
+99-G/J/K/N....9A-H/J/K/N....9B-G/H/J/K/N....9C-I/J/K/N...9D-G/I/J/K/N...9E-H/I/J/K/N...9F-G/H/I/J/K/N...A0-L/N...A1-G/L/N
+A2-H/L/N...A3-G/H/L/N...A4-I/L/N...A5-G/I/L/N...A6-H/I/L/N...A7-G/H/I/L/N..A8-J/L/N..A9-G/J/L/N..AA-H/J/L/N..AB-G/H/J/L/N
+AC-I/J/L/N...AD-G/I/J/L/N...AE-H/I/J/L/N...AF-G/H/I/J/L/N...B0-K/L/N...B1-G/K/L/N...B2-H/K/L/N...B3-G/H/K/L/N..B4-I/K/L/N
+B5-G/I/K/L/N....B6-H/I/K/L/N....B7-G/H/I/K/L/N...B8-J/K/L/N...B9-G/J/K/L/N...BA-H/J/K/L/N...BB-G/H/J/K/L/N...BC-I/J/K/L/N
+BD-G/I/J/K/L/N....BE-H/I/J/K/L/N....BF-G/H/I/J/K/L/N....C0-M/N...C1-G/M/N...C2-H/M/N...C3-G/H/M/N...C4-I/M/N...C5-G/I/M/N
+C6-H/I/M/N....C7-G/H/I/M/N...C8-J/M/N...C9-G/J/M/N...CA-H/J/M/N...CB-G/H/J/M/N...CC-I/J/M/N...CD-G/I/J/M/N...CE-H/I/J/M/N
+CF-G/H/I/J/M/N...D0-K/M/N...D1-G/K/M/N...D2-H/K/M/N..D3-G/H/K/M/N..D4-I/K/M/N..D5-G/I/K/M/N..D6-H/I/K/M/N..D7-G/H/I/K/M/N
+D8-J/K/M/N...D9-G/J/K/M/N...DA-H/J/K/M/N...DB-G/H/J/K/M/N..DC-I/J/K/M/N..DD-G/I/J/K/M/N..DE-H/I/J/K/M/N..DF-G/H/I/J/K/M/N
+E0-L/M/N...E1-G/L/M/N...E2-H/L/M/N...E3-G/H/L/M/N...E4-I/L/M/N...E5-G/I/L/M/N...E6-H/I/L/M/N...E7-G/H/I/L/M/N..E8-J/L/M/N
+E9-G/J/L/M/N...EA-H/J/L/M/N...EB-G/H/J/L/M/N...EC-I/J/L/M/N..ED-G/I/J/L/M/N..EE-H/I/J/L/M/N..EF-G/H/I/J/L/M/N..F0-K/L/M/N
+F1-G/K/L/M/N...F2-H/K/L/M/N..F3-G/H/K/L/M/N..F4-I/K/L/M/N..F5-G/I/K/L/M/N..F6-H/I/K/L/M/N..F7-G/H/I/K/L/M/N..F8-J/K/L/M/N
+F9-G/J/K/L/M/N...FA-H/J/K/L/M/N..FB-G/H/J/K/L/M/N..FC-I/J/K/L/M/N..FD-G/I/J/K/L/M/N..FE-H/I/J/K/L/M/N..FF-G/H/I/J/K/L/M/N
+
+
+
+******************************************************---X6---***********************************************************
+*************************************************************************************************************************
+
+____________________________-Weapon Element, Weapon Hurt Category, Armor Special Defense-________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........All the checkbox options follow the same byte order, so here is the easiest way to find the option you want.
+..........At the top of the page in Notepad options, go to (Edit), then choose (Find), and then type in the letters that
+..........correspond to your choice(s). Im using G-N because 0-9 and A-F are used in all the hex locations.
+..........Make sure you type in the letters like this, g/h/i, ect. Capitol/noncapitol doesnt matter, the / does. 
+ 
+
+......Reference.......Weapon Element..........Weapon Hurt Category.....Armor Special Defense...
+.......[G][K]........[Status.][Fire...]........[Evil...][Beast..]........[Status.][Fire...]....
+.......[H][L]........[Poi/Sto][Ice....]........[Dragon.][Water..]........[Poi/Sto][Ice....]....
+.......[I][M]........[Time...][Lit....]........[Giant..][Mage...]........[Time...][Lit....]....
+.......[J][N]........[Death..][Earth..]........[Undead.][Regen..]........[Death..][Earth..]....
+
+
+00-None...01-G...02-H...03-G/H...04-I...05-G/I...06-H/I...07-G/H/I...08-J...09-G/J...0a-H/J...0b-G/H/J...0c-I/J..0d-G/I/J
+0e-H/I/J...0f-G/H/I/J...10-K...11-G/K...12-H/K...13-G/H/K...14-I/K...15-G/I/K...16-H/I/K...17-G/H/I/K...18-J/K...19-G/J/K
+1a-H/J/K....1b-G/H/J/K....1c-I/J/K....1d-G/I/J/K...1e-H/I/J/K...1f-G/H/I/J/K...20-L...21-G/L...22-H/L...23-G/H/L...24-I/L
+25-G/I/L....26-H/I/L....27-G/H/I/L....28-J/L....29-G/J/L....2a-H/J/L....2b-G/H/J/L....2c-I/J/L....2d-G/I/J/L...2e-H/I/J/L
+2f-G/H/I/J/L....30-K/L....31-G/K/L...32-H/K/L...33-G/H/K/L...34-I/K/L...35-G/I/K/L...36-H/I/K/L...37-G/H/I/K/L...38-J/K/L
+39-G/J/K/L....3a-H/J/K/L....3b-G/H/J/K/L....3c-I/J/K/L....3d-G/I/J/K/L....3e-H/I/J/K/L....3f-G/H/I/J/K/L....40-M...41-G/M
+42-H/M....43-G/H/M....44-I/M....45-G/I/M....46-H/I/M....47-G/H/I/M...48-J/M...49-G/J/M...4a-H/J/M...4b-G/H/J/M...4c-I/J/M
+4d-G/I/J/M....4e-H/I/J/M....4f-G/H/I/J/M...50-K/M...51-G/K/M...52-H/K/M...53-G/H/K/M...54-I/K/M...55-G/I/K/M...56-H/I/K/M
+57-G/H/I/K/M...58-J/K/M...59-G/J/K/M...5a-H/J/K/M...5b-G/H/J/K/M..5c-I/J/K/M...5d-G/I/J/K/M..5e-H/I/J/K/M..5f-G/H/I/J/K/M
+60-L/M....61-G/L/M....62-H/L/M....63-G/H/L/M....64-I/L/M...65-G/I/L/M...66-H/I/L/M...67-G/H/I/L/M...68-J/L/M...69-G/J/L/M
+6a-H/J/L/M...6b-G/H/J/L/M...6c-I/J/L/M...6d-G/I/J/L/M...6e-H/I/J/L/M...6f-G/H/I/J/L/M...70-K/L/M...71-G/K/L/M..72-H/K/L/M
+73-G/H/K/L/M....74-I/K/L/M....75-G/I/K/L/M....76-H/I/K/L/M....77-G/H/I/K/L/M....78-J/K/L/M....79-G/J/K/L/M...7a-H/J/K/L/M
+7b-G/H/J/K/L/M....7c-I/J/K/L/M....7d-G/I/J/K/L/M....7e-H/I/J/K/L/M...7f-G/H/I/J/K/L/M...80-N...81-G/N...82-H/N...83-G/H/N
+84-I/N...85-G/I/N...86-H/I/N...87-G/H/I/N...88-J/N...89-G/J/N...8a-H/J/N...8b-G/H/J/N...8c-I/J/N...8d-G/I/J/N..8e-H/I/J/N
+8f-G/H/I/J/N....90-K/N....91-G/K/N...92-H/K/N...93-G/H/K/N...94-I/K/N...95-G/I/K/N...96-H/I/K/N...97-G/H/I/K/N...98-J/K/N
+99-G/J/K/N....9a-H/J/K/N....9b-G/H/J/K/N....9c-I/J/K/N...9d-G/I/J/K/N...9e-H/I/J/K/N...9f-G/H/I/J/K/N...a0-L/N...a1-G/L/N
+a2-H/L/N...a3-G/H/L/N...a4-I/L/N...a5-G/I/L/N...a6-H/I/L/N...a7-G/H/I/L/N..a8-J/L/N..a9-G/J/L/N..aa-H/J/L/N..ab-G/H/J/L/N
+ac-I/J/L/N...ad-G/I/J/L/N...ae-H/I/J/L/N...af-G/H/I/J/L/N...b0-K/L/N...b1-G/K/L/N...b2-H/K/L/N...b3-G/H/K/L/N..b4-I/K/L/N
+b5-G/I/K/L/N....b6-H/I/K/L/N....b7-G/H/I/K/L/N...b8-J/K/L/N...b9-G/J/K/L/N...ba-H/J/K/L/N...bb-G/H/J/K/L/N...bc-I/J/K/L/N
+bd-G/I/J/K/L/N....be-H/I/J/K/L/N....bf-G/H/I/J/K/L/N....c0-M/N...c1-G/M/N...c2-H/M/N...c3-G/H/M/N...c4-I/M/N...c5-G/I/M/N
+c6-H/I/M/N....c7-G/H/I/M/N...c8-J/M/N...c9-G/J/M/N...ca-H/J/M/N...cb-G/H/J/M/N...cc-I/J/M/N...cd-G/I/J/M/N...ce-H/I/J/M/N
+cf-G/H/I/J/M/N...d0-K/M/N...d1-G/K/M/N...d2-H/K/M/N..d3-G/H/K/M/N..d4-I/K/M/N..d5-G/I/K/M/N..d6-H/I/K/M/N..d7-G/H/I/K/M/N
+d8-J/K/M/N...d9-G/J/K/M/N...da-H/J/K/M/N...db-G/H/J/K/M/N..dc-I/J/K/M/N..dd-G/I/J/K/M/N..de-H/I/J/K/M/N..df-G/H/I/J/K/M/N
+e0-L/M/N...e1-G/L/M/N...e2-H/L/M/N...e3-G/H/L/M/N...e4-I/L/M/N...e5-G/I/L/M/N...e6-H/I/L/M/N...e7-G/H/I/L/M/N..e8-J/L/M/N
+e9-G/J/L/M/N...ea-H/J/L/M/N...eb-G/H/J/L/M/N...ec-I/J/L/M/N..ed-G/I/J/L/M/N..ee-H/I/J/L/M/N..ef-G/H/I/J/L/M/N..f0-K/L/M/N
+f1-G/K/L/M/N...f2-H/K/L/M/N..f3-G/H/K/L/M/N..f4-I/K/L/M/N..f5-G/I/K/L/M/N..f6-H/I/K/L/M/N..f7-G/H/I/K/L/M/N..f8-J/K/L/M/N
+f9-G/J/K/L/M/N...fa-H/J/K/L/M/N..fb-G/H/J/K/L/M/N..fc-I/J/K/L/M/N..fd-G/I/J/K/L/M/N..fe-H/I/J/K/L/M/N..ff-G/H/I/J/K/L/M/N
+
+
+
+*******************************************************---X7---**********************************************************
+*************************************************************************************************************************
+
+_____________________________________________________-Spell Cast-________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+....................Byte options are the same for both Weapons and Armor
+
+
+(L1) 01-Cure........02-Dia.........03-Protect.....04-Invisible...05-Fire........06-Sleep.......07-Poison......08-Thunder
+
+(L2) 09-Poisona.....0a-Silence.....0b-Fear........0c-Float.......0d-Blizzard....0e-Darkness....0f-Strike......10-Slow
+
+(L3) 11-Cura........12-Diara.......13-A.Spell.....14-Stona.......15-Fira........16-Hold........17-Thundara....18-Sleepra
+
+(L4) 19-Tornado.....1a-Heal........1b-A.Element...1c-Raise.......1d-Quake.......1e-Haste.......1f-Confuse.....20-Blizzara
+
+(L5) 21-Curaga-.....22-Ruin........23-Diaga.......24-A.Death.....25-Firaga-.....26-Scourge.....27-Teleport....28-Slowra	
+
+(L6) 29-Healara.....2a-Silega......2b-Protera.....2c-Invisira....2d-Thundaga....2e-Death.......2f-Chasm.......30-Stun
+
+(L7) 31-Curaja......32-Diaja.......33-Exit........34-Arise.......35-Blizzaga....36-Break.......37-Sever.......38-Bio
+
+(L8) 39-Healaga.....3a-Holy........3b-Barrier.....3c-Dispel......3d-Flare.......3e-Stop........3f-Banish......40-Kill
+
+
+41-ColdBreath....42-FireBreath....43-StoneGaze.....44-Absolute0.....45-Meteor........46-Eruption......47-Earthquake....
+
+48-DeathGaze.....49-FierceGaze....4a-BanishGaze....4b-IceStorm......4c-FireStorm.....4d-Meltdown......4e-PyroBreath....
+
+4f-StoneGas......50-MindBlast.....51-PoisonGas.....52-Lightning.....53-FatalGas......54-DarkBreath....55-UltimaBeam....
+
+56-OctopusInk....57-PoisonDarts...58-StunGaze......59-Tsunami.......5a-Cyclone.......5b-Megaflare.....
+
+
+
+*******************************************************---X8---**********************************************************
+*************************************************************************************************************************
+
+___________________________________________________-Who can Equip-_______________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........Set the Hex Editor to 16 wide
+
+..........It is nearly impossible to read any text in GFF when (View with DTE) is off.
+..........Even with it on, some of it is hard to decipher.
+
+..........Here is an alternate way to equip Weapons and Armor, if needed.
+
+..........Open a separate non patched file in a Hex Editor, and Hackster at the same time.
+..........You will use the first Weapon spot (3bf60/61) for Weapons, and the first Armor spot (3bfB0/B1) for Armor.
+..........Choose which characters are to equip the certain item with Hackster,
+..........and then copy the coresponding bytes to the appropriate address in GFF.
+
+..........For example, if you want the Icebrand to be Equiped by Kn/Ni/RW, choose those classes in Hackster
+..........with the non patched file, in the first Weapon spot. Save, and then look at the byte value at 3Bf60/61. 
+..........Take the Bytes cb 0f, and copy them to 3bf88/89 in GFF, which is the Icebrand location.
+
+
+
+...............Weapons..................................................Armor
+
+
+3bf66/67-Short Sword----(09,05)........................3bfb2/b3-Leather Armor---(04,08)
+3bf6a/6b-Broad Sword----(15,10)........................3bfb4/b5-Chain Armor-----(12,10)
+3bf78/79-Claymore-------(20,10)........................3bfb6/b7-Iron Armor------(20,24)
+3bfa2/a3-Vorpal Blade---(22,20)........................3bfba/bb-Silver Armor----(20,10)
+3bf80/81-Silver Sword---(24,15)........................3bfbc/bd-Flame Armor-----(32,20)
+3bfa8/a9-Razor Edge-----(24,25)........................3bfbe/bf-Ice Armor-------(32,20)
+3bf86/87-Flametongue----(26,20)........................3bfc0/c1-Diamond Armor---(40,24)
+3bf88/89-Icebrand-------(29,19)........................3bfc2/c3-Dragon Armor----(40,20)
+3bf9e/9f-Defender-------(30,35)........................3bfb8/b9-Maximilian------(88,32)
+3bf8e/8f-Gaia Blade-----(32,30)........................3bfb0/b1-Linen Tunic-----(02,02)
+3bfac/ad-Excalibur------(45,35)........................3bfcc/cd-White Robe------(28,04)
+3bf96/97-SaveTheQueen---(47,47)........................3bfce/cf-Black Robe------(28,04)
+
+3bf76/77-Cutlass--------(15,05)........................3bfc4/c5-Bronze Band-----(06,01)
+3bf90/91-Coral Sword----(18,15)........................3bfc6/c7-Silver Band-----(16,01)
+3bf94/95-Rune Blade-----(18,15)........................3bfc8/c9-Ruby Band-------(24,01)
+3bf8a/8b-Dragonslayer---(19,15)........................3bfca/cb-Pearl Band------(32,01)
+3bfaa/ab-Katana---------(28,35)........................3bfd0/d1-Wooden Shield---(02,+1)
+3bfae/af-Masamune-------(45,45)........................3bfd2/d3-Iron Shield-----(04,+2)
+
+3bf6c/6d-Battle Axe-----(18,05)........................3bfd4/d5-Silver Shield---(08,+4)
+3bf7a/7b-Titans Axe-----(24,07)........................3bfd6/d7-Flame Shield----(12,+4)
+3bf84/85-Silver Axe-----(29,10)........................3bfd8/d9-Ice Shield------(12,+4)
+3bf98/99-Sacred Axe-----(34,15)........................3bfda/db-Diamond Shield--(16,+8)
+
+3bf60/61-Iron Fist------(09,06)........................3bfdc/dd-Aegis Shield----(16,+8)
+3bf70/71-Burning Fist---(12,08)........................3bfde/df-Buckler---------(02,+2)
+3bf74/75-Dragon Claw----(15,10)........................3bfe0/e1-Fey Mantle------(08,+8)
+3bf7c/7d-Tiger Fangs----(18,12)........................3bfe4/e5-Bronze Helm-----(02,02)
+3bf6e/6f-Kaiser Fist----(24,16)........................3bfe6/e7-Iron Helm-------(04,04)
+
+3bf68/69-Heavy Mallet---(09,00)........................3bfe8/e9-Silver Helm-----(06,03)
+3bf92/93-Beast Killer---(23,07)........................3bfea/eb-Diamond Helm----(10,05)
+3bfa6/a7-Mjolnir--------(29,15)........................3bfee/ef-Ribbon----------(00,00)
+
+3bf62/63-Battle Knife---(05,10)........................3bfe2/e3-Felt Hat--------(01,01)
+3bf72/73-Baselard-------(07,10)........................3bfec/ed-Plumed Hat------(2,+12)
+3bf7e/7f-Silver Knife---(10,15)........................3bff0/f1-Leather Glove---(01,00)
+3bf8c/8d-Cleaver--------(16,15)........................3bff2/f3-Bronze Glove----(02,02)
+3bfa4/a5-Orichalcum-----(16,40)........................3bff4/f5-Iron Glove------(04,03)
+
+3bf64/65-Cypress Cane---(04,00)........................3bff6/f7-Silver Glove----(06,02)
+3bf9a/9b-Healing Staff--(06,00)........................3bffa/fb-Power Glove-----(06,02)
+3bf9c/9d-Mages Wand-----(12,10)........................3bffc/fd-Diamond Glove---(10,04)
+3bf82/83-Silver Staff---(15,05)........................3bff8/f9-Magical Ring----(01,00)
+3bfa0/a1-Wizards Wand---(15,15)........................3bffe/ff-Angels Ring-----(08,00)
+
+
+
+******************************************************---X9---***********************************************************
+*************************************************************************************************************************
+
+_______________________________________________________-Text-____________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........All text needs to be done with a Hex Editor. Set to 16 wide
+
+..........The last byte for anything you rename must end with 00, before the next Pointer.
+..........The words will bleed into each other if the (00) is removed.
+
+..........One aspect that has a little bit of a complication. Each thing that is renamed has to take up the same amount
+..........space as before, or it will appear wrong in a Shop.
+ 
+..........There is single space text, 7a, 80-ff, and there is double space text 03-79, and one triple space text 69. 
+..........7B-7F are used in a few select words, and areas of text that use these should be left unchanged.
+..........Some byte options from be-ff are either single or double. I didnt test the non usable ones.
+
+
+
+...............Weapons..................................................Armor
+
+
+2b930/38-Short Sword----(09,05)........................2bab9/c4-Leather Armor---(04,08)
+2b944/4c-Broad Sword----(15,10)........................2bac6/cf-Chain Armor-----(12,10)
+2b98c/95-Claymore-------(20,10)........................2bad1/d9-Iron Armor------(20,24)
+2ba68/71-Vorpal Blade---(22,20)........................2bae6/ee-Silver Armor----(20,10)
+2b9b5/bd-Silver Sword---(24,15)........................2baf0/f9-Flame Armor-----(32,20)
+2ba87/90-Razor Edge-----(24,25)........................2bafb/04-Ice Armor-------(32,20)
+2b9d4/dc-Flametongue----(26,20)........................2bb06/11-Diamond Armor---(40,24)
+2b9de/e6-Icebrand-------(29,19)........................2bb13/1c-Dragon Armor----(40,20)
+2ba52/5a-Defender-------(30,35)........................2badb/e4-Maximilian------(88,32)
+2b9fc/06-Gaia Blade-----(32,30)........................2baae/b7-Linen Tunic-----(02,02)
+2ba9b/a3-Excalibur------(45,35)........................2bb45/4d-White Robe------(28,04)
+2ba26/2f-SaveTheQueen---(47,47)........................2bb4f/58-Black Robe------(28,04)
+
+2b982/8a-Cutlass--------(15,05)........................2bb1e/26-Bronze Band-----(06,01)
+2ba08/10-Coral Sword----(18,15)........................2bb28/2f-Silver Band-----(16,01)
+2ba1b/24-Rune Blade-----(18,15)........................2bb31/39-Ruby Band-------(24,01)
+2b9e8/f1-Dragonslayer---(19,15)........................2bb3b/43-Pearl Band------(32,01)
+2ba92/99-Katana---------(28,35)........................2bb5a/63-Wooden Shield---(02,+1)
+2baa5/ac-Masamune-------(45,45)........................2bb65/6c-Iron Shield-----(04,+2)
+
+2b94e/57-Battle Axe-----(18,05)........................2bb6e/77-Silver Shield---(08,+4)
+2b997/9f-Titans Axe-----(24,07)........................2bb79/81-Flame Shield----(12,+4)
+2b9ca/d2-Silver Axe-----(29,10)........................2bb83/8b-Ice Shield------(12,+4)
+2ba31/39-Sacred Axe-----(34,15)........................2bb8d/99-Diamond Shield--(16,+8)
+
+2b911/18-Iron Fist------(09,06)........................2bb9b/a3-Aegis Shield----(16,+8)
+2b963/6b-Burning Fist---(12,08)........................2bba5/ac-Buckler---------(02,+2)
+2b976/80-Dragon Claw----(15,10)........................2bbae/b6-Fey Mantle------(08,+8)
+2b9a1/a9-Tiger Fangs----(18,12)........................2bbc1/ca-Bronze Helm-----(02,02)
+2b959/61-Kaiser Fist----(24,16)........................2bbcc/d4-Iron Helm-------(04,04)
+
+2b93a/42-Heavy Mallet---(09,00)........................2bbd6/de-Silver Helm-----(06,03)
+2ba12/19-Beast Killer---(23,07)........................2bbe0/eb-Diamond Helm----(10,05)
+2ba7d/85-Mjolnir--------(29,15)........................2bbf7/ff-Ribbon----------(00,00)
+
+2b91a/23-Battle Knife---(05,10)........................2bbb8/bf-Felt Hat--------(01,01)
+2b96d/74-Baselard-------(07,10)........................2bbed/f5-Plumed Hat------(2,+12)
+2b9ab/b3-Silver Knife---(10,15)........................2bc01/0b-Leather Glove---(01,00)
+2b9f3/fa-Cleaver--------(16,15)........................2bc0d/15-Bronze Glove----(02,02)
+2ba73/7b-Orichalcum-----(16,40)........................2bc17/1e-Iron Glove------(04,03)
+
+2b925/2e-Cypress Cane---(04,00)........................2bc20/27-Silver Glove----(06,02)
+2ba3b/46-Healing Staff--(06,00)........................2bc34/3c-Power Glove-----(06,02)
+2ba48/50-Mages Wand-----(12,10)........................2bc3e/48-Diamond Glove---(10,04)
+2b9bf/c8-Silver Staff---(15,05)........................2bc29/32-Magical Ring----(01,00)
+2ba5c/66-Wizards Wand---(15,15)........................2bc4a/52-Angels Ring-----(08,00)
+
+
+
+*****************************************************---X10---***********************************************************
+*************************************************************************************************************************
+
+__________________________________________________-Text Pointers-________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........Changing Pointers is a little tricky. Here is what to look for.
+
+
+..........8....|9|....A....|B|....For Banks 00-14, the Pointer will be 8-b. 
+..........C.....D....(E)....F.....For Bank 15, it will be c-f
+
+..........0.....1.....2.....3
+..........4....|5|....6.....7
+..........8.....9.....A....|B|
+..........C.....D....(E)....F
+
+..........The ones in parenthesis or brackets are for the following text examples.
+..........Directly above those is what determines the Pointer.
+
+..........2(59)b5 = A5 99
+..........3(e9)b5 = A5 E9
+..........2(b9)b5 = A5 B9
+
+..........Here is an sample, so you can see what to look for. Notice the last one requires a subtraction.
+
+..........2b9b5-Silver Sword-A5 B9.......2bb13-Dragon Armor-03 BB.......2bc01-Leather Glove-F1 BB......
+
+
+
+...............Weapons..................................................Armor
+
+
+2b74e/4f-Short Sword----(09,05)........................2b79a/9b-Leather Armor---(04,08)
+2b754/55-Broad Sword----(15,10)........................2b79c/9d-Chain Armor-----(12,10)
+2b760/61-Claymore-------(20,10)........................2b79e/9f-Iron Armor------(20,24)
+2b78a/8b-Vorpal Blade---(22,20)........................2b7a2/a3-Silver Armor----(20,10)
+2b768/69-Silver Sword---(24,15)........................2b7a4/a5-Flame Armor-----(32,20)
+2b790/91-Razor Edge-----(24,25)........................2b7a6/a7-Ice Armor-------(32,20)
+2b76e/6f-Flametongue----(26,20)........................2b7a8/a9-Diamond Armor---(40,24)
+2b770/71-Icebrand-------(29,19)........................2b7aa/ab-Dragon Armor----(40,20)
+2b786/87-Defender-------(30,35)........................2b7a0/a1-Maximilian------(88,32)
+2b776/77-Gaia Blade-----(32,30)........................2b798/99-Linen Tunic-----(02,02)
+2b794/95-Excalibur------(45,35)........................2b7b4/b5-White Robe------(28,04)
+2b77e/7f-SaveTheQueen---(47,47)........................2b7b6/b7-Black Robe------(28,04)
+
+2b75e/5f-Cutlass--------(15,05)........................2b7ac/ad-Bronze Band-----(06,01)
+2b778/79-Coral Sword----(18,15)........................2b7ae/af-Silver Band-----(16,01)
+2b77c/7d-Rune Blade-----(18,15)........................2b7b0/b1-Ruby Band-------(24,01)
+2b772/73-Dragonslayer---(19,15)........................2b7b2/b3-Pearl Band------(32,01)
+2b792/93-Katana---------(28,35)........................2b7b8/b9-Wooden Shield---(02,+1)
+2b796/97-Masamune-------(45,45)........................2b7ba/bb-Iron Shield-----(04,+2)
+
+2b754/55-Battle Axe-----(18,05)........................2b7bc/bd-Silver Shield---(08,+4)
+2b762/63-Titans Axe-----(24,07)........................2b7be/bf-Flame Shield----(12,+4)
+2b76c/6d-Silver Axe-----(29,10)........................2b7c0/c1-Ice Shield------(12,+4)
+2b780/81-Sacred Axe-----(34,15)........................2b7c2/c3-Diamond Shield--(16,+8)
+
+2b748/49-Iron Fist------(09,06)........................2b7c4/c5-Aegis Shield----(16,+8)
+2b758/59-Burning Fist---(12,08)........................2b7c6/c7-Buckler---------(02,+2)
+2b75c/5d-Dragon Claw----(15,10)........................2b7c8/c9-Fey Mantle------(08,+8)
+2b764/65-Tiger Fangs----(18,12)........................2b7cc/cd-Bronze Helm-----(02,02)
+2b756/57-Kaiser Fist----(24,16)........................2b7ce/cf-Iron Helm-------(04,04)
+
+2b750/51-Heavy Mallet---(09,00)........................2b7d0/d1-Silver Helm-----(06,03)
+2b77a/7b-Beast Killer---(23,07)........................2b7d2/d3-Diamond Helm----(10,05)
+2b78e/8f-Mjolnir--------(29,15)........................2b7d6/d7-Ribbon----------(00,00)
+
+2b74a/4b-Battle Knife---(05,10)........................2b7ca/cb-Felt Hat--------(01,01)
+2b75a/5b-Baselard-------(07,10)........................2b7d4/d5-Plumed Hat------(2,+12)
+2b766/67-Silver Knife---(10,15)........................2b7d8/d9-Leather Glove---(01,00)
+2b774/75-Cleaver--------(16,15)........................2b7da/db-Bronze Glove----(02,02)
+2b78c/8d-Orichalcum-----(16,40)........................2b7dc/dd-Iron Glove------(04,03)
+
+2b74c/4d-Cypress Cane---(04,00)........................2b7de/df-Silver Glove----(06,02)
+2b782/83-Healing Staff--(06,00)........................2b7e2/e3-Power Glove-----(06,02)
+2b784/85-Mages Wand-----(12,10)........................2b7e4/e5-Diamond Glove---(10,04)
+2b76a/6b-Silver Staff---(15,05)........................2b7e0/e1-Magical Ring----(01,00)
+2b788/89-Wizards Wand---(15,15)........................2b7e6/e7-Angels Ring-----(08,00)
+
+
+
+******************************************************---X11---**********************************************************
+*************************************************************************************************************************
+
+______________________________________________________-Prices-___________________________________________________________
+_________________________________________________________________________________________________________________________
+
+
+
+..........Set the Hex Editor to 16 wide
+
+..........Prices consist of 2 bytes. The first byte is low (0-255), and the second is high (256 for every 1). 
+..........If your price is (01 00), than it will be $1. If your price is (00 01), than it will be $256.
+
+..........You can set the Price with Hackster, but here is an alternative if neccesary.
+
+
+..........Here are the byte values for the common or optimal prices.
+
+
+
+0500-5.....0800-8.....0a00-10....0f00-15....1400-20....1900-25....1e00-30....2800-40....3200-50....3c00-60....4600-70
+
+4b00-75....5000-80....5a00-90....6400-100...7800-120...7d00-125...9600-150...a000-160...af00-175...b400-180...c800-200
+
+e100-225...f000-240...fa00-250...1301-275...1801-280...2c01-300...4001-320...4501-325...5e01-350...6801-360...7701-375
+
+9001-400...a901-425...c201-450...db01-475...f401-500...0d02-525...2602-550...3f02-575...5802-600...7102-625...8a02-650
+
+a302-675...bc02-700...d502-725...ee02-750...0703-775...2003-800...3903-825...5203-850...6b03-875...8403-900...b603-950
+
+------------------------------------------------------------------------------------------------------------------------
+
+e803-1000....1a04-1050....4c04-1100....7e04-1150....b004-1200....e204-1250....1405-1300....4605-1350....7805-1400
+
+aa05-1450....dc05-1500....0e06-1550....4006-1600....7206-1650....a406-1700....d606-1750....0807-1800....3a07-1850
+
+d007-2000....3408-2100....ca08-2250....6009-2400....c409-2500....8c0a-2700....be0a-2750....f00a-2800....220b-2850
+
+b80b-3000....800c-3200....b20c-3250....ac0d-3500....100e-3600....a60e-3750....a00f-4000....6810-4200....9a10-4250
+
+9411-4500....8e12-4750....c012-4800....8813-5000....5014-5200....1815-5400....7c15-5500....e015-5600....a816-5800
+
+7017-6000....9c18-6300....0019-6400....6419-6500....901a-6800....581b-7000....201c-7200....4c1d-7500....b01d-7600
+
+781e-7800....401f-8000....d020-8400....3421-8500....6022-8800....2823-9000....f023-9200....1c25-9500....8025-9600
+
+------------------------------------------------------------------------------------------------------------------------
+
+4826-9800....ac26-9900....1027-10000...0429-10500...302a-10800...f82a-11000...ec2c-11500...e02e-12000...d430-12500
+
+c832-13000...bc34-13500...b036-14000...a438-14500...983a-15000...8c3c-15500...803e-16000...7440-16500...6842-17000
+
+5c44-17500...5046-18000...4448-18500...204e-20000...0852-21000...e457-22500...c05d-24000...a861-25000...7869-27000
+
+6c6b-27500...606d-28000...3075-30000...007d-32000...f47e-32500...b888-35000...a08c-36000...7c92-37500...409c-40000
+
+10a4-42000...04a6-42500...c8af-45000...8cb9-47500...80bb-48000...50c3-50000...20cb-52000...f0d2-54000...d8d6-55000
+
+c0da-56000...90e2-58000...60ea-60000...18f6-63000...00fa-64000...e8fd-65000...ffff-65535
+
+
+
+...............Weapons..................................................Armor
+
+
+37c4e/4f-Short Sword----(09,05)........................37c9a/9b-Leather Armor---(04,08)
+37c52/53-Broad Sword----(15,10)........................37c9c/9d-Chain Armor-----(12,10)
+37c60/61-Claymore-------(20,10)........................37c9e/9f-Iron Armor------(20,24)
+37c8a/8b-Vorpal Blade---(22,20)........................37ca2/a3-Silver Armor----(20,10)
+37c68/69-Silver Sword---(24,15)........................37ca4/a5-Flame Armor-----(32,20)
+37c90/91-Razor Edge-----(24,25)........................37ca6/a7-Ice Armor-------(32,20)
+37c6e/6f-Flametongue----(26,20)........................37ca8/a9-Diamond Armor---(40,24)
+37c70/71-Icebrand-------(29,19)........................37caa/ab-Dragon Armor----(40,20)
+37c86/87-Defender-------(30,35)........................37ca0/a1-Maximilian------(88,32)
+37c76/77-Gaia Blade-----(32,30)........................37c98/99-Linen Tunic-----(02,02)
+37c94/95-Excalibur------(45,35)........................37cb4/b5-White Robe------(28,04)
+37c7e/7f-SaveTheQueen---(47,47)........................37cb6/b7-Black Robe------(28,04)
+
+37c5e/5f-Cutlass--------(15,05)........................37cac/ad-Bronze Band-----(06,01)
+37c78/79-Coral Sword----(18,15)........................37cae/af-Silver Band-----(16,01)
+37c7c/7d-Rune Blade-----(18,15)........................37cb0/b1-Ruby Band-------(24,01)
+37c72/73-Dragonslayer---(19,15)........................37cb2/b3-Pearl Band------(32,01)
+37c92/93-Katana---------(28,35)........................37cb8/b9-Wooden Shield---(02,+1)
+37c96/97-Masamune-------(45,45)........................37cba/bb-Iron Shield-----(04,+2)
+
+37c54/55-Battle Axe-----(18,05)........................37cbc/bd-Silver Shield---(08,+4)
+37c62/63-Titans Axe-----(24,07)........................37cbe/bf-Flame Shield----(12,+4)
+37c6c/6d-Silver Axe-----(29,10)........................37cc0/c1-Ice Shield------(12,+4)
+37c80/81-Sacred Axe-----(34,15)........................37cc2/c3-Diamond Shield--(16,+8)
+
+37c48/49-Iron Fist------(09,06)........................37cc4/c5-Aegis Shield----(16,+8)
+37c58/59-Burning Fist---(12,08)........................37cc6/c7-Buckler---------(02,+2)
+37c5c/5d-Dragon Claw----(15,10)........................37cc8/c9-Fey Mantle------(08,+8)
+37c64/65-Tiger Fangs----(18,12)........................37ccc/cd-Bronze Helm-----(02,02)
+37c56/57-Kaiser Fist----(24,16)........................37cce/cf-Iron Helm-------(04,04)
+
+37c50/51-Heavy Mallet---(09,00)........................37cd0/d1-Silver Helm-----(06,03)
+37c7a/7b-Beast Killer---(23,07)........................37cd2/d3-Diamond Helm----(10,05)
+37c8e/8f-Mjolnir--------(29,15)........................37cd6/d7-Ribbon----------(00,00)
+
+37c4a/4b-Battle Knife---(05,10)........................37cca/cb-Felt Hat--------(01,01)
+37c5a/5b-Baselard-------(07,10)........................37cd4/d5-Plumed Hat------(2,+12)
+37c66/67-Silver Knife---(10,15)........................37cd8/d9-Leather Glove---(01,00)
+37c74/75-Cleaver--------(16,15)........................37cda/db-Bronze Glove----(02,02)
+37c8c/8d-Orichalcum-----(16,40)........................37cdc/dd-Iron Glove------(04,03)
+
+37c4c/4d-Cypress Cane---(04,00)........................37cde/df-Silver Glove----(06,02)
+37c82/83-Healing Staff--(06,00)........................37ce2/e3-Power Glove-----(06,02)
+37c84/85-Mages Wand-----(12,10)........................37ce4/e5-Diamond Glove---(10,04)
+37c6a/6b-Silver Staff---(15,05)........................37ce0/e1-Magical Ring----(01,00)
+37c88/89-Wizards Wand---(15,15)........................37ce6/e7-Angels Ring-----(08,00)
+
+
+
+
+
+
+
+
+
+
+

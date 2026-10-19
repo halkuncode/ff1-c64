@@ -1,0 +1,50 @@
+;;; BANK 12
+;;; PART 1
+
+ba92: 20 f4 b8     JSR $b8f4   ; Set effective
+
+ba95: ad 89 6c     LDA $6c89   ; enemy-caster slot number
+ba98: 20 be b4     JSR $b4be   ; Set pointers for slot A: p[$92]=in-ROM, p[$90]=in-RAM
+
+;; w[0] = 168 + caster hit % - target evade
+ba9b: a0 12        LDY #$12    ; X = caster hit %
+ba9d: b1 90        LDA ($90),Y
+ba9f: aa           TAX
+baa0: a9 a8        LDA #$a8    ; w[0] = 168
+baa2: 8d 56 68     STA $6856
+baa5: a9 00        LDA #$00
+baa7: 8d 57 68     STA $6857
+baaa: 20 dd ae     JSR $aedd   ; w[A] = clamp(w[A] + X)
+baad: ae 85 68     LDX $6885   ; target evade
+bab0: 20 0a af     JSR $af0a   ; w[A] = clamp(w[A] - X)
+bab3: 20 d7 b8     JSR $b8d7   ; Do the roll against w[0], CS -> miss
+bab6: 90 05        BCC +$05  [$babd]
+bab8: a9 40        LDA #$40    ; "Missed!"
+baba: 4c 0d aa     JMP $aa0d   ; Display message indicated in A
+
+babd: a0 0b        LDY #$0b    ; caster damage
+babf: b1 90        LDA ($90),Y
+bac1: aa           TAX
+bac2: 20 6b b6     JSR $b66b   ; w[1] = A
+bac5: a9 00        LDA #$00
+bac7: 20 5d ae     JSR $ae5d   ; A = RND (A .. X)
+baca: aa           TAX
+bacb: a9 01        LDA #$01
+bacd: 20 dd ae     JSR $aedd   ; w[A] = clamp(w[A] + X)
+bad0: ae 7f 68     LDX $687f   ; target absorb
+bad3: 20 0a af     JSR $af0a   ; w[A] = clamp(w[A] - X)
+bad6: 20 3c af     JSR $af3c   ; w[A]<=0 (sets flags NZ)
+bad9: d0 03        BNE +$03  [$bade]
+badb: ee 58 68     INC $6858   ; min 1 damage
+bade: 4c 59 b9     JMP $b959   ; Apply damage
+
+; Cheat, since the only offset we care about in the magic struct is +4 (effect)
+;;; PART 2a
+851c: 26
+
+;;; PART 2b
+b853: 92 ba
+
+;;; PART 2c
+; Requires enemy-waking-bug.ips
+b228: a9 67        LDA #$67

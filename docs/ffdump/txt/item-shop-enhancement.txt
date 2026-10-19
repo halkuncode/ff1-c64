@@ -1,0 +1,176 @@
+;;; BANK 14
+
+;;; PART 1a
+80a0: a2 26 05 51 b1 be b7 05 51 b5 b5 bc 05 1c 39 05 b0 22 bc 00  ; You can't carry that many
+
+;;; PART 1b
+80ff: 10 00 01 11 00 01 12 00 01 13 00 00  ; <W1 name>\\<W2 name>\\<W3 name>\\<W4 name>
+
+;;; PART 1c
+8248: 8b b8 bc 01 8b b8 bc ff 81 80 01 8e bb 5b 00        ; Buy\\Buy 10\\Exit
+
+;;; PART 1c
+; Do "select warrior" menu: which in $62, A/B flag in C
+a8e4: a9 03        LDA #$03
+a8e6: 20 3b aa     JSR $aa3b   ; Draw shop window (in A)
+a8e9: a9 12        LDA #$12
+a8eb: 20 26 aa     JSR $aa26   ; Draw shop text
+a8ee: a9 04        LDA #$04
+a8f0: 85 63        STA $63
+a8f2: 4c 07 a9     JMP $a907   ; Do shop main menu: # items in $63; C clear/set indicates A/B, $62 is menu item selected
+
+; Do "BUY/BUY 10/EXIT" menu: which in $62, A/B flag in C
+a8f5: a9 03        LDA #$03
+a8f7: 20 3b aa     JSR $aa3b   ; Draw shop window (in A)
+a8fa: a9 1f        LDA #$1f
+a8fc: 20 26 aa     JSR $aa26   ; Draw shop text
+a8ff: a9 03        LDA #$03
+a901: 85 63        STA $63
+a903: 4c 07 a9     JMP $a907   ; Do shop main menu: # items in $63; C clear/set indicates A/B, $62 is menu item selected
+
+a906: ea           NOP
+
+;;; PART 2a
+a32c: 71 a4        .DW $a471  ; item
+a32e: 71 a4        .DW $a471  ; caravan
+
+;;; PART 2b
+a45a: 20 66 a4     JSR $a466   ; Copy $030d-f into $10-12
+a45d: 20 ea dd     JSR $ddea   ; Add 3-byte word in $10-12 into gold
+a460: 20 ef a7     JSR $a7ef   ; Draw gold
+a463: 4c b9 a3     JMP $a3b9   ; go BUY/SELL/EXIT
+
+; Copy $030d-f into $10-12
+a466: a2 02        LDX #$02
+a468: bd 0d 03     LDA $030d,X
+a46b: 95 10        STA $10,X
+a46d: ca           DEX
+a46e: 10 f8        BPL +$f8  [$a468]
+a470: 60           RTS
+
+;; ITEM/CARAVAN handler
+a471: a9 09        LDA #$09
+a473: d0 02        BNE +$02  [$a477]
+a475: a9 25        LDA #$25
+a477: 20 5b aa     JSR $aa5b   ; Draw shopkeeper text in A
+a47a: a5 66        LDA $66     ; Test if ITEM or CARAVAN
+a47c: 4a           LSR
+a47d: 90 09        BCC +$09  [$a488]
+a47f: 20 b1 a8     JSR $a8b1   ; Do BUY/EXIT menu: which in $62, A/B flag in C
+a482: b0 ec        BCS +$ec  [$a470]  ; B = return
+a484: 06 62        ASL $62     ; (we can just <<=1 and use the same handler)
+a486: 90 05        BCC +$05  [$a48d]
+a488: 20 f5 a8     JSR $a8f5   ; Do BUY/BUY10/EXIT menu: which in $62, A/B flag in C
+a48b: b0 e3        BCS +$e3  [$a470]  ; B = return
+a48d: a5 62        LDA $62
+a48f: f0 05        BEQ +$05  [$a496]  ; BUY = set flag = 0
+a491: 4a           LSR
+a492: 90 dc        BCC +$dc  [$a470]  ; Exit = return
+a494: a9 09        LDA #$09
+a496: 85 6a        STA $6a     ; Store flag: 00 is x1, 09 is x10
+a498: a9 0d        LDA #$0d
+a49a: 20 5b aa     JSR $aa5b   ; Draw shopkeeper text in A ("What do you want?")
+a49d: 20 57 a8     JSR $a857   ; Draw wares menu and get selection: item in $62, A/B flag in C
+a4a0: b0 d8        BCS +$d8  [$a47a]  ; B = BUY/EXIT
+a4a2: 20 76 aa     JSR $aa76   ; Copy part number into $030c and price into $10-12 and $030d-f
+a4a5: a6 6a        LDX $6a     ; Check flag: 0 is x1, 1 is x10
+a4a7: f0 17        BEQ +$17  [$a4c0]
+a4a9: 86 13        STX $13
+a4ab: 18           CLC
+a4ac: a2 00        LDX #$00
+a4ae: a0 03        LDY #$03
+a4b0: bd 0d 03     LDA $030d,X
+a4b3: 75 10        ADC $10,X
+a4b5: 9d 0d 03     STA $030d,X
+a4b8: e8           INX
+a4b9: 88           DEY
+a4ba: d0 f4        BNE +$f4  [$a4b0]
+a4bc: c6 13        DEC $13
+a4be: d0 eb        BNE +$eb  [$a4ab]
+a4c0: 20 68 aa     JSR $aa68   ; Draw "X Gold OK?" for price in $030d-f
+a4c3: 20 c2 a8     JSR $a8c2   ; Do YES/NO menu: which in $62, A/B flag in C
+a4c6: b0 ad        BCS +$ad  [$a475]  ; B = "too bad, something else"
+a4c8: a5 62        LDA $62
+a4ca: d0 a9        BNE +$a9  [$a475]  ; NO = "too bad, something else"
+a4cc: 20 8c aa     JSR $aa8c   ; Gold >= $030d-f? C clear if so
+a4cf: 90 05        BCC +$05  [$a4d6]
+a4d1: a9 10        LDA #$10    ; Draw shopkeeper text "You can't afford that"
+a4d3: 4c 77 a4     JMP $a477   ; and BUY/EXIT
+a4d6: ae 0c 03     LDX $030c
+a4d9: bd 20 60     LDA $6020,X
+a4dc: 38           SEC
+a4dd: 65 6a        ADC $6a  
+a4df: c9 64        CMP #$64
+a4e1: 90 05        BCC +$05  [$a4e8]
+a4e3: a9 0c        LDA #$0c    ; Draw shopkeeper text "You can't carry anymore"
+a4e5: 4c 77 a4     JMP $a477   ; and BUY/EXIT
+a4e8: 9d 20 60     STA $6020,X
+a4eb: 20 f3 a4     JSR $a4f3   ; Gold -= $030d-f, draw it, load salables for warrior $62 and set C if any
+a4ee: a9 13        LDA #$13    ; Draw shopkeeper text "Thank you! What else?"
+a4f0: 4c 77 a4     JMP $a477   ; BUY/EXIT
+
+; Gold -= $030d-f and draw it
+a4f3: a2 00        LDX #$00
+a4f5: a0 03        LDY #$03
+a4f7: 38           SEC
+a4f8: bd 1c 60     LDA $601c,X
+a4fb: fd 0d 03     SBC $030d,X
+a4fe: 9d 1c 60     STA $601c,X
+a501: e8           INX
+a502: 88           DEY
+a503: d0 f3        BNE +$f3  [$a4f8]
+a505: 4c ef a7     JMP $a7ef   ; Draw gold
+
+;;; PART 3a
+; Draw "X Gold OK?", $030c = item number, $10-$12 = $030d-f = price
+aa65: 20 76 aa     JSR $aa76   ; Copy part number into $030c and price into $10-12 and $030d-f
+; Draw "X Gold OK?" for price in $030d-f
+aa68: a9 0e        LDA #$0e
+aa6a: 20 5b aa     JSR $aa5b   ; Draw shopkeeper text in A ("\\Gold\\OK?")
+aa6d: 20 66 a4     JSR $a466   ; Copy $030d-f into $10-12
+aa70: 20 8e 8e     JSR $8e8e   ; p[$3e] = 6-digit number in $10-12
+aa73: 4c 32 aa     JMP $aa32   ; Output string at p[$3e] to ($3a,$3b)
+
+; Copy part number into $030c and price into $10-12 and $030d-f
+aa76: a6 62        LDX $62
+aa78: bd 00 03     LDA $0300,X  ; Copy item number
+aa7b: 8d 0c 03     STA $030c
+aa7e: 20 b9 ec     JSR $ecb9   ; $10-12 = price of item in A
+aa81: a2 02        LDX #$02
+aa83: b5 10        LDA $10,X
+aa85: 9d 0d 03     STA $030d,X
+aa88: ca           DEX
+aa89: 10 f8        BPL +$f8  [$aa83]
+aa8b: 60           RTS
+
+; Gold >= $030d-f? C clear if so
+aa8c: a2 02        LDX #$02
+aa8e: bd 0d 03     LDA $030d,X
+aa91: dd 1c 60     CMP $601c,X
+aa94: d0 04        BNE +$04  [$aa9a]
+aa96: ca           DEX
+aa97: 10 f5        BPL +$f5  [$aa8e]
+aa99: 18           CLC
+aa9a: 60           RTS
+
+;;; PART 3b
+a390: 20 8c aa     JSR $aa8c   ; Gold >= $030d-f? C clear if so
+;;; PART 3b
+a3e0: 20 8c aa     JSR $aa8c   ; Gold >= $030d-f? C clear if so
+
+;;; PART 3c
+a39d: 20 f3 a4     JSR $a4f3   ; Gold -= $030d-f and draw it
+;;; PART 3c
+a404: 20 f3 a4     JSR $a4f3   ; Gold -= $030d-f and draw it
+
+;;; PART 4
+; Output "<sell price> Gold OK?", $030d-f = sell price
+; (partway through)
+aacb: 18           CLC
+aacc: a2 02        LDX #$02
+aace: b5 10        LDA $10,X
+aad0: 6a           ROR
+aad1: 95 10        STA $10,X
+aad3: 9d 0d 03     STA $030d,X
+aad6: ca           DEX
+aad7: 10 f5        BPL +$f5  [$aace]

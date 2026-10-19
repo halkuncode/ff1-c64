@@ -1,0 +1,151 @@
+;;; BANK 15
+;;; PART 1
+c8b3: 20 2e cf     JSR $cf2e   ; Decompress and load map ($48 and $49) and sprites, and do open animation
+c8b6: 20 00 fe     JSR $fe00   ; wait for V-blank
+c8b9: a9 02        LDA #$02    ; Upload sprites
+c8bb: 8d 14 40     STA $4014
+c8be: 20 80 cc     JSR $cc80
+c8c1: e6 f0        INC $f0
+c8c3: d0 02        BNE +$02  [$c8c7]
+c8c5: e6 f1        INC $f1
+c8c7: 20 81 c6     JSR $c681   ; Start music or play current notes, bank=13
+c8ca: a5 32        LDA $32
+c8cc: c9 01        CMP #$01
+c8ce: d0 03        BNE +$03  [$c8d3]
+c8d0: 20 01 d4     JSR $d401   ; Something to do with updating the palette map
+c8d3: a5 34        LDA $34     ;; Currently walking? Skip buttons and such
+c8d5: d0 34        BNE +$34  [$c90b]
+c8d7: a5 6c        LDA $6c
+c8d9: f0 03        BEQ +$03  [$c8de]
+c8db: 20 4e da     JSR $da4e   ; Do screen shaking (i.e. when getting an orb)?
+c8de: a5 50        LDA $50     ;; Entering a shop?
+c8e0: d0 32        BNE +$32  [$c914]
+
+c8e2: a5 44        LDA $44
+c8e4: 4a           LSR
+c8e5: 4a           LSR
+c8e6: 4a           LSR
+c8e7: 4a           LSR
+c8e8: 29 0e        AND #$0e
+c8ea: aa           TAX
+c8eb: bd f8 c8     LDA $c8f8,X
+c8ee: 85 10        STA $10
+c8f0: bd f9 c8     LDA $c8f9,X
+c8f3: 85 11        STA $11
+c8f5: 6c 10 00     JMP ($0010)
+
+c8f8: 08 c9        .DW $c908 ; 00 normal
+c8fa: 2e c9        .DW $c92e ; 20 battle
+c8fc: 01 d7        .DW $d701 ; 40 warp
+c8fe: 01 d7        .DW $d701 ; 60 ??
+c900: 51 c9        .DW $c951 ; 80 map-to-map teleport
+c902: 78 c9        .DW $c978 ; a0 map-to-map without warp-back
+c904: a1 c9        .DW $c9a1 ; c0 map-to-world teleport
+c906: 01 d7        .DW $d701 ; e0 ??
+
+c908: 20 c4 c9     JSR $c9c4
+c90b: 20 3c c4     JSR $c43c   ; Clear sprites
+c90e: 20 0f e4     JSR $e40f
+c911: 4c b6 c8     JMP $c8b6
+
+c914: 20 94 cb     JSR $cb94   ; p[$10]=map tile data for current position; $52 = (map tile data byte 0) & 0x1e
+c917: a9 00        LDA #$00
+c919: 85 0d        STA $0d
+c91b: a9 02        LDA #$02
+c91d: 20 46 d9     JSR $d946   ; Do palette cycle: A.1 selects palette (reg/room), A.0 selects direction (to/from black)
+c920: a9 0e        LDA #$0e
+c922: 20 03 fe     JSR $fe03  ; Show Bank in A in memory locations $8000-$bfff 
+c925: 20 30 a3     JSR $a330
+c928: 20 3a cf     JSR $cf3a   ; Cycle in to map palette
+c92b: 4c b6 c8     JMP $c8b6
+
+c92e: 20 94 cb     JSR $cb94   ;; BATTLE! ; p[$10]=map tile data for current position; $52 = (map tile data byte 0) & 0x1e
+c931: 20 cd d8     JSR $d8cd   ; Do battle entry flashing, then BG off and clear sprites
+c934: a9 00        LDA #$00
+c936: 85 44        STA $44
+c938: 8d 01 20     STA $2001
+c93b: 8d 15 40     STA $4015
+c93e: 20 00 e9     JSR $e900  ; Load battle $6a with BG $53
+c941: 20 00 f2     JSR $f200  ; Load battle data ($6a) and start battle
+c944: 90 e2        BCC +$e2  [$c928]
+c946: 20 9c e8     JSR $e89c  ; Upload ending background!
+c949: a9 0d        LDA #$0d
+c94b: 20 03 fe     JSR $fe03  ; Show Bank in A in memory locations $8000-$bfff 
+c94e: 4c 03 b8     JMP $b803  ; Do ending!
+
+c951: a5 29        LDA $29    ;; map to map teleport
+c953: 48           PHA
+c954: a5 2a        LDA $2a
+c956: 48           PHA
+c957: a5 0d        LDA $0d
+c959: 48           PHA
+c95a: a5 48        LDA $48
+c95c: 48           PHA
+c95d: a5 49        LDA $49
+c95f: 48           PHA
+c960: 20 01 d7     JSR $d701  ; Do close animation
+c963: 20 78 c9     JSR $c978  ; Load new map and stuff
+c966: 68           PLA         ; Restore the old map (WARP got us back here)
+c967: 85 49        STA $49
+c969: 68           PLA
+c96a: 85 48        STA $48
+c96c: 68           PLA
+c96d: 85 0d        STA $0d
+c96f: 68           PLA
+c970: 85 2a        STA $2a
+c972: 68           PLA
+c973: 85 29        STA $29
+c975: 4c b3 c8     JMP $c8b3   ; Load the old map and do the main map loop
+
+c978: a9 00        LDA #$00
+c97a: 20 03 fe     JSR $fe03  ; Show Bank in A in memory locations $8000-$bfff 
+c97d: a6 45        LDX $45
+c97f: bd 00 ad     LDA $ad00,X  ; load target
+c982: 38           SEC
+c983: e9 07        SBC #$07
+c985: 29 3f        AND #$3f
+c987: 85 29        STA $29
+c989: bd 40 ad     LDA $ad40,X
+c98c: 38           SEC
+c98d: e9 07        SBC #$07
+c98f: 29 3f        AND #$3f
+c991: 85 2a        STA $2a
+c993: bd 80 ad     LDA $ad80,X
+c996: 85 48        STA $48
+c998: aa           TAX
+c999: bd c0 ac     LDA $acc0,X
+c99c: 85 49        STA $49
+c99e: 4c b3 c8     JMP $c8b3   ; Load new map and do the main map loop
+
+c9a1: 20 01 d7     JSR $d701   ;; MAP->WORLD teleport ; Do close animation
+c9a4: a9 00        LDA #$00
+c9a6: 20 03 fe     JSR $fe03   ; Show Bank in A in memory locations $8000-$bfff 
+c9a9: a6 45        LDX $45     ; load new position
+c9ab: bd 60 ac     LDA $ac60,X
+c9ae: 38           SEC
+c9af: e9 07        SBC #$07
+c9b1: 85 27        STA $27
+c9b3: bd 70 ac     LDA $ac70,X
+c9b6: 38           SEC
+c9b7: e9 07        SBC #$07
+c9b9: 85 28        STA $28
+c9bb: 4c cb c0     JMP $c0cb   ; Load world map and do main loop
+
+c9be: ea           NOP
+c9bf: ea           NOP
+c9c0: ea           NOP
+c9c1: ea           NOP
+c9c2: ea           NOP
+c9c3: ea           NOP
+;c9c4
+
+;;; BANK 0
+;;; PART 2a
+; Use it for the ice cave
+8b5a: a0 12 a0 15
+
+;;; PART 2b
+; Use it for the CoO too
+8998: a0 1a a0 1b a0 1c a0 1d
+89a0: a0 1e a0 1f a0 3a a0 3b a0 3c a0 3d
+8b5a: a0 12 a0 15
