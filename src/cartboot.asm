@@ -44,17 +44,20 @@ EASYFLASH_LED     = $80
     lda #(EASYFLASH_16K | EASYFLASH_LED)
     sta EASYFLASH_CTRL
 
-    ; 2. Switch to Bank $0F (where bank0F is stored)
+    ; 2. Switch to Bank $0F (where game kernel is stored)
     lda #$0F
     sta EASYFLASH_BANK
 
-    ; 3. Source: $8000 (Start of Bank $0F in 16K mode)
+    ; 3. Source: $8000 (Start of kernel in 16K mode)
     lda #<$8000
     sta ptr1
     lda #>$8000
     sta ptr1+1
 
     ; Destination: $1000 (RAM)
+	; On the NES the kenel was at $C000-$FFFF
+	; On the C64, hardware stuff lives there,
+	; so we move the kernel to ram at $1000
     lda #<$1000
     sta ptr2
     lda #>$1000
