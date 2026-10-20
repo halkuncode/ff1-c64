@@ -13,9 +13,11 @@
 .export WaitForVBlank_L, WaitForVBlank
 .export SwapPRG_L, SwapPRG
 .export CoordToNTAddr, lut_ScreenRowLo, lut_ScreenRowHi
+.export DrawCursor, UpdateSprites
 
 .import EnterIntroStory, EnterTitleScreen
 .import lut_MenuCHR
+.import lut_FingerSprite
 
 
 ;;;;
@@ -125,7 +127,10 @@ halt_loop:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ClearOAM:
-    RTS
+    lda #$00
+    sta shadow_spr_en       ; Turn off all 8 sprite enables
+    sta sprindex            ; Reset allocation pointer to Slot 0
+    rts
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -954,6 +959,38 @@ LoadMenuBGCHRAndPalettes:
     RTS
 
 LoadBatSprCHRPalettes:
+    LDA #BANK_MENUCHR          ; Bank 9 (contains lut_FingerSprite)
+    JSR SwapPRG_L
+
+    ; Copy 128 bytes of Finger Sprite (Base + Overlay) from lut_FingerSprite to $5800
+    LDA #<lut_FingerSprite
+    STA tmp
+    LDA #>lut_FingerSprite
+    STA tmp+1
+
+    LDA #<$5800
+    STA chr_dest
+    LDA #>$5800
+    STA chr_dest+1
+
+    LDY #$00
+@CopySprite:
+    LDA (tmp), Y
+    STA (chr_dest), Y
+    INY
+    CPY #128
+    BNE @CopySprite
+
+    ; Set global Sprite Multicolor registers according to user specs:
+    ; Background is 00 (transparent / black $D021)
+    ; Multicolor 1 = 11 (Dark Grey, $0B)
+    ; Multicolor 2 = 15 (Light Grey, $0F)
+    LDA #COLOR_DARKGREY        ; 11 ($0B)
+    STA SPMC0                  ; $D025 = Sprite Multicolor 0
+    LDA #COLOR_LIGHTGREY       ; 15 ($0F)
+    STA SPMC1                  ; $D026 = Sprite Multicolor 1
+
+    ; Set Bank back to caller's bank (BANK_INTRO / BANK_TITLE = $0E)
     LDA #BANK_INTRO
     JSR SwapPRG_L
     RTS
@@ -1161,6 +1198,9 @@ OnIRQ:
     ; Increment frame counter
     inc vblank_count
 
+    ; Push sprites to VIC-II hardware during VBlank
+    jsr UpdateSprites
+
     ; Acknowledge VIC-II Raster IRQ
     lda #$01
     sta VICIRQ
@@ -1186,3 +1226,147 @@ ClearBGPalette:
     sta BGCOL2     ; Extra background color 2 = Black
     rts
 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  LUTs for Sprite Bitmasks
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_BitMask:
+    .byte $01, $02, $04, $08, $10, $20, $40, $80
+
+lut_BitMaskInv:
+    .byte $FE, $FD, $FB, $F7, $EF, $DF, $BF, $7F
+
+lut_PairMask:
+    .byte $03, $06, $0C, $18, $30, $60, $C0, $00
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Draw Cursor  [10516]
+;;
+;;    Draws the cursor at given X,Y coords (spr_x,spr_y)
+;;    Allocates 2 paired sprite slots:
+;;      Slot X   : Multicolor Base (hand shape)
+;;      Slot X+1 : Hi-Res Overlay (white cuff & highlights)
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawCursor:
+    ldx sprindex
+    cpx #$07                ; Ensure at least 2 slots (X and X+1 <= 7)
+    bcs @Exit
+
+    ; 1. Set coordinates for both Base and Overlay
+    lda spr_x
+    sta shadow_spr_x, x
+    sta shadow_spr_x+1, x
+
+    lda spr_y
+    sta shadow_spr_y, x
+    sta shadow_spr_y+1, x
+
+    ; Clear MSB for both slots (assuming X < 256 for menu cursor)
+    lda lut_BitMaskInv, x
+    and shadow_spr_msb
+    sta shadow_spr_msb
+    inx
+    lda lut_BitMaskInv, x
+    and shadow_spr_msb
+    sta shadow_spr_msb
+    dex
+
+    ; 2. Set Sprite Pointers (Slot X is in front = Overlay, Slot X+1 is behind = Base)
+    lda #BLOCK_FINGER_OVERLAY    ; Block 97 ($61 -> $5840)
+    sta shadow_spr_ptr, x
+    lda #BLOCK_FINGER_BASE       ; Block 96 ($60 -> $5800)
+    sta shadow_spr_ptr+1, x
+
+    ; 3. Set Colors (Custom color White for both as specified)
+    lda #COLOR_WHITE             ; Custom color 1 for Overlay (in front)
+    sta shadow_spr_col, x
+    lda #COLOR_WHITE             ; Custom color 1 for Base (behind)
+    sta shadow_spr_col+1, x
+
+    ; 4. Set Modes: Slot X = Hi-Res Overlay, Slot X+1 = Multicolor Base
+    lda lut_BitMaskInv, x
+    and shadow_spr_mcm
+    sta shadow_spr_mcm           ; Disable multicolor (Hi-Res) on Overlay (Slot X)
+
+    inx
+    lda lut_BitMask, x
+    ora shadow_spr_mcm
+    sta shadow_spr_mcm           ; Enable multicolor on Base (Slot X+1)
+
+    ; 5. Enable both slots
+    dex
+    lda lut_PairMask, x
+    ora shadow_spr_en
+    sta shadow_spr_en
+
+    ; 6. Advance sprindex by 2 for next entity
+    inx
+    inx
+    stx sprindex
+
+@Exit:
+    rts
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Update Sprites  (VIC-II Flush)
+;;
+;;    Flushes the shadow sprite registers to the VIC-II hardware
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+UpdateSprites:
+    ; 1. Copy coordinates to $D000-$D00F
+    ldx #$00
+    ldy #$00
+@CoordLoop:
+    lda shadow_spr_x, x
+    sta SP0X, y
+    lda shadow_spr_y, x
+    sta SP0Y, y
+    iny
+    iny
+    inx
+    cpx #$08
+    bne @CoordLoop
+
+    ; 2. MSB of X coordinates ($D010)
+    lda shadow_spr_msb
+    sta MSIGX
+
+    ; 3. Sprite Pointers (Screen at $4000 -> pointers at $43F8-$43FF)
+    ; And Individual Colors ($D027-$D02E)
+    ldx #$07
+@AttrLoop:
+    lda shadow_spr_ptr, x
+    sta $43F8, x
+    lda shadow_spr_col, x
+    sta SP0COL, x
+    dex
+    bpl @AttrLoop
+
+    ; 4. Modes & Enables
+    lda shadow_spr_mcm
+    sta SPMC                     ; $D01C
+
+    lda shadow_spr_en
+    sta SPENA                    ; $D015
+
+    ; 5. Priorities and Expansion (Ensure normal size in front of BG)
+    lda #$00
+    sta SPBGPR                   ; $D01B (0 = in front of BG)
+    sta XEXP                     ; $D01D (no X stretch)
+    sta YEXP                     ; $D017 (no Y stretch)
+
+    rts

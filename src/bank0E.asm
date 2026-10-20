@@ -6,7 +6,7 @@
 
 .export EnterIntroStory, EnterTitleScreen
 .import LoadMenuCHRPal, DrawComplexString, WaitForVBlank_L, UpdateJoy_L, DrawBox
-.import GameStart_L, CallMusicPlay_L, ClearOAM, DrawPalette_L
+.import GameStart_L, CallMusicPlay_L, ClearOAM, DrawPalette_L, DrawCursor
 .import lut_ScreenRowLo, lut_ScreenRowHi
 .import lut_IntroStoryText
 
@@ -199,7 +199,7 @@ ClearNT:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Enter Intro Story  [$A103 :: 0x3A113]  [3393]
+;;  Enter Intro Story  [3393]
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -303,7 +303,19 @@ EnterTitleScreen:
     STA text_ptr+1
     JSR DrawComplexString
 
-    RTS
+  ;; This is the main logic loop for the Title screen.
+  @Loop:
+    JSR ClearOAM            ; Clear shadow sprite buffer
+
+    LDX cursor              ; Draw the cursor sprite using a fixed X coord of 120
+    LDA #120                ;  and using the current cursor position to get the Y coord
+    STA spr_x               ;  from a LUT
+    LDA lut_TitleCursor_Y, X
+    STA spr_y
+    JSR DrawCursor          ; Draw Finger Cursor (Base + Overlay)
+
+    JSR WaitForVBlank_L     ; Wait for VBlank (UpdateSprites flushes during Raster IRQ)
+    JMP @Loop               ; Hold on loop to display cursor!
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -356,8 +368,8 @@ lut_TitleText_RespondRate:
 ;;  Small LUT for the Y position of the title screen cursor  [$A272 :: 0x3A282]
 
 lut_TitleCursor_Y:
-  .BYTE $58   ; to point at "Continue"
-  .BYTE $80   ; to point at "New Game"
+  .BYTE 118   ; to point at "Continue" (Row 9)
+  .BYTE 158   ; to point at "New Game" (Row 14)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

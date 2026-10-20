@@ -246,6 +246,18 @@ oam_t           = oam+1
 oam_a           = oam+2
 oam_x           = oam+3
 
+; C64 VIC-II Shadow Sprite Registers
+shadow_spr_x    = $0200         ; 8 bytes: Low 8-bits of X (Sprites 0-7)
+shadow_spr_msb  = $0208         ; 1 byte:  Bit 8 of X (Sprites 0-7)
+shadow_spr_y    = $0209         ; 8 bytes: Y coordinates (Sprites 0-7)
+shadow_spr_ptr  = $0211         ; 8 bytes: Sprite Block Pointers (written to $43F8-$43FF)
+shadow_spr_col  = $0219         ; 8 bytes: Sprite Individual Colors (written to $D027-$D02E)
+shadow_spr_mcm  = $0221         ; 1 byte:  Multicolor mask ($D01C)
+shadow_spr_en   = $0222         ; 1 byte:  Enable mask ($D015)
+shadow_spr_pri  = $0223         ; 1 byte:  Priority mask ($D01B)
+shadow_spr_xexp = $0224         ; 1 byte:  X expand mask ($D01D)
+shadow_spr_yexp = $0225         ; 1 byte:  Y expand mask ($D017)
+
 puzzle          = $0300  ; shared
 str_buf         = $0300  ; $39 bytes at least -- buffer must not cross page
 item_box        = $0300  ; $20? bytes -- shares space with str_buf

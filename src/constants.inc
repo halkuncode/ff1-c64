@@ -495,3 +495,11 @@ lut_InitUnsramFirstPage = $B000 ; BANK_STARTUPINFO
 
 
 lut_ClassStartingStats  = $B040 ; BANK_STARTINGSTATS
+
+
+; ==============================================================================
+; Sprite Block Constants (VIC Bank 1: $4000-$7FFF, 64 bytes per block)
+; ==============================================================================
+SPRITE_BASE_ADDR        = $5800
+BLOCK_FINGER_BASE       = ($5800 - $4000) / 64   ; Block 96 ($60)
+BLOCK_FINGER_OVERLAY    = ($5840 - $4000) / 64   ; Block 97 ($61)
