@@ -31,25 +31,8 @@ lut_BattleCHR_Bank08:
 ; ;;  Backdrop  8 ($8000): Earth Cave
 ; ;;  Monsters (8120): Mummy - Coctric - Wyvern - Tyro
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-lut_Backdrop_08_Graphic:  ; 18 C64 MultiColor tiles (144 bytes) - Earth_Cave
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 00
-    .byte $C2, $82, $02, $82, $83, $83, $80, $83  ; Tile 01
-    .byte $A8, $6C, $B8, $F8, $F8, $38, $78, $38  ; Tile 02
-    .byte $C2, $82, $02, $82, $83, $83, $80, $83  ; Tile 03
-    .byte $A8, $6C, $B8, $F8, $F8, $38, $78, $38  ; Tile 04
-    .byte $82, $82, $82, $82, $C2, $C3, $C3, $C3  ; Tile 05
-    .byte $B8, $B8, $B8, $78, $B8, $78, $B8, $6C  ; Tile 06
-    .byte $82, $82, $82, $82, $C2, $C3, $C3, $C3  ; Tile 07
-    .byte $B8, $B8, $B8, $78, $B8, $78, $B8, $6C  ; Tile 08
-    .byte $C2, $82, $02, $82, $83, $83, $80, $83  ; Tile 09
-    .byte $A8, $6C, $B8, $F8, $F8, $38, $78, $38  ; Tile 10
-    .byte $C2, $82, $02, $82, $83, $83, $80, $83  ; Tile 11
-    .byte $A8, $6C, $B8, $F8, $F8, $38, $78, $38  ; Tile 12
-    .byte $F3, $F0, $00, $02, $A2, $A2, $AC, $BF  ; Tile 13
-    .byte $C0, $08, $A8, $A4, $98, $AC, $BC, $3C  ; Tile 14
-    .byte $33, $33, $33, $30, $01, $EA, $3A, $0F  ; Tile 15
-    .byte $72, $F2, $33, $33, $03, $87, $E8, $3C  ; Tile 16
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 17
+lut_Backdrop_08_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
+    .incbin "../res/backdrops/backdrop08.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_08_Graphic:  ; 110 tiles (1760 bytes) -> Mummy - Coctric - Wyvern - Tyro
@@ -169,25 +152,8 @@ lut_Monsters_08_Graphic:  ; 110 tiles (1760 bytes) -> Mummy - Coctric - Wyvern -
 ; ;;  Backdrop  9 ($8800): Castle
 ; ;;  Monsters (8920): Caribe - Gator - Ocho - Hydra
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-lut_Backdrop_09_Graphic:  ; 18 C64 MultiColor tiles (144 bytes) - Castle
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 00
-    .byte $3A, $1F, $15, $19, $39, $1F, $15, $1A  ; Tile 01
-    .byte $80, $CB, $AB, $BB, $B3, $C8, $4F, $8F  ; Tile 02
-    .byte $00, $55, $6A, $5F, $AB, $00, $65, $B9  ; Tile 03
-    .byte $00, $55, $6B, $6F, $AB, $00, $45, $BA  ; Tile 04
-    .byte $3A, $1F, $15, $19, $39, $1F, $15, $1A  ; Tile 05
-    .byte $83, $CB, $A8, $BB, $B3, $CB, $4F, $8C  ; Tile 06
-    .byte $BA, $FF, $00, $42, $C0, $80, $C0, $00  ; Tile 07
-    .byte $BA, $FF, $00, $B3, $BF, $EF, $FF, $00  ; Tile 08
-    .byte $3A, $1F, $15, $19, $39, $1F, $15, $1A  ; Tile 09
-    .byte $83, $CB, $AB, $BB, $B3, $CB, $4F, $8F  ; Tile 10
-    .byte $55, $A6, $F6, $BA, $00, $54, $9B, $AB  ; Tile 11
-    .byte $55, $BB, $FF, $BB, $00, $56, $AB, $AB  ; Tile 12
-    .byte $3A, $1F, $15, $19, $39, $0F, $A0, $FA  ; Tile 13
-    .byte $83, $C8, $AB, $BB, $BB, $F3, $08, $AF  ; Tile 14
-    .byte $FF, $00, $3B, $FB, $FE, $FF, $00, $FF  ; Tile 15
-    .byte $FF, $00, $36, $FF, $FB, $FF, $00, $FF  ; Tile 16
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 17
+lut_Backdrop_09_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
+    .incbin "../res/backdrops/backdrop09.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_09_Graphic:  ; 110 tiles (1760 bytes) -> Caribe - Gator - Ocho - Hydra
@@ -307,25 +273,8 @@ lut_Monsters_09_Graphic:  ; 110 tiles (1760 bytes) -> Caribe - Gator - Ocho - Hy
 ; ;;  Backdrop 10 ($9000): River
 ; ;;  Monsters (9120): Sentry - Water - Naga - Chimera
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-lut_Backdrop_10_Graphic:  ; 18 C64 MultiColor tiles (144 bytes) - River
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 00
-    .byte $55, $55, $55, $55, $55, $55, $55, $55  ; Tile 01
-    .byte $55, $55, $55, $55, $55, $55, $55, $55  ; Tile 02
-    .byte $55, $55, $55, $55, $55, $55, $55, $55  ; Tile 03
-    .byte $55, $55, $55, $55, $55, $55, $55, $55  ; Tile 04
-    .byte $55, $10, $A8, $A2, $08, $22, $0A, $CC  ; Tile 05
-    .byte $55, $54, $00, $A8, $82, $20, $88, $2F  ; Tile 06
-    .byte $55, $54, $02, $00, $8A, $02, $AA, $3C  ; Tile 07
-    .byte $55, $10, $A8, $A2, $08, $22, $0A, $CC  ; Tile 08
-    .byte $55, $69, $55, $55, $A5, $55, $5A, $55  ; Tile 09
-    .byte $55, $59, $55, $A5, $56, $55, $55, $59  ; Tile 10
-    .byte $55, $56, $55, $55, $55, $56, $55, $55  ; Tile 11
-    .byte $55, $55, $69, $55, $55, $99, $55, $55  ; Tile 12
-    .byte $56, $50, $40, $29, $2A, $28, $AA, $AA  ; Tile 13
-    .byte $55, $65, $54, $6A, $0A, $82, $00, $22  ; Tile 14
-    .byte $99, $04, $06, $62, $AA, $AA, $A8, $88  ; Tile 15
-    .byte $55, $14, $40, $A8, $A2, $20, $88, $2F  ; Tile 16
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 17
+lut_Backdrop_10_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
+    .incbin "../res/backdrops/backdrop10.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_10_Graphic:  ; 110 tiles (1760 bytes) -> Sentry - Water - Naga - Chimera
@@ -445,25 +394,8 @@ lut_Monsters_10_Graphic:  ; 110 tiles (1760 bytes) -> Sentry - Water - Naga - Ch
 ; ;;  Backdrop 11 ($9800): Tower
 ; ;;  Monsters (9920): Wizard - Garland - Dragon 2 - Golem
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-lut_Backdrop_11_Graphic:  ; 18 C64 MultiColor tiles (144 bytes) - Tower
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 00
-    .byte $00, $5A, $00, $74, $5E, $00, $5A, $00  ; Tile 01
-    .byte $03, $FC, $00, $B0, $8C, $00, $FC, $03  ; Tile 02
-    .byte $AA, $FF, $CF, $FF, $C3, $FF, $C3, $FF  ; Tile 03
-    .byte $A8, $FC, $00, $F0, $C0, $F0, $C0, $FC  ; Tile 04
-    .byte $26, $24, $36, $26, $3E, $2E, $3E, $26  ; Tile 05
-    .byte $BF, $0F, $B3, $8F, $BF, $0F, $3F, $B3  ; Tile 06
-    .byte $FF, $F0, $F0, $CF, $FF, $C0, $FC, $F0  ; Tile 07
-    .byte $00, $F0, $0C, $C0, $FC, $00, $C0, $00  ; Tile 08
-    .byte $00, $5A, $00, $74, $5E, $00, $5A, $00  ; Tile 09
-    .byte $03, $FC, $00, $B0, $8C, $00, $FC, $03  ; Tile 10
-    .byte $FF, $F0, $F0, $CF, $FF, $C0, $FC, $F0  ; Tile 11
-    .byte $00, $F0, $0C, $C0, $FC, $00, $C0, $00  ; Tile 12
-    .byte $26, $24, $36, $26, $3E, $2E, $3E, $26  ; Tile 13
-    .byte $BF, $0F, $B3, $8F, $BF, $0F, $3F, $B3  ; Tile 14
-    .byte $FF, $F0, $F0, $CF, $FF, $C0, $FC, $F0  ; Tile 15
-    .byte $00, $F0, $0C, $C0, $FC, $00, $C0, $00  ; Tile 16
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 17
+lut_Backdrop_11_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
+    .incbin "../res/backdrops/backdrop11.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_11_Graphic:  ; 110 tiles (1760 bytes) -> Wizard - Garland - Dragon 2 - Golem
@@ -583,25 +515,8 @@ lut_Monsters_11_Graphic:  ; 110 tiles (1760 bytes) -> Wizard - Garland - Dragon 
 ; ;;  Backdrop 12 ($A000): Sea Shrine
 ; ;;  Monsters (A120): Badman - Astos - Madpony - Warmech
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-lut_Backdrop_12_Graphic:  ; 18 C64 MultiColor tiles (144 bytes) - Sea_Shrine
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 00
-    .byte $54, $F3, $15, $25, $03, $FF, $15, $00  ; Tile 01
-    .byte $AA, $FF, $88, $28, $FC, $FC, $A8, $00  ; Tile 02
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 03
-    .byte $00, $FF, $3C, $B0, $00, $F0, $AC, $AC  ; Tile 04
-    .byte $39, $39, $3D, $09, $30, $0C, $31, $09  ; Tile 05
-    .byte $FC, $E8, $E8, $EC, $F8, $E8, $E8, $E8  ; Tile 06
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 07
-    .byte $B0, $2C, $2C, $AC, $BC, $AC, $8C, $2C  ; Tile 08
-    .byte $39, $39, $3D, $39, $3B, $39, $01, $39  ; Tile 09
-    .byte $E8, $E8, $E8, $E8, $08, $E0, $E8, $E8  ; Tile 10
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 11
-    .byte $B0, $2C, $2C, $AC, $BC, $00, $BC, $00  ; Tile 12
-    .byte $39, $39, $3D, $39, $3B, $39, $01, $39  ; Tile 13
-    .byte $EC, $B0, $00, $C0, $30, $40, $C0, $EC  ; Tile 14
-    .byte $00, $00, $80, $B0, $00, $0C, $80, $00  ; Tile 15
-    .byte $00, $00, $0F, $3C, $33, $01, $01, $39  ; Tile 16
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 17
+lut_Backdrop_12_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
+    .incbin "../res/backdrops/backdrop12.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_12_Graphic:  ; 110 tiles (1760 bytes) -> Badman - Astos - Madpony - Warmech
@@ -721,25 +636,8 @@ lut_Monsters_12_Graphic:  ; 110 tiles (1760 bytes) -> Badman - Astos - Madpony -
 ; ;;  Backdrop 13 ($A800): Ice Cave
 ; ;;  Monsters (A920): Kary -- Lich
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-lut_Backdrop_13_Graphic:  ; 18 C64 MultiColor tiles (144 bytes) - Ice_Cave
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 00
-    .byte $B9, $89, $88, $DA, $DA, $2A, $2A, $2A  ; Tile 01
-    .byte $C4, $E4, $E2, $A2, $E2, $E1, $22, $2E  ; Tile 02
-    .byte $B9, $89, $88, $DA, $DA, $2A, $2A, $2A  ; Tile 03
-    .byte $C4, $E4, $E2, $A2, $E2, $E1, $22, $2E  ; Tile 04
-    .byte $2F, $3F, $30, $F2, $32, $3E, $7E, $7A  ; Tile 05
-    .byte $2E, $2C, $2D, $2D, $2D, $2C, $2E, $1C  ; Tile 06
-    .byte $2F, $3F, $30, $F2, $32, $3E, $7E, $7A  ; Tile 07
-    .byte $2E, $2C, $2D, $2D, $2D, $2C, $2E, $1C  ; Tile 08
-    .byte $42, $84, $B4, $B4, $BC, $BC, $CC, $0C  ; Tile 09
-    .byte $1E, $1E, $1E, $4E, $8C, $8C, $8C, $80  ; Tile 10
-    .byte $42, $84, $B4, $B4, $BC, $BC, $CC, $0C  ; Tile 11
-    .byte $1E, $1E, $1E, $4E, $8C, $8C, $8C, $80  ; Tile 12
-    .byte $8C, $80, $80, $CB, $C4, $04, $C7, $A3  ; Tile 13
-    .byte $80, $88, $88, $8C, $C0, $C8, $C8, $CC  ; Tile 14
-    .byte $00, $80, $07, $2B, $68, $33, $0F, $C0  ; Tile 15
-    .byte $CC, $0C, $0C, $B0, $00, $2C, $3C, $00  ; Tile 16
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 17
+lut_Backdrop_13_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
+    .incbin "../res/backdrops/backdrop13.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_13_Graphic:  ; 110 tiles (1760 bytes) -> Kary -- Lich
@@ -859,25 +757,8 @@ lut_Monsters_13_Graphic:  ; 110 tiles (1760 bytes) -> Kary -- Lich
 ; ;;  Backdrop 14 ($B000): Volcano
 ; ;;  Monsters (B120): Kraken -- Tiamat
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-lut_Backdrop_14_Graphic:  ; 18 C64 MultiColor tiles (144 bytes) - Volcano
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 00
-    .byte $C0, $78, $3F, $6F, $2B, $1A, $00, $C0  ; Tile 01
-    .byte $02, $03, $FB, $0B, $CC, $0C, $3C, $AC  ; Tile 02
-    .byte $38, $0C, $F8, $3C, $F8, $F0, $F3, $F0  ; Tile 03
-    .byte $FC, $38, $FC, $38, $FC, $F8, $F0, $E3  ; Tile 04
-    .byte $83, $8C, $C2, $8B, $8E, $38, $20, $F3  ; Tile 05
-    .byte $F3, $E3, $A2, $8F, $03, $3E, $FA, $3E  ; Tile 06
-    .byte $83, $8C, $C2, $8B, $8E, $38, $20, $F3  ; Tile 07
-    .byte $F3, $E3, $A2, $8F, $03, $3E, $FA, $3E  ; Tile 08
-    .byte $20, $F3, $20, $F3, $E8, $F8, $E0, $EF  ; Tile 09
-    .byte $F8, $FC, $E8, $B8, $28, $F8, $E3, $F0  ; Tile 10
-    .byte $30, $E0, $E0, $00, $8C, $30, $08, $29  ; Tile 11
-    .byte $F8, $FC, $E8, $B8, $28, $F8, $E3, $F0  ; Tile 12
-    .byte $20, $C0, $BC, $C0, $8C, $0D, $0E, $31  ; Tile 13
-    .byte $F0, $08, $0C, $10, $1C, $28, $70, $B0  ; Tile 14
-    .byte $0D, $0B, $2B, $2F, $BF, $B0, $F3, $C0  ; Tile 15
-    .byte $F0, $08, $0C, $10, $1C, $28, $70, $B0  ; Tile 16
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 17
+lut_Backdrop_14_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
+    .incbin "../res/backdrops/backdrop14.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_14_Graphic:  ; 110 tiles (1760 bytes) -> Kraken -- Tiamat
@@ -997,25 +878,8 @@ lut_Monsters_14_Graphic:  ; 110 tiles (1760 bytes) -> Kraken -- Tiamat
 ; ;;  Backdrop 15 ($B800): Waterfall
 ; ;;  Monsters (B920):  ---- Chaos ----
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-lut_Backdrop_15_Graphic:  ; 18 C64 MultiColor tiles (144 bytes) - Waterfall
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 00
-    .byte $FA, $B2, $F2, $B2, $B2, $B3, $72, $F3  ; Tile 01
-    .byte $FD, $7F, $76, $77, $76, $F7, $76, $C7  ; Tile 02
-    .byte $31, $2C, $2D, $29, $ED, $2D, $21, $E1  ; Tile 03
-    .byte $6D, $7D, $6D, $7D, $63, $73, $F3, $D3  ; Tile 04
-    .byte $22, $23, $13, $1E, $D8, $98, $DF, $8A  ; Tile 05
-    .byte $DE, $1B, $DA, $FB, $2B, $2B, $9B, $A8  ; Tile 06
-    .byte $23, $23, $23, $23, $73, $23, $53, $93  ; Tile 07
-    .byte $73, $F3, $73, $F3, $F3, $F3, $F3, $F3  ; Tile 08
-    .byte $8F, $E7, $9D, $F9, $9A, $6B, $65, $76  ; Tile 09
-    .byte $55, $01, $70, $75, $F5, $7F, $DB, $DB  ; Tile 10
-    .byte $13, $31, $B7, $3D, $3F, $0F, $6B, $4F  ; Tile 11
-    .byte $D2, $F1, $F7, $F6, $F7, $F6, $C6, $C7  ; Tile 12
-    .byte $6E, $67, $77, $BA, $6F, $AA, $8B, $B0  ; Tile 13
-    .byte $DA, $DA, $FB, $FB, $FB, $3B, $BF, $30  ; Tile 14
-    .byte $CF, $C3, $CF, $C3, $C3, $C0, $CF, $80  ; Tile 15
-    .byte $C7, $CE, $CE, $CF, $CE, $0F, $C0, $03  ; Tile 16
-    .byte $00, $00, $00, $00, $00, $00, $00, $00  ; Tile 17
+lut_Backdrop_15_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
+    .incbin "../res/backdrops/backdrop15.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_15_Graphic:  ; 110 tiles (1760 bytes) ->  ---- Chaos ----

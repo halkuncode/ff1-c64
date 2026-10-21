@@ -32,9 +32,9 @@ TitleScreen_Copyright:
     LDA #COLOR_BLUE
     STA BGCOL0
 
-    ; Paint Screen RAM ($4000-$43E7) with text tile 127 (full block)
+    ; Paint Screen RAM ($4000-$43E7) with character $00 (solid block)
     LDX #$00
-    LDA #127                   ; tile 127 (full solid block)
+    LDA #$00                   ; character $00 (solid block)
 @LoopScreen:
     STA $4000, X
     STA $4100, X

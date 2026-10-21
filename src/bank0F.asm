@@ -1009,32 +1009,9 @@ LoadMenuCHR:
     LDA #BANK_MENUCHR             ; Bank 9
     JSR SwapPRG_L
 
-    ; 1. Copy 1024 bytes (tiles 0..127) to $4800-$4BFF
-    ; This puts tile 127 at character 127 ($7F) as the full solid block!
-    LDA #<lut_MenuCHR
-    STA tmp
-    LDA #>lut_MenuCHR
-    STA tmp+1
-
-    LDA #$00
-    STA chr_dest
-    LDA #$48
-    STA chr_dest+1
-
-    LDX #$04
-    LDY #$00
-@Loop1:
-    LDA (tmp), Y
-    STA (chr_dest), Y
-    INY
-    BNE @Loop1
-    INC tmp+1
-    INC chr_dest+1
-    DEX
-    BNE @Loop1
-
-    ; 2. Copy 1024 bytes (tiles 0..127) to $4C00-$4FFF
-    ; This puts the font (tiles 0..126) at characters $80..$FE!
+    ; Copy 1024 bytes (128 tiles) to $4C00-$4FFF (characters $80-$FF)
+    ; Characters $00-$7F ($4800-$4BFF) remain preserved for graphic tiles!
+    ; Tile 127 in lut_MenuCHR lands at character $FF as the full solid block.
     LDA #<lut_MenuCHR
     STA tmp
     LDA #>lut_MenuCHR
@@ -1047,23 +1024,24 @@ LoadMenuCHR:
 
     LDX #$04
     LDY #$00
-@Loop2:
+@Loop:
     LDA (tmp), Y
     STA (chr_dest), Y
     INY
-    BNE @Loop2
+    BNE @Loop
     INC tmp+1
     INC chr_dest+1
     DEX
-    BNE @Loop2
+    BNE @Loop
 
-    ; 3. Ensure Character $FF (at $4FF8-$4FFF) is a blank space (all zeros)
-    ; so that $FF in story text and ClearNT acts as transparent/empty space
-    LDY #7
+    ; 1. Ensure Character $FF (at $4FF8-$4FFF) is transparent (blank space, all zeros)
+    LDY #$07
     LDA #$00
 :   STA $4FF8, Y
     DEY
     BPL :-
+
+    ; Note: Character $00 is loaded from the battle backdrop CHR graphics ($4800-$4807)
 
     RTS
 
