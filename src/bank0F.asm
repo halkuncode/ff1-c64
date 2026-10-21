@@ -20,6 +20,7 @@
 .import lut_MenuCHR
 .import lut_FingerSprite
 .import lut_BattleFormations
+.import MusicPlay_L
 
 
 ;;;;
@@ -121,7 +122,8 @@ GameStart:
 
 	  
 halt_loop:
-    ; Core game loop logic will live here
+    jsr WaitForVBlank_L
+    jsr CallMusicPlay_L
     jmp halt_loop
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -164,7 +166,28 @@ DisableAPU:
 ;;
 ;;  CallMusicPlay  [1613]
 ;;
-CallMusicPlay:      rts 
+CallMusicPlay:
+    pha
+    txa
+    pha
+    tya
+    pha
+    lda cur_bank
+    pha
+
+    lda #BANK_MUSIC
+    jsr SwapPRG
+    jsr MusicPlay_L
+
+    pla
+    jsr SwapPRG
+
+    pla
+    tay
+    pla
+    tax
+    pla
+    rts 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -1172,6 +1195,7 @@ lut_DTE1:
 SwapPRG_L:       JMP SwapPRG
 
 SwapPRG:
+    sta cur_bank
     tax
     lda lut_EasyFlashBanks, x
     sta EASYFLASH_BANK
