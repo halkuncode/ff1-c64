@@ -8,6 +8,7 @@
 
 .export DrawComplexString_L, DrawBox_L, CallMusicPlay_L, UpdateJoy_L, DrawPalette_L
 .export DrawComplexString, DrawBox, CallMusicPlay, UpdateJoy, DrawPalette, LoadMenuCHRPal, ClearOAM
+.export LoadBorderPalette_Blue, LoadBorderPalette_Black
 .export LoadMenuCHR, LoadMenuBGCHRAndPalettes, LoadBattleBGCHRAndPalettes, LoadBatSprCHRPalettes
 .export GameStart, OnReset, OnNMI, OnIRQ
 .export WaitForVBlank_L, WaitForVBlank
@@ -18,6 +19,7 @@
 .import EnterIntroStory, EnterTitleScreen
 .import lut_MenuCHR
 .import lut_FingerSprite
+.import lut_BattleFormations
 
 
 ;;;;
@@ -61,6 +63,16 @@ GameStart:
 	LDX #$FF            ; reset stack pointer
     TXS
 
+    ; Check if cold boot or warm reset (Enter/Start pressed during intro)
+    LDA startintrocheck
+    CMP #$4D
+    BEQ @TitleScreen
+
+    ; Cold boot: initialize variables
+    LDA #0
+    STA btlformation
+    STA ow_tile
+
 	LDA #0              ; (pointless LDA)
 	JSR DisableAPU      ; Silence/disable all audio
 
@@ -94,19 +106,15 @@ GameStart:
 	LDA #$01                        ; start on foot
 	STA unsram_vehicle
 
-    ; For testing bank switching, unconditionally jump to intro story
-    LDA startintrocheck             ; check a random spot in memory.  This value is not inialized as powerup,
-    CMP #$4D                        ;    and will be semi-random.
-    BEQ :+                          ; if it is any value other than $4D, we can assume we just powered on...
-      LDA #$4D                      ; ... so initilize it to $4D.  From this point forward, it will always be initlialized.
-      STA startintrocheck           ; This is how the game makes the distinction between cold boot and warm reset
-      
-      LDA #BANK_INTRO               ; If we just came in from a cold boot...
-      JSR SwapPRG_L                 ; swap in the intro story bank
-      JSR EnterIntroStory           ; And do the intro story!
-      
-      
-  : LDA #BANK_TITLE                 ; Then swap in the title bank
+    LDA #$4D
+    STA startintrocheck             ; Mark as initialized so warm reset goes to title screen
+
+    LDA #BANK_INTRO                 ; Cold boot: do the intro story!
+    JSR SwapPRG_L
+    JSR EnterIntroStory
+
+@TitleScreen:
+    LDA #BANK_TITLE                 ; Then swap in the title bank
     JSR SwapPRG_L                   ; to do the title screen
     JSR EnterTitleScreen
 
@@ -776,17 +784,17 @@ LoadMenuCHRPal:                ; does not load 'lit orb' palette, or the two mid
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 CHRLoadToA:
-    ; Low byte of dest is always $00
+    ; Destination in C64 Character Memory ($4800-$4FFF)
+    ; PPU dest address high byte A divided by 2 gives C64 page offset from $4800
+    ; e.g. A = $06 (PPU $0600) -> C64 $4B00 (tile $60, 32 tiles)
+    pha
     lda #$00
     sta chr_dest
-    ; PPU $0000 maps to C64 $4800, $0100 -> $4900, etc.
-    ; Destination high byte = $48 + (A & $07)
-    txa
-    pha             ; preserve X
-    lda #$48
-    sta chr_dest+1
     pla
-    tax             ; restore X
+    lsr a
+    clc
+    adc #$48
+    sta chr_dest+1
 
     ; No JMP or RTS -- seamlessly runs into CHRLoad
 
@@ -887,7 +895,63 @@ LoadBattleBGCHRAndPalettes:
     ORA #$10                      ; Bit 4 = 1: MultiColor text mode
     STA SCROLX
 
-    ; Load font & menu window borders (chars $80-$FF)
+    ; Load monster graphics (enemy CHR)
+    LDA btlformation              ; get battle formation number
+    ASL A                         ; multiply it by 16
+    ASL A
+    ASL A
+    ASL A
+    STA tmp+4                     ; put low byte in tmp+4
+    LDA btlformation
+    AND #$7F                      ; drop the "Formation B" bit
+    LSR A
+    LSR A
+    LSR A
+    LSR A
+    CLC
+    ADC #>lut_BattleFormations    ; add to high byte of pointer
+    STA tmp+5                     ; (tmp+4) points to formation entry in Bank $0B
+
+    LDA #BANK_BTLDATA             ; swap to Bank $0B
+    JSR SwapPRG_L
+
+    LDY #0
+    LDA (tmp+4), Y                ; Enemy CHR page ID from formation data
+    AND #$0F
+    STA enCHRpage
+
+    JSR LoadBattleBGCHRPointers   ; swaps in BANK_BATTLECHR ($07 or $08), sets tmp to start of CHR
+    INC tmp+1                     ; increment high byte: monsters start at offset $0120 ($8120)
+
+    ; Copy 880 bytes (110 tiles * 8 bytes = $0370 bytes) of monster graphics to $4890-$4BFF
+    LDA #$20                      ; source starts at (tmp) + $20 -> $8120, $8920, etc.
+    STA tmp
+    LDA #$90                      ; dest starts at $4890 (tile $12)
+    STA chr_dest
+    LDA #$48
+    STA chr_dest+1
+
+    LDX #$03                      ; 3 full pages (768 bytes)
+    LDY #$00
+@MonsterPageLoop:
+    LDA (tmp), Y
+    STA (chr_dest), Y
+    INY
+    BNE @MonsterPageLoop
+    INC tmp+1
+    INC chr_dest+1
+    DEX
+    BNE @MonsterPageLoop
+
+    ; Remaining 112 bytes ($70) -> completes 880 bytes, reaching $4C00
+@MonsterRemLoop:
+    LDA (tmp), Y
+    STA (chr_dest), Y
+    INY
+    CPY #$70
+    BNE @MonsterRemLoop
+
+    ; Load font & menu window borders (chars $80-$FF, $4C00-$4FFF)
     JSR LoadMenuCHR
 
     RTS
@@ -955,7 +1019,29 @@ LoadBattleBGCHRPointers:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 LoadMenuBGCHRAndPalettes:
-    JSR LoadBattleBGCHRAndPalettes   ; Load Battle BG and palettes.
+    JSR LoadBattleBGCHRAndPalettes   ; Load Battle BG, monster CHR, font, etc.
+    LDA #BANK_ORBCHR                 ; Swap to Bank D (BANK_ORBCHR)
+    JSR SwapPRG_L
+    LDX #$01                         ; 1 page (256 bytes = 32 tiles * 8 bytes)
+    LDA #<lut_OrbCHR                 ; from source address lut_OrbCHR ($B600)
+    STA tmp
+    LDA #>lut_OrbCHR
+    STA tmp+1
+    LDA #$06                         ; dest address $0600 (maps to C64 $4B00)
+    JSR CHRLoadToA                   ; loads 32 orb tiles into $4B00-$4BFF (tiles $60-$7F)
+    JMP LoadBorderPalette_Blue       ; Set up menu border and background colors
+
+LoadBorderPalette_Blue:
+    LDA #COLOR_BLACK
+    STA EXTCOL
+    LDA #COLOR_BLUE
+    STA BGCOL0
+    RTS
+
+LoadBorderPalette_Black:
+    LDA #COLOR_BLACK
+    STA EXTCOL
+    STA BGCOL0
     RTS
 
 LoadBatSprCHRPalettes:

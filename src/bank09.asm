@@ -11,7 +11,7 @@
 ; Contains: Font, icons, window borders, and solid block tile 127
 .export lut_MenuCHR
 lut_MenuCHR:
-    .incbin "../res/font/menufont.chr"
+    .incbin "../res/menu/menufont.chr"
 
 ; $9000 - $907F: Finger Cursor Sprites (128 bytes)
 ; Sprite 0: Multicolor Base (64 bytes)

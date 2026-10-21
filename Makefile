@@ -61,7 +61,9 @@ $(OBJDIR):
 $(OBJDIR)/%.o: $(SRCDIR)/%.asm $(INCS) | $(OBJDIR)
 	$(AS) $(ASFLAGS) $< -o $@
 
-$(OBJDIR)/bank09.o: res/font/menufont.chr
+$(OBJDIR)/bank09.o: res/menu/menufont.chr
+$(OBJDIR)/bank0D.o: res/menu/orbs.chr
+$(OBJDIR)/bank07.o: res/monsters/imp.chr res/monsters/wolf.chr res/monsters/iguana.chr res/monsters/giant.chr
 
 $(TARGET): $(OBJS) $(CFG)
 	$(LD) $(LDFLAGS) $(OBJS)

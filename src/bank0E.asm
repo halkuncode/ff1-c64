@@ -303,19 +303,19 @@ EnterTitleScreen:
     STA text_ptr+1
     JSR DrawComplexString
 
-  ;; This is the main logic loop for the Title screen.
-  @Loop:
+;; Draw the finger cursor at its starting position, flush, and return
     JSR ClearOAM            ; Clear shadow sprite buffer
 
-    LDX cursor              ; Draw the cursor sprite using a fixed X coord of 120
-    LDA #120                ;  and using the current cursor position to get the Y coord
-    STA spr_x               ;  from a LUT
-    LDA lut_TitleCursor_Y, X
+    LDX #0
+    STX cursor              ; Cursor at starting position (0 = Continue)
+    LDA #120                ; Cursor X coord
+    STA spr_x
+    LDA lut_TitleCursor_Y   ; Y coord for position 0
     STA spr_y
     JSR DrawCursor          ; Draw Finger Cursor (Base + Overlay)
 
-    JSR WaitForVBlank_L     ; Wait for VBlank (UpdateSprites flushes during Raster IRQ)
-    JMP @Loop               ; Hold on loop to display cursor!
+    JSR WaitForVBlank_L     ; Wait for VBlank so UpdateSprites flushes to VIC-II hardware
+    RTS                     ; Return to bank0F.asm (which pauses in halt_loop)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -328,6 +328,10 @@ EnterTitleScreen:
 IntroTitlePrepare:
     LDA #$08               ; set soft2000 so that sprites use right pattern
     STA soft2000           ;   table while BG uses left
+
+    LDA #0
+    STA btlformation       ; Initialize to battle formation 0 (Imp/Wolf/Iguana/Giant)
+    STA ow_tile            ; Initialize to overworld tile 0 (Grass backdrop)
 
     JSR LoadMenuCHRPal     ; Load necessary CHR and palettes
 

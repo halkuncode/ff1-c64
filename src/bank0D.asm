@@ -5,7 +5,17 @@
 .segment "BANK_0D"
 
 ; Reserved $8000 - $BF1F (16,160 bytes)
-.res $3F20, $00
+.export lut_OrbCHR
+
+; Reserved $8000 - $B5FF (13,824 bytes)
+.res $3600, $00
+
+; $B600 - $B6FF: Orb graphics for menus (32 tiles * 8 bytes = 256 bytes, 1bpp / hi-res)
+lut_OrbCHR:
+    .incbin "../res/menu/orbs.chr"
+
+; Reserved $B700 - $BF1F (2,080 bytes)
+.res $0820, $00
 
 ; $BF20 - $BFFF: Intro Story Text (224 bytes)
 ; Control codes:
