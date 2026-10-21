@@ -303,19 +303,123 @@ EnterTitleScreen:
     STA text_ptr+1
     JSR DrawComplexString
 
-;; Draw the finger cursor at its starting position, flush, and return
+;; Title screen interactive selection loop
+    LDA #0
+    STA cursor              ; Cursor at starting position (0 = Continue)
+    STA joy_prevdir
+    STA joy_a
+    STA joy_start
+
+    JSR TitleScreen_DrawRespondRate ; Draw initial respond rate digit
+
+TitleScreen_Loop:
     JSR ClearOAM            ; Clear shadow sprite buffer
 
-    LDX #0
-    STX cursor              ; Cursor at starting position (0 = Continue)
-    LDA #120                ; Cursor X coord
+    LDX cursor              ; Cursor position: 0 = Continue, 1 = New Game
+    LDA #120                ; Fixed X pixel coord
     STA spr_x
-    LDA lut_TitleCursor_Y   ; Y coord for position 0
+    LDA lut_TitleCursor_Y, X; Y coord from table (118 for Continue, 158 for New Game)
     STA spr_y
     JSR DrawCursor          ; Draw Finger Cursor (Base + Overlay)
 
     JSR WaitForVBlank_L     ; Wait for VBlank so UpdateSprites flushes to VIC-II hardware
-    RTS                     ; Return to bank0F.asm (which pauses in halt_loop)
+    JSR TitleScreen_DrawRespondRate ; Redraw respond rate digit
+
+    JSR UpdateJoy_L         ; Scan keyboard & joystick
+    LDA #BANK_THIS
+    STA cur_bank
+
+    JSR CallMusicPlay_L     ; Keep music playing every frame
+
+    LDA joy_a               ; Check if Fire / Space or Start / Return was pressed
+    ORA joy_start
+    BNE TitleScreen_OptionChosen
+
+    LDA joy                 ; Directional buttons (Up, Down, Left, Right)
+    AND #$0F
+    CMP joy_prevdir
+    BEQ TitleScreen_Loop
+
+    STA joy_prevdir
+    CMP #0
+    BEQ TitleScreen_Loop    ; Button released, continue looping
+
+    CMP #$04                ; Up ($08) or Down ($04)?
+    BCC @LeftRight
+
+@UpDown:
+    LDA cursor              ; Toggle cursor between Continue (0) and New Game (1)
+    EOR #1
+    STA cursor
+    JSR PlaySFX_MenuMove    ; Play cursor "tweep" sound effect!
+    JMP TitleScreen_Loop
+
+@LeftRight:
+    CMP #RIGHT              ; Pressed Right?
+    BNE @Left
+    LDA #1                  ; +1 for Right
+    BNE :+
+@Left:
+    LDA #$FF                ; -1 for Left
+:   CLC
+    ADC respondrate
+    AND #7                  ; Wrap between 0..7
+    STA respondrate
+    JSR PlaySFX_MenuMove    ; Play "tweep" sound effect!
+    JMP TitleScreen_Loop
+
+TitleScreen_OptionChosen:
+    JSR PlaySFX_MenuSel     ; Play selection sound on choice!
+    RTS                     ; Option selected! Return to bank0F.asm (falls to halt_loop)
+
+
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Menu Sound Effects (borrows Voice 2)
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PlaySFX_MenuMove:
+    lda #3              ; 3 frames duration (crisp chirp)
+    sta sq2_sfx
+    lda #<$5000         ; High chirp starting at ~1.25 kHz
+    sta V2FREQ_L
+    lda #>$5000
+    sta V2FREQ_H
+    lda #$02            ; Fast decay (24ms)
+    sta V2AD
+    lda #$00            ; Zero sustain (clean blip)
+    sta V2SR
+    lda #SID_PULSE
+    sta V2CR
+    lda #(SID_PULSE | SID_GATE)
+    sta V2CR
+    rts
+
+PlaySFX_MenuSel:
+    lda #5              ; 5 frames duration
+    sta sq2_sfx
+    lda #<$6000         ; Higher pitch (~1.5 kHz)
+    sta V2FREQ_L
+    lda #>$6000
+    sta V2FREQ_H
+    lda #$03
+    sta V2AD
+    lda #$00
+    sta V2SR
+    lda #SID_PULSE
+    sta V2CR
+    lda #(SID_PULSE | SID_GATE)
+    sta V2CR
+    rts
+
+
+TitleScreen_DrawRespondRate:
+    LDA respondrate         ; 0 to 7
+    CLC
+    ADC #$80 + 1            ; Convert 0..7 to menu font digit tile '1'..'8' ($81..$88)
+    STA $433A               ; Screen RAM (Row 20, Col 26 - at the end after "RESPOND RATE")
+    LDA #COLOR_WHITE
+    STA $DB3A               ; Color RAM (White text)
+    RTS
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;

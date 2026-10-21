@@ -45,6 +45,7 @@ Music_NewSong:
 
     lda #0
     sta mu_chanprimer
+    sta mu_tempo_acc
     sta sq2_sfx
 
     ; Silence SID voices
@@ -72,6 +73,14 @@ Music_NewSong:
     ; Master Volume = 15 (Max), No filters
     lda #$0F
     sta SIGVOL
+
+    ; Default ADSR for Square 2 (saved in ch_envptr)
+    lda #$08
+    sta V2AD
+    sta CHAN_SQ2 + ch_envptr
+    lda #$C0
+    sta V2SR
+    sta CHAN_SQ2 + ch_envptr+1
 
     ; Triangle default ADSR: instant attack, full sustain
     lda #$00
@@ -195,7 +204,8 @@ MusicPlay:
     lda #(SID_PULSE | SID_GATE)
     sta V1CR
 
-    lda #$80
+    lda CHAN_SQ1 + ch_freq+1
+    ora #$80
     sta CHAN_SQ1 + ch_freq+1    ; Mark frequency as written
 @Sq1_Done:
 
@@ -205,14 +215,39 @@ MusicPlay:
     lda sq2_sfx
     beq @Sq2_Update
     dec sq2_sfx
-    bne @Sq2_Done
-    beq @Sq2_FreqChange
+    beq @Sq2_RestoreMusic       ; SFX finished, cleanly restore Square 2 music
+
+    ; While SFX is active: bump pitch upwards on frame 2
+    lda V2FREQ_H
+    clc
+    adc #$18
+    sta V2FREQ_H
+    jmp @Sq2_Done
+
+@Sq2_RestoreMusic:
+    ; Restore Square 2's music ADSR
+    lda CHAN_SQ2 + ch_envptr
+    sta V2AD
+    lda CHAN_SQ2 + ch_envptr+1
+    sta V2SR
+
+    ; Restore Voice 2 frequency
+    lda CHAN_SQ2 + ch_freq
+    sta V2FREQ_L
+    lda CHAN_SQ2 + ch_freq+1
+    and #$7F
+    sta V2FREQ_H
+
+    lda #SID_PULSE
+    sta V2CR
+    lda #(SID_PULSE | SID_GATE)
+    sta V2CR
+    jmp @Sq2_Done
 
 @Sq2_Update:
     lda CHAN_SQ2 + ch_freq+1
     bmi @Sq2_Done
 
-@Sq2_FreqChange:
     lda CHAN_SQ2 + ch_freq
     sta V2FREQ_L
     lda CHAN_SQ2 + ch_freq+1
@@ -224,7 +259,8 @@ MusicPlay:
     lda #(SID_PULSE | SID_GATE)
     sta V2CR
 
-    lda #$80
+    lda CHAN_SQ2 + ch_freq+1
+    ora #$80
     sta CHAN_SQ2 + ch_freq+1
 @Sq2_Done:
 
@@ -245,7 +281,8 @@ MusicPlay:
     lda #(SID_TRI | SID_GATE)
     sta V3CR
 
-    lda #$80
+    lda CHAN_TRI + ch_freq+1
+    ora #$80
     sta CHAN_TRI + ch_freq+1
     jmp @Tri_Done
 
@@ -258,7 +295,22 @@ MusicPlay:
 
     ; ----------------------------------------------------
     ; Step length counters and process score data
+    ; Running with ~20.7% speedup: accumulate $35 (53/256 = 20.7%)
+    ; On carry (~every 5th frame), step counters twice.
     ; ----------------------------------------------------
+    lda mu_tempo_acc
+    clc
+    adc #$35            ; ~20.7% speedup accumulator rate (additional 10% bump)
+    sta mu_tempo_acc
+    bcc @SingleStep
+
+    jsr StepChannels    ; Extra tick on carry
+
+@SingleStep:
+    jsr StepChannels
+    rts
+
+StepChannels:
     lda #CHAN_START
     sta mu_chan
 
@@ -541,15 +593,19 @@ Music_SetEnvPattern:
     bne :+
     lda lut_SID_AD, y
     sta V1AD
+    sta CHAN_SQ1 + ch_envptr
     lda lut_SID_SR, y
     sta V1SR
+    sta CHAN_SQ1 + ch_envptr+1
     rts
 :   cpx #CHAN_SQ2
     bne :+
     lda lut_SID_AD, y
     sta V2AD
+    sta CHAN_SQ2 + ch_envptr
     lda lut_SID_SR, y
     sta V2SR
+    sta CHAN_SQ2 + ch_envptr+1
 :   rts
 
 
@@ -603,7 +659,7 @@ lut_SID_SR:
     .byte $B3, $93, $A3, $83   ; EC-EF: sustained with release
 
 ; Pad from driver end up to $B600 ($01F2 = 498 bytes)
-.res $01F2, $00
+.res $0197, $00
 
 ; ==============================================================================
 ; $B600 - $B6FF: Orb graphics for menus (32 tiles * 8 bytes = 256 bytes)

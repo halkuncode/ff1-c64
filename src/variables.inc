@@ -87,6 +87,7 @@ cur_mapobj      = $4A ; counter for updating which map object
 music_track     = $4B
 mu_chanprimer   = $4C
 mu_chan         = $4D
+mu_tempo_acc    = $4E
 
 entering_shop   = $50 ; nonzero = about to enter shop
 shop_id         = $51

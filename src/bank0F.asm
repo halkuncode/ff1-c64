@@ -128,7 +128,7 @@ halt_loop:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Clear OAM   [$C43C :: 0x3C44C]  [976]
+;;  Clear OAM   [976]
 ;;
 ;;    Fills Shadow OAM with $F8 (which effectively clears it so no sprites are visible)
 ;;  also resets the sprite index to zero, so that the next sprite drawn will
