@@ -19,7 +19,7 @@
 
 .import EnterIntroStory, EnterTitleScreen, NewGamePartyGeneration
 .import lut_MenuCHR
-.import lut_FingerSprite
+.import lut_FingerSprite, lut_HeroSprites
 .import lut_BattleFormations
 .import MusicPlay_L
 
@@ -1307,6 +1307,29 @@ LoadBatSprCHRPalettes:
     CPY #128
     BNE @CopySprite
 
+    ; Copy 1536 bytes (6 pages = 24 blocks) of Hero Sprites from lut_HeroSprites to $5880
+    LDA #<lut_HeroSprites
+    STA tmp
+    LDA #>lut_HeroSprites
+    STA tmp+1
+
+    LDA #<$5880
+    STA chr_dest
+    LDA #>$5880
+    STA chr_dest+1
+
+    LDX #6                     ; 6 pages = 1536 bytes ($0600)
+    LDY #0
+@CopyHeroes:
+    LDA (tmp), Y
+    STA (chr_dest), Y
+    INY
+    BNE @CopyHeroes
+    INC tmp+1
+    INC chr_dest+1
+    DEX
+    BNE @CopyHeroes
+
     ; Load 16-byte battle/menu sprite palette into cur_pal + $10..$1F
     LDX #$0F
 :   LDA lut_BattleSpritePalettes, X
@@ -1516,6 +1539,12 @@ WaitForVBlank:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 OnIRQ:
+    ; Check if Party Generation 2-zone multiplexer is active
+    lda spr_multiplex_mode
+    beq @NormalIRQ
+    jmp PartyGen_IRQ
+
+@NormalIRQ:
     ; Increment frame counter
     inc vblank_count
 
@@ -1529,6 +1558,444 @@ OnIRQ:
     ; When called via KERNAL at $0314, registers were already pushed by KERNAL ($FF48).
     ; We jump to $FEBC which pulls Y, X, A and performs RTI cleanly!
     jmp $FEBC
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  PartyGen_IRQ - 2-Zone Raster Multiplexer for Party Generation
+;;
+;;  Zone 1 (Scanline 250 / VBlank -> 135):
+;;    Physical Sprites 0-3: Hero 0 (Top-Left)
+;;    Physical Sprites 4-7: Hero 1 (Top-Right)
+;;  Zone 2 (Scanline 145 -> 240):
+;;    Physical Sprites 0-3: Hero 2 (Bottom-Left)
+;;    Physical Sprites 4-7: Hero 3 (Bottom-Right)
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+BLOCK_HERO_BASE = 98           ; $62 ($5880 in Bank 1 RAM)
+
+COLOR_PEACH = COLOR_LIGHTRED  ; $0A
+
+PartyGen_IRQ:
+    lda #$01
+    sta VICIRQ                 ; Acknowledge VIC-II Raster IRQ
+
+    lda spr_irq_zone
+    beq @Zone0
+    cmp #1
+    beq @Zone1
+    cmp #2
+    beq @Zone2
+    jmp @Zone3
+
+@Zone0:
+    inc vblank_count           ; Increment frame counter once per frame on VBlank
+
+    jsr SetupHero0_Upper
+    jsr SetupHero1_Upper
+
+    ; Common VIC-II configuration for sprites
+    lda #$00
+    sta MSIGX                  ; MSB 0 for all
+    sta XEXP                   ; No X expansion
+    sta YEXP                   ; No Y expansion
+    sta SPBGPR                 ; In front of BG
+    lda #$FF
+    sta SPENA                  ; Enable all 8 sprites
+
+    lda char_index
+    cmp #$20
+    bcs @TopNoCursor
+
+    ; Cursor is in Top Half (Hero 0 or Hero 1)
+    jsr SetupCursor
+
+    ; Arm next split at Scanline 100 for Feet
+    lda #100
+    sta RASTER
+    lda SCROLY
+    and #$7F                   ; Raster bit 8 = 0
+    sta SCROLY
+    lda #1
+    sta spr_irq_zone
+    jmp $FEBC
+
+@TopNoCursor:
+    jsr SetupHero01_Feet
+
+    ; Arm next split at Scanline 145 for Bottom Half
+    lda #145
+    sta RASTER
+    lda SCROLY
+    and #$7F                   ; Raster bit 8 = 0
+    sta SCROLY
+    lda #2
+    sta spr_irq_zone
+    jmp $FEBC
+
+@Zone1:
+    ; Scanline 100: Cursor top finished, set up Feet for Hero 0 & 1
+    jsr SetupHero01_Feet
+
+    ; Arm next split at Scanline 145 for Bottom Half
+    lda #145
+    sta RASTER
+    lda SCROLY
+    and #$7F                   ; Raster bit 8 = 0
+    sta SCROLY
+    lda #2
+    sta spr_irq_zone
+    jmp $FEBC
+
+@Zone2:
+    ; Scanline 145: Bottom Half (Hero 2 & 3)
+    jsr SetupHero2_Upper
+    jsr SetupHero3_Upper
+
+    lda char_index
+    cmp #$20
+    bcc @BottomNoCursor
+
+    ; Cursor is in Bottom Half (Hero 2 or Hero 3)
+    jsr SetupCursor
+
+    ; Arm next split at Scanline 204 for Feet
+    lda #204
+    sta RASTER
+    lda SCROLY
+    and #$7F                   ; Raster bit 8 = 0
+    sta SCROLY
+    lda #3
+    sta spr_irq_zone
+    jmp $FEBC
+
+@BottomNoCursor:
+    jsr SetupHero23_Feet
+
+    ; Arm next split at Scanline 250 for VBlank
+    lda #250
+    sta RASTER
+    lda SCROLY
+    and #$7F                   ; Raster bit 8 = 0
+    sta SCROLY
+    lda #0
+    sta spr_irq_zone
+    jmp $FEBC
+
+@Zone3:
+    ; Scanline 204: Cursor bottom finished, set up Feet for Hero 2 & 3
+    jsr SetupHero23_Feet
+
+    ; Arm next split at Scanline 250 for VBlank
+    lda #250
+    sta RASTER
+    lda SCROLY
+    and #$7F                   ; Raster bit 8 = 0
+    sta SCROLY
+    lda #0
+    sta spr_irq_zone
+    jmp $FEBC
+
+SetupCursor:
+    ldx char_index
+    lda ptygen_curs_x, x
+    sta SP1X
+    sta SP5X
+    lda ptygen_curs_y, x
+    sta SP1Y
+    sta SP5Y
+    lda #BLOCK_FINGER_OVERLAY   ; Block 97 (Hi-Res Overlay, White)
+    sta $43F9                  ; Sprite 1 pointer
+    lda #COLOR_WHITE
+    sta SP1COL
+    lda #BLOCK_FINGER_BASE      ; Block 96 (Multicolor Base, White + Greys)
+    sta $43FD                  ; Sprite 5 pointer
+    lda #COLOR_WHITE
+    sta SP5COL
+    lda #%00100000             ; Sprite 5 Multicolor, Sprite 1 Hi-Res
+    sta SPMC
+    rts
+
+SetupHero0_Upper:
+    ldx ptygen+0
+    txa
+    asl a
+    asl a                      ; A = class * 4
+    tay
+
+    ; Layer 0: Body (Y = 90, X = 120)
+    lda #120
+    sta SP0X
+    lda #90
+    sta SP0Y
+    tya
+    clc
+    adc #BLOCK_HERO_BASE
+    sta $43F8
+    lda lut_ClassColors, y
+    sta SP0COL
+
+    ; Layer 2: Skin/Accents (Y = 90 + dY, X = 120)
+    lda #120
+    sta SP2X
+    lda #90
+    clc
+    adc lut_Class_dY + 2, y
+    sta SP2Y
+    tya
+    clc
+    adc #(BLOCK_HERO_BASE + 2)
+    sta $43FA
+    lda lut_ClassColors + 2, y
+    sta SP2COL
+
+    ; Layer 3: Hilight/Secondary (Y = 90, X = 120)
+    lda #120
+    sta SP3X
+    lda #90
+    sta SP3Y
+    tya
+    clc
+    adc #(BLOCK_HERO_BASE + 3)
+    sta $43FB
+    lda lut_ClassColors + 3, y
+    sta SP3COL
+    rts
+
+SetupHero1_Upper:
+    ldx ptygen+$10
+    txa
+    asl a
+    asl a
+    tay
+
+    ; Layer 0: Body (Y = 90, X = 232)
+    lda #232
+    sta SP4X
+    lda #90
+    sta SP4Y
+    tya
+    clc
+    adc #BLOCK_HERO_BASE
+    sta $43FC
+    lda lut_ClassColors, y
+    sta SP4COL
+
+    ; Layer 2: Skin/Accents (Y = 90 + dY, X = 232)
+    lda #232
+    sta SP6X
+    lda #90
+    clc
+    adc lut_Class_dY + 2, y
+    sta SP6Y
+    tya
+    clc
+    adc #(BLOCK_HERO_BASE + 2)
+    sta $43FE
+    lda lut_ClassColors + 2, y
+    sta SP6COL
+
+    ; Layer 3: Hilight/Secondary (Y = 90, X = 232)
+    lda #232
+    sta SP7X
+    lda #90
+    sta SP7Y
+    tya
+    clc
+    adc #(BLOCK_HERO_BASE + 3)
+    sta $43FF
+    lda lut_ClassColors + 3, y
+    sta SP7COL
+    rts
+
+SetupHero01_Feet:
+    ; Sprite 1: Hero 0 Feet (Y = 111, X = 120)
+    lda #120
+    sta SP1X
+    lda #111
+    sta SP1Y
+    ldx ptygen+0
+    txa
+    asl a
+    asl a
+    tay
+    clc
+    adc #(BLOCK_HERO_BASE + 1)
+    sta $43F9
+    lda lut_ClassColors + 1, y
+    sta SP1COL
+
+    ; Sprite 5: Hero 1 Feet (Y = 111, X = 232)
+    lda #232
+    sta SP5X
+    lda #111
+    sta SP5Y
+    ldx ptygen+$10
+    txa
+    asl a
+    asl a
+    tay
+    clc
+    adc #(BLOCK_HERO_BASE + 1)
+    sta $43FD
+    lda lut_ClassColors + 1, y
+    sta SP5COL
+
+    lda #$00                   ; All Hi-Res
+    sta SPMC
+    rts
+
+SetupHero2_Upper:
+    ldx ptygen+$20
+    txa
+    asl a
+    asl a
+    tay
+
+    ; Layer 0: Body (Y = 194, X = 120)
+    lda #120
+    sta SP0X
+    lda #194
+    sta SP0Y
+    tya
+    clc
+    adc #BLOCK_HERO_BASE
+    sta $43F8
+    lda lut_ClassColors, y
+    sta SP0COL
+
+    ; Layer 2: Skin/Accents (Y = 194 + dY, X = 120)
+    lda #120
+    sta SP2X
+    lda #194
+    clc
+    adc lut_Class_dY + 2, y
+    sta SP2Y
+    tya
+    clc
+    adc #(BLOCK_HERO_BASE + 2)
+    sta $43FA
+    lda lut_ClassColors + 2, y
+    sta SP2COL
+
+    ; Layer 3: Hilight/Secondary (Y = 194, X = 120)
+    lda #120
+    sta SP3X
+    lda #194
+    sta SP3Y
+    tya
+    clc
+    adc #(BLOCK_HERO_BASE + 3)
+    sta $43FB
+    lda lut_ClassColors + 3, y
+    sta SP3COL
+    rts
+
+SetupHero3_Upper:
+    ldx ptygen+$30
+    txa
+    asl a
+    asl a
+    tay
+
+    ; Layer 0: Body (Y = 194, X = 232)
+    lda #232
+    sta SP4X
+    lda #194
+    sta SP4Y
+    tya
+    clc
+    adc #BLOCK_HERO_BASE
+    sta $43FC
+    lda lut_ClassColors, y
+    sta SP4COL
+
+    ; Layer 2: Skin/Accents (Y = 194 + dY, X = 232)
+    lda #232
+    sta SP6X
+    lda #194
+    clc
+    adc lut_Class_dY + 2, y
+    sta SP6Y
+    tya
+    clc
+    adc #(BLOCK_HERO_BASE + 2)
+    sta $43FE
+    lda lut_ClassColors + 2, y
+    sta SP6COL
+
+    ; Layer 3: Hilight/Secondary (Y = 194, X = 232)
+    lda #232
+    sta SP7X
+    lda #194
+    sta SP7Y
+    tya
+    clc
+    adc #(BLOCK_HERO_BASE + 3)
+    sta $43FF
+    lda lut_ClassColors + 3, y
+    sta SP7COL
+    rts
+
+SetupHero23_Feet:
+    ; Sprite 1: Hero 2 Feet (Y = 215, X = 120)
+    lda #120
+    sta SP1X
+    lda #215
+    sta SP1Y
+    ldx ptygen+$20
+    txa
+    asl a
+    asl a
+    tay
+    clc
+    adc #(BLOCK_HERO_BASE + 1)
+    sta $43F9
+    lda lut_ClassColors + 1, y
+    sta SP1COL
+
+    ; Sprite 5: Hero 3 Feet (Y = 215, X = 232)
+    lda #232
+    sta SP5X
+    lda #215
+    sta SP5Y
+    ldx ptygen+$30
+    txa
+    asl a
+    asl a
+    tay
+    clc
+    adc #(BLOCK_HERO_BASE + 1)
+    sta $43FD
+    lda lut_ClassColors + 1, y
+    sta SP5COL
+
+    lda #$00                   ; All Hi-Res
+    sta SPMC
+    rts
+
+lut_ClassColors:
+    ; Class 0 (Fighter): Red, Red/Brown, Peach, Light Grey
+    .byte COLOR_RED, COLOR_RED, COLOR_PEACH, COLOR_LIGHTGREY
+    ; Class 1 (Thief): Brown, Brown, Peach, Cyan
+    .byte COLOR_ORANGE, COLOR_ORANGE, COLOR_PEACH, COLOR_CYAN
+    ; Class 2 (Black Belt): Cyan, Cyan, Brown, Peach
+    .byte COLOR_CYAN, COLOR_CYAN, COLOR_ORANGE, COLOR_PEACH
+    ; Class 3 (Red Mage): Red, Red, Peach, White
+    .byte COLOR_RED, COLOR_RED, COLOR_PEACH, COLOR_WHITE
+    ; Class 4 (White Mage): White, White, Red, Peach
+    .byte COLOR_WHITE, COLOR_WHITE, COLOR_RED, COLOR_PEACH
+    ; Class 5 (Black Mage): Cyan, Cyan, Yellow, Brown
+    .byte COLOR_CYAN, COLOR_CYAN, COLOR_YELLOW, COLOR_ORANGE
+
+lut_Class_dY:
+    .byte 0, 21, 0, 0   ; Class 0 (Fighter)
+    .byte 0, 21, 0, 0   ; Class 1 (Thief)
+    .byte 0, 21, 0, 0   ; Class 2 (Black Belt)
+    .byte 0, 21, 0, 0   ; Class 3 (Red Mage)
+    .byte 0, 21, 3, 0   ; Class 4 (White Mage) - dY=+3 on Layer 2!
+    .byte 0, 21, 0, 0   ; Class 5 (Black Mage)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

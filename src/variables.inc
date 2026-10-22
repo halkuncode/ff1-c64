@@ -1,6 +1,8 @@
 
 story_dropinput = $07
 vblank_count    = $08 ; Frame counter incremented by VIC-II Raster IRQ
+spr_multiplex_mode = $09 ; 0 = Standard single-zone VBlank IRQ, 1 = Party Gen 2-Zone Multiplexer
+spr_irq_zone       = $0A ; 0 = Zone 1 (Top heroes), 1 = Zone 2 (Bottom heroes)
 inroom          = $0D ; bit 7 is the actual inroom flag.  $x1=entering room, $x2=entering locked room (different sprite vis), $x5=exiting room, $x6=exiting locked room
 doorppuaddr     = $0E ; 2 bytes, PPU address of door drawing work
 chr_dest        = $0E ; 2 bytes, C64 Character RAM destination pointer ($4800-$4FFF)

@@ -1,4 +1,4 @@
-white mage hi-res sprite
+; white mage hi-res sprite
 ; sprite 0: body
 ; color = 1 (white)
 ; relitive position 0,0

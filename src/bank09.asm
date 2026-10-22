@@ -38,5 +38,10 @@ lut_FingerSprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$00,$00,$00,$00,$01
 
-; Pad the remainder of the 16KB bank ($9080 - $BFFF = 12160 bytes)
-.res $3000 - 128, $00
+; $9080 - $967F: Hero Sprites (6 classes x 256 bytes = 1536 bytes)
+.export lut_HeroSprites
+lut_HeroSprites:
+    .incbin "../res/heros/heroes.bin"
+
+; Pad the remainder of the 16KB bank ($9680 - $BFFF = 10624 bytes = $2980)
+.res $2980, $00

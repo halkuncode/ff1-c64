@@ -61,7 +61,10 @@ $(OBJDIR):
 $(OBJDIR)/%.o: $(SRCDIR)/%.asm $(INCS) | $(OBJDIR)
 	$(AS) $(ASFLAGS) $< -o $@
 
-$(OBJDIR)/bank09.o: res/menu/menufont.chr
+res/heros/heroes.bin: scripts/build_heroes.py res/heros/fighter.asm res/heros/thief.asm res/heros/blackbelt.asm res/heros/redmage.asm res/heros/whitemage.asm res/heros/blackmage.asm
+	python scripts/build_heroes.py
+
+$(OBJDIR)/bank09.o: res/menu/menufont.chr res/heros/heroes.bin
 $(OBJDIR)/bank0A.o: res/data/bank0A.dat
 $(OBJDIR)/bank0D.o: res/menu/orbs.chr res/audio/scoredata.bin
 $(OBJDIR)/bank07.o: res/monsters/imp.chr res/monsters/wolf.chr res/monsters/iguana.chr res/monsters/giant.chr

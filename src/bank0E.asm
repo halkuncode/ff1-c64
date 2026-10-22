@@ -4,7 +4,8 @@
 
 .segment "BANK_0E"
 
-.export EnterIntroStory, EnterTitleScreen, NewGamePartyGeneration, PtyGen_DrawText, PtyGen_DrawOneText, PtyGen_DrawCursor
+.export EnterIntroStory, EnterTitleScreen, NewGamePartyGeneration, DoPartyGen_OnCharacter
+.export PtyGen_DrawText, PtyGen_DrawOneText, PtyGen_DrawCursor, PtyGen_Frame, PtyGen_Joy
 .import LoadMenuCHRPal, LoadNewGameCHRPal, DrawComplexString, WaitForVBlank_L, UpdateJoy_L, DrawBox
 .import GameStart_L, CallMusicPlay_L, ClearOAM, DrawPalette_L, DrawCursor
 .import lut_ScreenRowLo, lut_ScreenRowHi
@@ -725,10 +726,119 @@ NewGamePartyGeneration:
 ;;
 ;;  DoPartyGen_OnCharacter  [2713]
 ;;
+;;    Does character selection and name input for one character.
+;;
+;;  input:      ptygen = filled appropriately
+;;          char_index = $00, $10, $20, $30 to indicate which character we're setting
+;;
+;;  output:    C is cleared if user confirmed/named character
+;;             C is set if user pressed B to cancel/go back
+;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 DoPartyGen_OnCharacter:
-    JSR PtyGen_DrawScreen
+    JSR PtyGen_DrawScreen           ; Draw the Party generation screen
+
+  @MainLoop:
+    JSR PtyGen_Frame                ; Do a frame and update joypad input
+
+    ; Name screen input is deferred until next step per user instructions
+    ; LDA joy_a
+    ; BNE DoNameInput
+    LDA joy_b
+    BEQ :+
+      SEC
+      RTS
+
+  : LDA joy
+    AND #$0F
+    CMP joy_prevdir
+    BEQ @MainLoop                   ; No change in directional input -> loop
+
+    STA joy_prevdir                 ; Record new directional input as prevdir
+    CMP #$00                        ; If directional input released -> loop
+    BEQ @MainLoop
+
+    ; User input: Left/Right (A/D key) to select the class
+    LDX char_index
+    LDA joy_prevdir
+    AND #(LEFT | UP)                ; Left (A key, $02) or Up (W key, $08)
+    BEQ @CheckRight
+
+    ; Decrement class (wrap 0 -> 5)
+    LDA ptygen_class, X
+    SEC
+    SBC #1
+    BPL :+
+      LDA #5
+  : STA ptygen_class, X
+    JMP @UpdateClass
+
+@CheckRight:
+    ; Right (D key, $01) or Down (S key, $04) -> Increment class (wrap 5 -> 0)
+    LDA ptygen_class, X
+    CLC
+    ADC #1
+    CMP #6
+    BCC :+
+      LDA #0
+  : STA ptygen_class, X
+
+@UpdateClass:
+    LDA #$01                        ; Menustall flag (drawing while display is active)
+    STA menustall
+    LDX char_index                  ; Redraw the on-screen class name
+    JSR PtyGen_DrawOneText
+    JMP @MainLoop
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  PtyGen_Frame  [2933]
+;;
+;;    Does typical frame handling for the Party Gen screen
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PtyGen_Frame:
+    JSR WaitForVBlank_L
+
+    LDA #BANK_THIS
+    STA cur_bank
+    JSR CallMusicPlay_L
+
+    JMP PtyGen_Joy
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  PtyGen_Joy  [2987]
+;;
+;;    Updates joypad data and plays button-related sound effects for
+;;    Party Generation screen.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PtyGen_Joy:
+    LDA joy
+    AND #$0F
+    STA tmp+7                       ; Save old directional buttons
+
+    JSR UpdateJoy_L                 ; Update joypad and keyboard data
+
+    LDA joy_a                       ; If either A or B pressed...
+    ORA joy_b
+    BEQ :+
+      JMP PlaySFX_MenuSel           ; Play selection SFX
+
+:   LDA joy                         ; Check new directional buttons
+    AND #$0F
+    BEQ @Exit                       ; None pressed -> exit
+    CMP tmp+7                       ; Same as previous frame?
+    BEQ @Exit                       ; No new direction -> exit
+    JMP PlaySFX_MenuMove            ; Play move chirp SFX
+
+@Exit:
     RTS
 
 
@@ -796,11 +906,15 @@ PtyGen_DrawScreen:
     STA joy
     STA joy_prevdir
 
-    ; Draw the 4 character boxes, text, and cursor
+    ; Draw the 4 character boxes and text
     JSR PtyGen_DrawBoxes
     JSR PtyGen_DrawText
-    JSR ClearOAM
-    JSR PtyGen_DrawCursor
+
+    ; Enable 2-zone raster multiplexer for all 4 heroes
+    LDA #1
+    STA spr_multiplex_mode
+    LDA #0
+    STA spr_irq_zone
     RTS
 
 
