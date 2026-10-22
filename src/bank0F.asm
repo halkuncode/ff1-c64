@@ -9,14 +9,15 @@
 .export DrawComplexString_L, DrawBox_L, CallMusicPlay_L, UpdateJoy_L, DrawPalette_L
 .export DrawComplexString, DrawBox, CallMusicPlay, UpdateJoy, DrawPalette, LoadMenuCHRPal, ClearOAM
 .export LoadBorderPalette_Blue, LoadBorderPalette_Black
-.export LoadMenuCHR, LoadMenuBGCHRAndPalettes, LoadBattleBGCHRAndPalettes, LoadBatSprCHRPalettes
+.export LoadMenuCHR, LoadMenuBGCHRAndPalettes, LoadBattleBGCHRAndPalettes, LoadBatSprCHRPalettes, LoadNewGameCHRPal
 .export GameStart, OnReset, OnNMI, OnIRQ
 .export WaitForVBlank_L, WaitForVBlank
 .export SwapPRG_L, SwapPRG
 .export CoordToNTAddr, lut_ScreenRowLo, lut_ScreenRowHi
-.export DrawCursor, UpdateSprites
+.export DrawCursor, UpdateSprites, VerifyChecksum
+.export lut_NES_to_C64
 
-.import EnterIntroStory, EnterTitleScreen
+.import EnterIntroStory, EnterTitleScreen, NewGamePartyGeneration
 .import lut_MenuCHR
 .import lut_FingerSprite
 .import lut_BattleFormations
@@ -119,12 +120,77 @@ GameStart:
     JSR SwapPRG_L                   ; to do the title screen
     JSR EnterTitleScreen
 
+    BCS @NewGame                    ; Do a new game, if the user selected the New Game option
+    
+        ; Otherwise, they selected "Continue"...
+    LDA sram_assert_55              ; check sram assertion values to make sure
+    CMP #$55                        ;  sram is not corrupt.  If they are not what are expected...
+    BNE @NewGame                    ;  then do a new game.
+    LDA sram_assert_AA
+    CMP #$AA
+    BNE @NewGame
+    
+    JSR VerifyChecksum              ; Then verify checksum to ensure save game integrity
+    BCS @NewGame                    ;  if it failed, do a new game
+    
+    ; Continue saved game
+    LDX #$00
+    : LDA   sram, X                 ; Copy all of SRAM to unsram
+      STA unsram, X
+      LDA   sram+$100, X
+      STA unsram+$100, X
+      LDA   sram+$200, X
+      STA unsram+$200, X
+      LDA   sram+$300, X
+      STA unsram+$300, X
+      INX
+      BNE :-
+    JMP @Begin                      ; Then begin the game
+    
+    
+  @NewGame:
+    LDA #BANK_PARTYGEN              ; swap in party generation bank
+    JSR SwapPRG_L
+    JSR NewGamePartyGeneration      ; create a new party
 
-	  
+@Begin:  
 halt_loop:
     jsr WaitForVBlank_L
     jsr CallMusicPlay_L
     jmp halt_loop
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Verify Checksum  [2057]
+;;
+;;    Sums every byte in SRAM ($6400-$67FF) including carry.
+;;    If the result equals $FF, CLC (valid).
+;;    Otherwise, SEC (corrupt).
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+VerifyChecksum:
+    LDA #$00      ; clear A
+    LDX #$00      ; and X
+    CLC           ; and C!
+@Loop:
+    ADC $6400, X  ; sum every byte between $6400-$67FF
+    ADC $6500, X  ; include carry in each addition
+    ADC $6600, X
+    ADC $6700, X
+    INX
+    BNE @Loop
+
+    CMP #$FF      ; if result does not equal $FF, the checksum has failed
+    BNE @Fail
+
+    ; success!
+    CLC
+    RTS
+
+@Fail:
+    SEC
+    RTS
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -193,7 +259,89 @@ CallMusicPlay:
 ;;
 ;;  DrawPalette  [5863]
 ;;
-DrawPalette:        rts
+;;    Flushes the 32-byte Virtual Palette (cur_pal at $0240) to VIC-II registers.
+;;    Translates NES 6-bit color indices to C64 colors using lut_NES_to_C64.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawPalette:
+    ; 1. Border Color (from cur_pal + $0C)
+    lda cur_pal + $0C
+    and #$3F
+    tax
+    lda lut_NES_to_C64, x
+    sta EXTCOL
+
+    ; 2. Background Color 0 (from cur_pal + $0E)
+    lda cur_pal + $0E
+    and #$3F
+    tax
+    lda lut_NES_to_C64, x
+    sta BGCOL0
+
+    ; 3. Extra Background Colors 1 & 2 (for battle / world backdrops)
+    lda cur_pal + 1
+    and #$3F
+    tax
+    lda lut_NES_to_C64, x
+    sta BGCOL1
+
+    lda cur_pal + 2
+    and #$3F
+    tax
+    lda lut_NES_to_C64, x
+    sta BGCOL2
+
+    ; 4. Sprite Multicolor registers ($D025, $D026)
+    ; NES Sprite Palettes start at cur_pal + $10
+    lda cur_pal + $11
+    and #$3F
+    tax
+    lda lut_NES_to_C64, x
+    sta SPMC0
+
+    lda cur_pal + $12
+    and #$3F
+    tax
+    lda lut_NES_to_C64, x
+    sta SPMC1
+
+    rts
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  lut_NES_to_C64
+;;
+;;  Translation lookup table mapping the 64 NES master colors ($00-$3F)
+;;  to the closest matching Commodore 64 color (0-15).
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_NES_to_C64:
+    ; $00 - $0F: Dark / Mid tones
+    .byte COLOR_GREY,       COLOR_BLUE,       COLOR_BLUE,       COLOR_PURPLE
+    .byte COLOR_PURPLE,     COLOR_RED,        COLOR_BROWN,      COLOR_BROWN
+    .byte COLOR_BROWN,      COLOR_GREEN,      COLOR_GREEN,      COLOR_GREEN
+    .byte COLOR_CYAN,       COLOR_BLACK,      COLOR_BLACK,      COLOR_BLACK
+
+    ; $10 - $1F: Mid / Vibrant tones
+    .byte COLOR_LIGHTGREY,  COLOR_LIGHTBLUE,  COLOR_BLUE,       COLOR_PURPLE
+    .byte COLOR_PURPLE,     COLOR_RED,        COLOR_ORANGE,     COLOR_ORANGE
+    .byte COLOR_YELLOW,     COLOR_GREEN,      COLOR_LIGHTGREEN, COLOR_GREEN
+    .byte COLOR_CYAN,       COLOR_BLACK,      COLOR_BLACK,      COLOR_BLACK
+
+    ; $20 - $2F: Light tones
+    .byte COLOR_WHITE,      COLOR_LIGHTBLUE,  COLOR_LIGHTBLUE,  COLOR_PURPLE
+    .byte COLOR_LIGHTRED,   COLOR_LIGHTRED,   COLOR_LIGHTRED,   COLOR_ORANGE
+    .byte COLOR_YELLOW,     COLOR_LIGHTGREEN, COLOR_LIGHTGREEN, COLOR_LIGHTGREEN
+    .byte COLOR_CYAN,       COLOR_DARKGREY,   COLOR_BLACK,      COLOR_BLACK
+
+    ; $30 - $3F: Pastel / Highlight tones
+    .byte COLOR_WHITE,      COLOR_LIGHTBLUE,  COLOR_LIGHTBLUE,  COLOR_LIGHTGREY
+    .byte COLOR_LIGHTRED,   COLOR_LIGHTRED,   COLOR_LIGHTRED,   COLOR_YELLOW
+    .byte COLOR_YELLOW,     COLOR_LIGHTGREEN, COLOR_LIGHTGREEN, COLOR_CYAN
+    .byte COLOR_CYAN,       COLOR_LIGHTGREY,  COLOR_BLACK,      COLOR_BLACK
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -449,7 +597,9 @@ DrawComplexString:
 @Draw_NoStall:
     LDY #0
     LDA (text_ptr), Y             ; Fetch character from string
-    BEQ @Exit                     ; $00 = null terminator -> exit
+    BNE :+
+    JMP @Exit                     ; $00 = null terminator -> exit
+:
 
     INC text_ptr                  ; Advance string pointer
     BNE :+
@@ -486,6 +636,8 @@ DrawComplexString:
 @ControlCode:
     CMP #$01                      ; $01 = Double line break
     BEQ @DoubleLineBreak
+    CMP #$02                      ; $02 = Item / class name
+    BEQ @Code_02
     CMP #$05                      ; $05 = Single line break
     BEQ @SingleLineBreak
     JMP @SingleLineBreak
@@ -499,6 +651,60 @@ DrawComplexString:
 @SingleLineBreak:
     INC dest_y
     JSR CoordToNTAddr
+    JMP @Draw_NoStall
+
+@Code_02:
+    LDY #0
+    LDA (text_ptr), Y             ; Fetch item ID from string
+    INC text_ptr
+    BNE @DrawItem
+    INC text_ptr+1
+
+@DrawItem:
+    JSR @Save                     ; Save current string & bank
+    PHA                           ; Save Item ID on stack
+
+    LDA #BANK_ITEMS
+    STA cur_bank
+    JSR SwapPRG_L
+
+    PLA                           ; Restore Item ID in A
+    ASL A
+    TAX
+
+    BCS @itemHigh
+    LDA lut_ItemNamePtrTbl, X
+    STA text_ptr
+    LDA lut_ItemNamePtrTbl+1, X
+    JMP @itemGo
+
+@itemHigh:
+    LDA lut_ItemNamePtrTbl+$100, X
+    STA text_ptr
+    LDA lut_ItemNamePtrTbl+$101, X
+
+@itemGo:
+    STA text_ptr+1
+    JSR @Draw_NoStall
+    JMP @Restore
+
+@Save:
+    LDY text_ptr
+    STY tmp_hi
+    LDY text_ptr+1
+    STY tmp_hi+1
+    LDY cur_bank
+    STY tmp_hi+2
+    RTS
+
+@Restore:
+    LDA tmp_hi
+    STA text_ptr
+    LDA tmp_hi+1
+    STA text_ptr+1
+    LDA tmp_hi+2
+    STA cur_bank
+    JSR SwapPRG_L
     JMP @Draw_NoStall
 
 @Exit:
@@ -781,6 +987,10 @@ MenuCondStall:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+LoadNewGameCHRPal:
+    JSR LoadMenuBGCHRAndPalettes
+    JMP LoadBatSprCHRPalettes
+
 LoadMenuCHRPal:                ; does not load 'lit orb' palette, or the two middle palettes ($03C0-03CB)
     JSR LoadMenuBGCHRAndPalettes
     JMP LoadBatSprCHRPalettes
@@ -898,14 +1108,18 @@ LoadBattleBGCHRAndPalettes:
     JSR SwapPRG_L
 
     LDA lut_BackdropPal+0, X
+    STA cur_pal+0
     STA BGCOL0                    ; $D021 = Background Color 0 (%00)
     LDA lut_BackdropPal+1, X
+    STA cur_pal+1
     STA BGCOL1                    ; $D022 = Background Color 1 (%01)
     LDA lut_BackdropPal+2, X
+    STA cur_pal+2
     STA BGCOL2                    ; $D023 = Background Color 2 (%10)
 
-    ; Color 3 goes to Color RAM ($D800)
+    ; Color 3 goes to Color RAM ($D800) and cur_pal+3
     LDA lut_BackdropPal+3, X
+    STA cur_pal+3
     ORA #$08                      ; Bit 3 = 1 enables MultiColor mode for character cell
     STA tmp+2
 
@@ -1055,17 +1269,20 @@ LoadMenuBGCHRAndPalettes:
     JMP LoadBorderPalette_Blue       ; Set up menu border and background colors
 
 LoadBorderPalette_Blue:
-    LDA #COLOR_BLACK
-    STA EXTCOL
-    LDA #COLOR_BLUE
-    STA BGCOL0
-    RTS
+    lda #$01                   ; NES Blue ($01)
+    bne :+                     ; Always branch
 
 LoadBorderPalette_Black:
-    LDA #COLOR_BLACK
-    STA EXTCOL
-    STA BGCOL0
-    RTS
+    lda #$0F                   ; NES Black ($0F)
+
+:   sta cur_pal + $0E          ; Blue/Black to window background
+    lda #$0F                   ; NES Black ($0F)
+    sta cur_pal + $0C          ; Black to border color 0
+    lda #$00                   ; NES Grey ($00)
+    sta cur_pal + $0D          ; Grey to color 1
+    lda #$30                   ; NES White ($30)
+    sta cur_pal + $0F          ; White to color 3
+    jmp DrawPalette            ; Flush Virtual Palette to VIC-II hardware
 
 LoadBatSprCHRPalettes:
     LDA #BANK_MENUCHR          ; Bank 9 (contains lut_FingerSprite)
@@ -1090,6 +1307,13 @@ LoadBatSprCHRPalettes:
     CPY #128
     BNE @CopySprite
 
+    ; Load 16-byte battle/menu sprite palette into cur_pal + $10..$1F
+    LDX #$0F
+:   LDA lut_BattleSpritePalettes, X
+    STA cur_pal + $10, X
+    DEX
+    BPL :-
+
     ; Set global Sprite Multicolor registers according to user specs:
     ; Background is 00 (transparent / black $D021)
     ; Multicolor 1 = 11 (Dark Grey, $0B)
@@ -1103,6 +1327,9 @@ LoadBatSprCHRPalettes:
     LDA #BANK_INTRO
     JSR SwapPRG_L
     RTS
+
+lut_BattleSpritePalettes:
+    .byte $0F,$28,$18,$21,  $0F,$16,$30,$36,   $0F,$30,$22,$12,  $0F,$30,$10,$00
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -1196,9 +1423,15 @@ SwapPRG_L:       JMP SwapPRG
 
 SwapPRG:
     sta cur_bank
-    tax
+    pha
+    txa
+    pha
+    ldx cur_bank
     lda lut_EasyFlashBanks, x
     sta EASYFLASH_BANK
+    pla
+    tax
+    pla
     rts
 
 lut_EasyFlashBanks:

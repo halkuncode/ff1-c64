@@ -4,8 +4,8 @@
 
 .segment "BANK_0E"
 
-.export EnterIntroStory, EnterTitleScreen
-.import LoadMenuCHRPal, DrawComplexString, WaitForVBlank_L, UpdateJoy_L, DrawBox
+.export EnterIntroStory, EnterTitleScreen, NewGamePartyGeneration, PtyGen_DrawText, PtyGen_DrawOneText, PtyGen_DrawCursor
+.import LoadMenuCHRPal, LoadNewGameCHRPal, DrawComplexString, WaitForVBlank_L, UpdateJoy_L, DrawBox
 .import GameStart_L, CallMusicPlay_L, ClearOAM, DrawPalette_L, DrawCursor
 .import lut_ScreenRowLo, lut_ScreenRowHi
 .import lut_IntroStoryText
@@ -27,6 +27,8 @@ TitleScreen_Copyright:
     JSR IntroTitlePrepare      ; clear NT, start music, reset input/cursor, etc
 
     ; Set border to black, background to blue
+    LDA #$0F
+    STA cur_pal + $0C          ; Virtual palette border = Black ($0F) for title screen
     LDA #COLOR_BLACK
     STA EXTCOL
     LDA #COLOR_BLUE
@@ -172,6 +174,9 @@ ClearNT:
     BNE @LoopColor
 
     ; Set background and border to Blue (native NES story background)
+    LDA #$01
+    STA cur_pal + $0C          ; Virtual palette border = Blue ($01) for opening story
+    STA cur_pal + $0E          ; Virtual palette background = Blue ($01)
     LDA #COLOR_BLUE
     STA BGCOL0
     STA EXTCOL
@@ -370,6 +375,8 @@ TitleScreen_Loop:
 
 TitleScreen_OptionChosen:
     JSR PlaySFX_MenuSel     ; Play selection sound on choice!
+    LDA cursor
+    LSR A                   ; C=1 if New Game (cursor=1), C=0 if Continue (cursor=0)
     RTS                     ; Option selected! Return to bank0F.asm (falls to halt_loop)
 
 
@@ -688,3 +695,296 @@ TurnMenuScreenOn_ClearOAM:  ; [8087]
 
 TurnMenuScreenOn:  ; [8091]
     RTS
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  NewGamePartyGeneration  [2581]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+NewGamePartyGeneration:
+    JSR LoadNewGameCHRPal   ; Load up all the CHR and palettes necessary for the New Game menus
+
+    LDX #$3F                ; Initialize the ptygen buffer!
+:   LDA lut_PtyGenBuf, X    ;  all $40 bytes!  ($10 bytes per character)
+    STA ptygen, X
+    DEX
+    BPL :-
+
+    LDA #$00        ; Null-terminates draw buffer for character name
+    STA $60
+
+@Char_0:                    ; To Character generation for each of the 4 characters
+    LDA #$00                ;   branching back to the previous char if cancelled
+    STA char_index
+    JSR DoPartyGen_OnCharacter
+    RTS                     ; Return to bank0F (which enters halt_loop to display screen)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DoPartyGen_OnCharacter  [2713]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DoPartyGen_OnCharacter:
+    JSR PtyGen_DrawScreen
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  PtyGen_DrawScreen  [2684]
+;;
+;;    Prepares and draws the Party Generation screen
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PtyGen_DrawScreen:
+    ; Set border to black, background to blue
+    LDA #$0F
+    STA cur_pal + $0C          ; Virtual palette border = Black ($0F) for title screen
+    LDA #COLOR_BLACK
+    STA EXTCOL
+    LDA #COLOR_BLUE
+    STA BGCOL0
+
+    ; Paint Screen RAM with character $00 (solid black block)
+    LDX #$00
+    LDA #$00
+@LoopScreen:
+    STA $4000, X
+    STA $4100, X
+    STA $4200, X
+    STA $4300, X
+    INX
+    BNE @LoopScreen
+
+    ; Paint Color RAM with character color 00 (black)
+    LDX #$00
+    LDA #COLOR_BLACK
+@LoopColor:
+    STA COLOR_RAM, X
+    STA COLOR_RAM + $0100, X
+    STA COLOR_RAM + $0200, X
+    STA COLOR_RAM + $0300, X
+    INX
+    BNE @LoopColor
+
+    ; Ensure VIC-II Bank 1 ($4000-$7FFF) and standard text mode are set
+    LDA CI2DRA
+    ORA #$03
+    STA CI2DRA
+    LDA CI2PRA
+    AND #$FC
+    ORA #VIC_BANK1
+    STA CI2PRA
+
+    LDA #$1B
+    STA SCROLY
+    LDA #$08
+    STA SCROLX
+    LDA #$02                   ; Screen: $4000, Charset: $4800
+    STA VMCSB
+
+    ; Clear soft2000 & joypad catchers
+    LDA #$08
+    STA soft2000
+    LDA #0
+    STA joy_a
+    STA joy_b
+    STA joy
+    STA joy_prevdir
+
+    ; Draw the 4 character boxes, text, and cursor
+    JSR PtyGen_DrawBoxes
+    JSR PtyGen_DrawText
+    JSR ClearOAM
+    JSR PtyGen_DrawCursor
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  PtyGen_DrawBoxes  [3016]
+;;
+;;    Draws the 4 boxes for the Party Generation screen
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PtyGen_DrawBoxes:
+    LDA #0
+    STA tmp+15       ; reset loop counter to zero
+
+@Loop:
+    JSR @Box         ; draw the next character's box
+    LDA tmp+15
+    CLC
+    ADC #$10         ; incrementing by $10 each time (indexes ptygen buffer)
+    STA tmp+15
+    CMP #$40
+    BCC @Loop
+    RTS
+
+@Box:
+    LDX tmp+15           ; get ptygen index in X
+
+    LDA ptygen_box_x, X  ; get X,Y coords from ptygen buffer
+    STA box_x
+    LDA ptygen_box_y, X
+    STA box_y
+
+    LDA #10              ; width = 10
+    STA box_wd
+    LDA #10              ; height = 10
+    STA box_ht
+
+    LDA #0
+    STA menustall        ; disable menustalling
+    JMP DrawBox          ; draw the box, and exit
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  PtyGen_DrawText  [3055]
+;;
+;;    Draws the text for all 4 character boxes in the Party Generation screen.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PtyGen_DrawText:
+    LDA #0             ; start loop counter at zero
+  @MainLoop:
+     PHA                ; push loop counter to back it up
+     JSR @DrawOne       ; draw one character's strings
+     PLA                ;  pull loop counter
+     CLC                ; and increase it to point to next character's data
+     ADC #$10           ;  ($10 bytes per char in 'ptygen')
+     CMP #$40
+     BCC @MainLoop      ;  loop until all 4 chars drawn
+    RTS
+
+  @DrawOne:
+    TAX                 ; put the ptygen index in X for upcoming routine
+
+      ; no JMP or RTS -- code flows seamlessly into PtyGen_DrawOneText
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  PtyGen_DrawOneText  [3093]
+;;
+;;    This draws text for *one* of the character boxes in the Party Generation
+;;  screen.  This is called by the above routine to draw all 4 of them at once,
+;;  but is also called to redraw an individual class name when the player changes
+;;  the class of the selected character.
+;;
+;;    The text drawn here is just two short strings.  First is the name of the
+;;  selected class (Fighter/Thief/etc).  Second is the character's name.
+;;
+;;    Text is drawn by simply copying short strings to the format buffer, then
+;;  calling DrawComplexString to draw them.  The character's name is simply
+;;  the 4 letters copied over.. whereas the class name makes use of one
+;;  of DrawComplexString's control codes.  See that routine for further details.
+;;
+;;  IN:  X = ptygen index of the char whose text we want to draw
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PtyGen_DrawOneText:
+    LDA ptygen_class_x, X   ; get X,Y coords where we're going to place
+    STA dest_x              ;  the class name
+    LDA ptygen_class_y, X
+    STA dest_y
+
+    LDA ptygen_class, X     ; get the selected class
+    CLC
+    ADC #$F0                ; add $F0 to select the class' "item name"
+    STA format_buf-1        ;  store that as 2nd byte in format string
+    LDA #$02                ; first byte in string is $02 -- the control code to
+    STA format_buf-2        ;  print an item name
+
+    LDA #<(format_buf-2)    ; set the text pointer to point to the start of the 2-byte
+    STA text_ptr            ;  string we just constructed
+    LDA #>(format_buf-2)
+    STA text_ptr+1
+
+    LDA #BANK_THIS          ; set cur and ret banks (see DrawComplexString for why)
+    STA cur_bank
+    STA ret_bank
+
+    TXA                     ; back up our index (DrawComplexString will corrupt it)
+    PHA
+    JSR DrawComplexString   ; draw the string
+    PLA
+    TAX                     ; and restore our index
+
+    LDA ptygen_name, X      ; next, copy over the 4-byte name of the character
+    STA format_buf-4        ;  over to the format buffer
+    LDA ptygen_name+1, X
+    STA format_buf-3
+    LDA ptygen_name+2, X
+    STA format_buf-2
+    LDA ptygen_name+3, X
+    STA format_buf-1
+
+    LDA ptygen_name_x, X    ; set destination coords appropriately
+    STA dest_x
+    LDA ptygen_name_y, X
+    STA dest_y
+
+    LDA #<(format_buf-4)    ; set pointer to start of 4-byte string
+    STA text_ptr
+    LDA #>(format_buf-4)
+    STA text_ptr+1
+
+    LDA #BANK_THIS          ; set banks again
+    STA cur_bank
+    STA ret_bank
+
+    JMP DrawComplexString   ; then draw another complex string -- and exit!
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  PtyGen_DrawCursor  [$9F26 :: 0x39F36]  [3155]
+;;
+;;    Draws the cursor for the Party Generation screen
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PtyGen_DrawCursor:
+    LDX char_index          ; use the current index to get the cursor
+    LDA ptygen_curs_x, X    ;  coords from the ptygen buffer.
+    STA spr_x
+    LDA ptygen_curs_y, X
+    STA spr_y
+    JMP DrawCursor          ; and draw the cursor there
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  lut_PtyGenBuf
+;;
+;;    Initial template for the 4 character slots ($40 bytes total).
+;;    Matches the NES format:
+;;      +$00: Class ID
+;;      +$01: Padding / Unused ($00)
+;;      +$02..+$05: Name (4 bytes, $FF = empty)
+;;      +$06..+$07: name_x, name_y
+;;      +$08..+$09: class_x, class_y
+;;      +$0A..+$0B: spr_x, spr_y
+;;      +$0C..+$0D: box_x, box_y
+;;      +$0E..+$0F: curs_x, curs_y
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_PtyGenBuf:
+  ; Hero 0: Fighter (Top-Left)
+  .BYTE $00, $00, $FF, $FF, $FF, $FF, 11,  9,  9,  3, 120,  90,  8,  1, 104,  90
+  ; Hero 1: Thief (Top-Right)
+  .BYTE $01, $00, $FF, $FF, $FF, $FF, 25,  9, 23,  3, 232,  90, 22,  1, 216,  90
+  ; Hero 2: Black Belt (Bottom-Left)
+  .BYTE $02, $00, $FF, $FF, $FF, $FF, 11, 22,  9, 16, 120, 194,  8, 14, 104, 194
+  ; Hero 3: Red Mage (Bottom-Right)
+  .BYTE $03, $00, $FF, $FF, $FF, $FF, 25, 22, 23, 16, 232, 194, 22, 14, 216, 194

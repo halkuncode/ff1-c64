@@ -259,11 +259,12 @@ shadow_spr_pri  = $0223         ; 1 byte:  Priority mask ($D01B)
 shadow_spr_xexp = $0224         ; 1 byte:  X expand mask ($D01D)
 shadow_spr_yexp = $0225         ; 1 byte:  Y expand mask ($D017)
 
-puzzle          = $0300  ; shared
-str_buf         = $0300  ; $39 bytes at least -- buffer must not cross page
-item_box        = $0300  ; $20? bytes -- shares space with str_buf
+; Page $02 Unified Display & Palette State ($0240-$02FF)
+cur_pal         = $0240       ; 32 bytes ($0240-$025F): Virtual Palette (16B BG + 16B Sprites)
+inroom_pal      = cur_pal+$20 ; 16 bytes ($0260-$026F): In-room / dungeon sub-palette
+tmp_pal         = $0270       ; 16 bytes ($0270-$027F): Palette cycling / fade buffer
 
-ptygen          = $0300  ; $40 bytes, shared
+ptygen          = $0280       ; $40 bytes ($0280-$02BF): Party gen buffer (safe from KERNAL vectors)
  ptygen_class   = ptygen
  ptygen_name    = ptygen+2
  ptygen_name_x  = ptygen+6
@@ -277,14 +278,15 @@ ptygen          = $0300  ; $40 bytes, shared
  ptygen_curs_x  = ptygen+$E
  ptygen_curs_y  = ptygen+$F
 
-shop_charindex  = $030A  ; shared
-shop_spell      = $030B  ; shared
-shop_curitem    = $030C  ; shared
-shop_curprice   = $030E  ; 2 shared bytes
+; Page $03 Safe RAM Area ($0340-$03FB: Tape Buffer, safe from $0300-$0333 vectors)
+puzzle          = $0340  ; shared
+str_buf         = $0340  ; $39 bytes at least -- buffer must not cross page
+item_box        = $0340  ; $20? bytes -- shares space with str_buf
 
-cur_pal         = $03C0       ; 32 bytes
-inroom_pal      = cur_pal+$20 ; 16 bytes
-tmp_pal         = $03F0       ; 16 bytes
+shop_charindex  = $0380  ; shared
+shop_spell      = $0381  ; shared
+shop_curitem    = $0382  ; shared
+shop_curprice   = $0384  ; 2 shared bytes
 
 tileset_data    = $0400  ; $400 bytes -- must be on page bound
 
