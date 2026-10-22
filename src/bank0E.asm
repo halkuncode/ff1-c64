@@ -6,6 +6,7 @@
 
 .export EnterIntroStory, EnterTitleScreen, NewGamePartyGeneration, DoPartyGen_OnCharacter
 .export PtyGen_DrawText, PtyGen_DrawOneText, PtyGen_DrawCursor, PtyGen_Frame, PtyGen_Joy
+.export DoNameInput, CharName_Frame, CharName_DrawCursor, NameInput_DrawName, DrawNameInputScreen
 .import LoadMenuCHRPal, LoadNewGameCHRPal, DrawComplexString, WaitForVBlank_L, UpdateJoy_L, DrawBox
 .import GameStart_L, CallMusicPlay_L, ClearOAM, DrawPalette_L, DrawCursor
 .import lut_ScreenRowLo, lut_ScreenRowHi
@@ -145,7 +146,7 @@ IntroStory_Joy:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  ClearNT  [$9B5E :: 0x39B6E]  [2504]
+;;  ClearNT  [2504]
 ;;
 ;;  Clears Screen RAM ($4000-$43E7) with $FF (spaces)
 ;;  and clears Color RAM ($D800-$DBE7) to Blue (hidden text)
@@ -463,7 +464,7 @@ IntroTitlePrepare:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Pointerless strings for the title screen  [$A253 :: 0x3A263]
+;;  Pointerless strings for the title screen  [3643]
 ;;
 ;;    These are complex strings drawn onto the title screen.  They
 ;;  have no pointer table -- instead the drawing code points to the
@@ -481,7 +482,7 @@ lut_TitleText_RespondRate:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Small LUT for the Y position of the title screen cursor  [$A272 :: 0x3A282]
+;;  Small LUT for the Y position of the title screen cursor  [3656]
 
 lut_TitleCursor_Y:
   .BYTE 118   ; to point at "Continue" (Row 9)
@@ -680,7 +681,7 @@ IntroStory_Frame:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Turn Menu Screen On   [$B78A :: 0x3B79A]  [8078]
+;;  Turn Menu Screen On  [8078]
 ;;
 ;;   Waits for VBlank, applies palette, then enables BG and Sprite rendering
 ;;   with default settings for menus.
@@ -719,7 +720,73 @@ NewGamePartyGeneration:
     LDA #$00                ;   branching back to the previous char if cancelled
     STA char_index
     JSR DoPartyGen_OnCharacter
-    RTS                     ; Return to bank0F (which enters halt_loop to display screen)
+    BCS @Char_0
+@Char_1:
+    LDA #$10
+    STA char_index
+    JSR DoPartyGen_OnCharacter
+    BCS @Char_0
+@Char_2:
+    LDA #$20
+    STA char_index
+    JSR DoPartyGen_OnCharacter
+    BCS @Char_1
+@Char_3:
+    LDA #$30
+    STA char_index
+    JSR DoPartyGen_OnCharacter
+    BCS @Char_2
+
+    ; Once all 4 characters have been generated and named...
+    JSR PtyGen_DrawScreen   ; Draw the screen one more time
+
+@ConfirmLoop:
+    JSR PtyGen_Frame        ; Keep multiplexer, music, and joypad running
+    LDA joy_a
+    ORA joy_start
+    BNE @Confirmed          ; Pressing Space or Return confirms party!
+    LDA joy_b
+    BEQ @ConfirmLoop
+    JMP @Char_3             ; Pressing B returns to Char 3 generation
+
+@Confirmed:
+    JSR PlaySFX_MenuSel
+
+    ; Move class and name selection into actual character stats
+    LDX #$00
+    JSR @RecordClassAndName
+    LDX #$10
+    JSR @RecordClassAndName
+    LDX #$20
+    JSR @RecordClassAndName
+    LDX #$30
+    JSR @RecordClassAndName
+
+    ; Disable multiplexer and clear sprites before continuing
+    LDA #0
+    STA spr_multiplex_mode
+    STA shadow_spr_en
+    STA SPENA
+    RTS
+
+@RecordClassAndName:
+    TXA                     ; X is the ptygen source index ($10 bytes per character)
+    ASL A
+    ASL A
+    TAY                     ; Y is the ch_stats dest index ($40 bytes per character)
+
+    LDA ptygen_class, X     ; copy class
+    STA ch_class, Y
+
+    LDA ptygen_name+0, X    ; and name
+    STA ch_name+0, Y
+    LDA ptygen_name+1, X
+    STA ch_name+1, Y
+    LDA ptygen_name+2, X
+    STA ch_name+2, Y
+    LDA ptygen_name+3, X
+    STA ch_name+3, Y
+    RTS
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -742,12 +809,17 @@ DoPartyGen_OnCharacter:
   @MainLoop:
     JSR PtyGen_Frame                ; Do a frame and update joypad input
 
-    ; Name screen input is deferred until next step per user instructions
-    ; LDA joy_a
-    ; BNE DoNameInput
+    LDA joy_a
+    BEQ @CheckB
+    JSR DoNameInput                 ; A pressed -> go to name input screen!
+    BCS DoPartyGen_OnCharacter      ; If cancelled (B at cursor 0), redraw screen & resume class select
+    CLC                             ; Name successfully entered! Return Carry Clear
+    RTS
+
+@CheckB:
     LDA joy_b
     BEQ :+
-      SEC
+      SEC                           ; B pressed on class screen -> cancel back to previous character
       RTS
 
   : LDA joy
@@ -794,6 +866,194 @@ DoPartyGen_OnCharacter:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
+;;  DoNameInput  [2766]
+;;
+;;    Does the name input screen.  Draw the screen, gets the name, etc, etc.
+;;
+;;  input:      ptygen = should be filled appropriately
+;;          char_index = $00, 10, 20, 30 to indicate which character's name we're setting
+;;
+;;  output:    C is cleared to indicate name successfully input
+;;             C is set to indicate cancel / go back
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DoNameInput:
+    ; Turn off hero multiplexer for name screen (single cursor only)
+    LDA #$00
+    STA spr_multiplex_mode
+    STA spr_irq_zone
+    LDA #250
+    STA RASTER
+    LDA SCROLY
+    AND #$7F
+    STA SCROLY
+
+    LDA #$00
+    STA menustall           ; zero a bunch of misc vars being used here
+    STA joy_a
+    STA joy_b
+    STA joy
+    STA joy_prevdir
+
+    STA cursor              ; letter of the name we're inputting (0-3)
+    STA namecurs_x          ; X position of letter selection cursor (0-9)
+    STA namecurs_y          ; Y position (0-6)
+
+    ; Some local temp vars
+    @cursoradd    = $63
+    @selectedtile = $10
+
+    JSR DrawNameInputScreen
+
+    LDX char_index          ; wipe this character's name
+    LDA #$FF
+    STA ptygen_name, X
+    STA ptygen_name+1, X
+    STA ptygen_name+2, X
+    STA ptygen_name+3, X
+
+    JSR NameInput_DrawName          ; Draw the initially empty name box
+
+    JSR TurnMenuScreenOn_ClearOAM   ; now that everything is drawn, turn the screen on
+
+    LDA #$01                ; Set menustall, as future drawing will
+    STA menustall           ;  be with the screen on
+
+  @MainLoop:
+    JSR CharName_Frame      ; Do a frame & get input
+
+    ; Check if Start (Return key) pressed -> Early confirm
+    LDA joy_start
+    BEQ :+
+      LDA #0
+      STA joy_start
+      JMP @Done
+  :
+
+    LDA joy_a
+    BNE @A_Pressed          ; Check if A or B pressed
+    LDA joy_b
+    BNE @B_Pressed
+
+    LDA joy                 ; Otherwise see if D-pad state has changed
+    AND #$0F
+    CMP joy_prevdir
+    BEQ @MainLoop           ; no change? Jump back
+    STA joy_prevdir
+
+    ; D-pad state has changed, see what it changed to
+    CMP #$00
+    BEQ @MainLoop           ; if released, do nothing and loop
+
+    CMP #$04
+    BCC @Left_Or_Right      ; if < 4, L or R pressed
+
+    CMP #$08                ; otherwise, if == 8, Up pressed
+    BNE @Down               ; otherwise, if != 8, Down pressed
+
+  @Up:
+    DEC namecurs_y          ; DEC cursor Y position
+    BPL @MainLoop
+    LDA #$06                ; wrap 0->6
+    STA namecurs_y
+    JMP @MainLoop
+
+  @Down:
+    INC namecurs_y          ; INC cursor Y position
+    LDA namecurs_y
+    CMP #$07                ; wrap 6->0
+    BCC @MainLoop
+    LDA #$00
+    STA namecurs_y
+    JMP @MainLoop
+
+  @Left_Or_Right:
+    CMP #$02                ; if D-pad state == 2, Left pressed
+    BNE @Right              ; else, Right pressed
+
+  @Left:
+    DEC namecurs_x          ; DEC cursor X position
+    BPL @MainLoop
+    LDA #$09                ; wrap 0->9
+    STA namecurs_x
+    JMP @MainLoop
+
+  @Right:
+    INC namecurs_x          ; INC cursor X position
+    LDA namecurs_x
+    CMP #$0A                ; wrap 9->0
+    BCC @MainLoop
+    LDA #$00
+    STA namecurs_x
+    JMP @MainLoop
+
+  @B_Pressed:
+    LDA #$FF                ; if B was pressed, erase the previous tile
+    STA @selectedtile       ;   by setting selectedtile to be a space
+
+    LDA cursor              ; then by pre-emptively moving the cursor back
+    SEC                     ;   so @SetTile will overwrite the prev char
+    SBC #$01                ;   instead of the next one
+    BMI @Cancel             ; if cursor was already 0, cancel back to class select!
+    STA cursor
+
+    LDA #$00                ; set cursoradd to 0 so @SetTile doesn't change
+    STA @cursoradd          ; the cursor
+    STA joy_b               ; clear joy_b as well
+    JMP @SetTile
+
+  @Cancel:
+    LDA #$00
+    STA joy_b
+    SEC                     ; SEC to indicate user cancelled back to class select
+    RTS
+
+  @A_Pressed:
+    LDX namecurs_y                  ; when A is pressed, clear joy_a
+    LDA #$00
+    STA joy_a                       ; Then get the tile they selected by first
+    LDA lut_NameInputRowStart, X    ;  running the Y cursor through a row lut
+    CLC
+    ADC namecurs_x                  ; add X cursor
+    ASL A                           ; and multiply by 2 -- since there are spaces between tiles
+    TAX                             ; use that value as an index to the lut_NameInput
+    LDA lut_NameInput, X
+    STA @selectedtile               ; record selected tile
+    LDA #$01
+    STA @cursoradd                  ; set cursoradd to 1 to indicate we want @SetTile to move the cursor forward
+
+    LDA cursor                      ; check current cursor position
+    CMP #$04                        ;  If we've already input 4 letters for this name....
+    BCS @Done                       ;  .. then we're done. Branch ahead
+                                    ; Otherwise, fall through to SetTile
+
+  @SetTile:
+    LDA cursor                  ; use cursor and char_index to access the appropriate
+    CLC                         ;   letter in this character's name
+    ADC char_index
+    TAX
+    LDA @selectedtile
+    STA ptygen_name, X          ; and write the selected tile
+
+    JSR NameInput_DrawName      ; Redraw the name as it appears on-screen
+
+    LDA cursor                  ; Then add to our cursor
+    CLC
+    ADC @cursoradd
+    BPL :+                      ; clipping at 0 (if subtracting -- although this never happens)
+      LDA #$00
+  : STA cursor
+
+    JMP @MainLoop               ; And keep going!
+
+  @Done:
+    CLC                         ; CLC to indicate name was successfully input
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
 ;;  PtyGen_Frame  [2933]
 ;;
 ;;    Does typical frame handling for the Party Gen screen
@@ -808,6 +1068,27 @@ PtyGen_Frame:
     JSR CallMusicPlay_L
 
     JMP PtyGen_Joy
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  CharName_Frame  [2957]
+;;
+;;    Does typical frame stuff for the Character naming screen
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+CharName_Frame:
+    JSR ClearOAM            ; wipe OAM then draw the cursor
+    JSR CharName_DrawCursor
+
+    JSR WaitForVBlank_L     ; VBlank
+
+    LDA #BANK_THIS          ; keep playing music
+    STA cur_bank
+    JSR CallMusicPlay_L
+
+    JMP PtyGen_Joy          ; then update joy
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1060,7 +1341,7 @@ PtyGen_DrawOneText:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  PtyGen_DrawCursor  [$9F26 :: 0x39F36]  [3155]
+;;  PtyGen_DrawCursor  [3155]
 ;;
 ;;    Draws the cursor for the Party Generation screen
 ;;
@@ -1073,6 +1354,208 @@ PtyGen_DrawCursor:
     LDA ptygen_curs_y, X
     STA spr_y
     JMP DrawCursor          ; and draw the cursor there
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  CharName_DrawCursor  [3173]
+;;
+;;    Draws the cursor for the Character Naming screen
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+CharName_DrawCursor:
+    LDA namecurs_x          ; X position = (cursx * 16) + 88
+    ASL A
+    ASL A
+    ASL A
+    ASL A
+    CLC
+    ADC #88
+    STA spr_x
+
+    LDA namecurs_y          ; Y position = (cursy * 16) + 106
+    ASL A
+    ASL A
+    ASL A
+    ASL A
+    CLC
+    ADC #106
+    STA spr_y
+
+    JMP DrawCursor
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  NameInput_DrawName  [3245]
+;;
+;;    Used during party generation.. specifically the name input screen
+;;  to draw the character's name at the top of the screen.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+NameInput_DrawName:
+    @buf  = $5C     ; local - buffer to hold the name for printing
+
+    LDX char_index          ; copy the character's name to our temp @buf
+    LDA ptygen_name, X
+    STA @buf
+    LDA ptygen_name+1, X
+    STA @buf+1
+    LDA ptygen_name+2, X
+    STA @buf+2
+    LDA ptygen_name+3, X
+    STA @buf+3              ; The code assumes @buf+4 ($60) is 0 (null terminator)
+
+    LDA #>@buf              ; Set the text pointer
+    STA text_ptr+1
+    LDA #<@buf
+    STA text_ptr
+
+    LDA #BANK_THIS          ; set cur/ret banks
+    STA cur_bank
+    STA ret_bank
+
+    LDA #18                 ; set X/Y positions for the name to be printed (Row 3, Col 18)
+    STA dest_x
+    LDA #3
+    STA dest_y
+
+    LDA #$01                ; drawing while screen is on, so set menustall
+    STA menustall
+
+    JMP DrawComplexString   ; Then draw the name and exit!
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawNameInputScreen  [3287]
+;;
+;;  Draws everything except for the player's name.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawNameInputScreen:
+    ; Paint Screen RAM with character $00 (solid black block)
+    LDX #$00
+    LDA #$00
+@LoopScreen:
+    STA $4000, X
+    STA $4100, X
+    STA $4200, X
+    STA $4300, X
+    INX
+    BNE @LoopScreen
+
+    ; Paint Color RAM with character color 00 (black)
+    LDX #$00
+    LDA #COLOR_BLACK
+@LoopColor:
+    STA COLOR_RAM, X
+    STA COLOR_RAM + $0100, X
+    STA COLOR_RAM + $0200, X
+    STA COLOR_RAM + $0300, X
+    INX
+    BNE @LoopColor
+
+    ; Ensure VIC-II Bank 1 and standard text mode are set
+    LDA CI2DRA
+    ORA #$03
+    STA CI2DRA
+    LDA CI2PRA
+    AND #$FC
+    ORA #VIC_BANK1
+    STA CI2PRA
+
+    LDA #$1B
+    STA SCROLY
+    LDA #$08
+    STA SCROLX
+    LDA #$02                   ; Screen: $4000, Charset: $4800
+    STA VMCSB
+
+    ; Clear soft2000 & joypad catchers
+    LDA #$08
+    STA soft2000
+    LDA #0
+    STA joy_a
+    STA joy_b
+    STA joy
+    STA joy_prevdir
+    STA menustall
+
+    ; Draw the small top box containing the player's name
+    ; (Centered at X=16, Y=1, Width=8, Height=4)
+    LDA #16
+    STA box_x
+    LDA #1
+    STA box_y
+    LDA #8
+    STA box_wd
+    LDA #4
+    STA box_ht
+    JSR DrawBox
+
+    ; Draw the big bottom box containing alphabet input
+    ; (Centered at X=8, Y=6, Width=23, Height=18)
+    LDA #8
+    STA box_x
+    LDA #6
+    STA box_y
+    LDA #23
+    STA box_wd
+    LDA #18
+    STA box_ht
+    JSR DrawBox
+
+    ; Print the NameInput LUT as a string inside the bottom box
+    LDA #<lut_NameInput
+    STA text_ptr
+    LDA #>lut_NameInput
+    STA text_ptr+1
+    LDA #10
+    STA dest_x
+    LDA #7
+    STA dest_y
+    LDA #BANK_THIS
+    STA cur_bank
+    STA ret_bank
+    JMP DrawComplexString
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Name Input Row Start lut  [3344]
+;;
+;;    offset (in usable characters) to start of each row in lut_NameInput
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_NameInputRowStart:
+  .BYTE  0, 10, 20, 30, 40, 50, 60  ; 10 characters of data per row
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Name Input lut  [3356]
+;;
+;;    This LUT contains the characters on the name input screen.
+;;    Stored in null-terminated string format with $FF (spaces) and
+;;    $01 (double line breaks) so it can be drawn in one pass.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_NameInput:
+  .BYTE $8A, $FF, $8B, $FF, $8C, $FF, $8D, $FF, $8E, $FF, $8F, $FF, $90, $FF, $91, $FF, $92, $FF, $93, $01  ; A - J
+  .BYTE $94, $FF, $95, $FF, $96, $FF, $97, $FF, $98, $FF, $99, $FF, $9A, $FF, $9B, $FF, $9C, $FF, $9D, $01  ; K - T
+  .BYTE $9E, $FF, $9F, $FF, $A0, $FF, $A1, $FF, $A2, $FF, $A3, $FF, $BE, $FF, $BF, $FF, $C0, $FF, $FF, $01  ; U - Z ; , . <space>
+  .BYTE $80, $FF, $81, $FF, $82, $FF, $83, $FF, $84, $FF, $85, $FF, $86, $FF, $87, $FF, $88, $FF, $89, $01  ; 0 - 9
+  .BYTE $A4, $FF, $A5, $FF, $A6, $FF, $A7, $FF, $A8, $FF, $A9, $FF, $AA, $FF, $AB, $FF, $AC, $FF, $AD, $01  ; a - j
+  .BYTE $AE, $FF, $AF, $FF, $B0, $FF, $B1, $FF, $B2, $FF, $B3, $FF, $B4, $FF, $B5, $FF, $B6, $FF, $B7, $01  ; k - t
+  .BYTE $B8, $FF, $B9, $FF, $BA, $FF, $BB, $FF, $BC, $FF, $BD, $FF, $C2, $FF, $C3, $FF, $C4, $FF, $C5, $01  ; u - z - .. ! ?
+  .BYTE $01
+  .BYTE $FF, $FF, $FF, $9C, $8E, $95, $8E, $8C, $9D, $FF, $FF, $97, $8A, $96, $8E, $00                      ;   SELECT  NAME
 
 
 

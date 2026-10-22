@@ -756,7 +756,7 @@ lut_ScreenRowHi:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  DrawBox  [$E06E :: 0x3E07E]  [7787]
+;;  DrawBox  [7787]
 ;;
 ;;    Draws a standard bordered window box.
 ;;
@@ -814,7 +814,7 @@ DrawBox:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Draw middle row of a box (used by DrawBox)   [$E0A5 :: 0x3E0B5]  [7839]
+;;  Draw middle row of a box (used by DrawBox)  [7839]
 ;;
 ;;   IN:  tmp+10   = width of innards (box_wd - 2)
 ;;        ppu_dest = Screen RAM address of the start of this row
@@ -869,7 +869,7 @@ DrawBoxRow_Mid:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Draw bottom row of a box (used by DrawBox)   [$E0D7 :: 0x3E0E7]  [7882]
+;;  Draw bottom row of a box (used by DrawBox)  [7882]
 ;;
 ;;   IN:  tmp+10   = width of innards (box_wd - 2)
 ;;        ppu_dest = Screen RAM address of the start of this row
@@ -907,7 +907,7 @@ DrawBoxRow_Bot:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Draw top row of a box (used by DrawBox)   [$E0FC :: 0x3E10C]  [7918]
+;;  Draw top row of a box (used by DrawBox)  [7918]
 ;;
 ;;   IN:  tmp+10   = width of innards (box_wd - 2)
 ;;        ppu_dest = Screen RAM address of the start of this row
@@ -962,7 +962,7 @@ DrawBoxRow_Top:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Menu Conditional Stall   [$E12E :: 0x3E13E]  [7962]
+;;  Menu Conditional Stall  [7962]
 ;;
 ;;    Conditionally stalls (waits) a frame when menustall is nonzero.
 ;;
@@ -1406,7 +1406,7 @@ LoadMenuCHR:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  DTE table   [$F050 :: 0x3F060]  [11294]
+;;  DTE table  [11294]
 ;;
 ;;  first table is the 2nd character in a DTE pair
 ;;  second table is the 1st character in a DTE pair
