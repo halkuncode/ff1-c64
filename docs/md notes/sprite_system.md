@@ -107,52 +107,122 @@ The sprite subsystem represents the largest architectural divide between the two
    NES Meta-Sprite (2x3 tiles)           C64 4-Sprite Hero Stack
    16 px wide x 24 px high               24 px wide x 42 px high
    ┌────────┬────────┐                   ┌──────────────────────────────┐
-   │ Tile 1 │ Tile 2 │ (Upper)           │  Sprite 0: Body  (Dark Red)  │
-   ├────────┼────────┤                   │  Sprite 2: Skin  (Peach)     │ (Y+0)
-   │ Tile 3 │ Tile 4 │ (Mid)             │  Sprite 3: Light (Lt Grey)   │
+   │ Tile 1 │ Tile 2 │ (Upper)           │  Sprite 0: Body   (Layer 0)  │
+   ├────────┼────────┤                   │  Sprite 2: Skin   (Layer 2)  │ (Y + dY)
+   │ Tile 3 │ Tile 4 │ (Mid)             │  Sprite 3: Accent (Layer 3)  │
    ├────────┼────────┤                   ├──────────────────────────────┤
-   │ Tile 5 │ Tile 6 │ (Lower)           │  Sprite 1: Feet  (Dark Red)  │ (Y+21)
+   │ Tile 5 │ Tile 6 │ (Lower)           │  Sprite 1: Feet   (Layer 1)  │ (Y + 21)
    └────────┴────────┘                   └──────────────────────────────┘
 ```
 
 ### The Hero Sprite Stack (4 Sprites per Hero)
-Because NES heroes have distinct heads, bodies, and feet, they exceed the 21-pixel vertical height of a single C64 sprite. The redrawn C64 heroes (as seen in `res/heros/fighter.asm`) use a **4-sprite multi-layer composite** ($24 \times 42$ pixels total):
-1. **Upper Body / Head ($Y+0$ to $Y+20$):**
-   * **Sprite 0 (Body):** Color = Dark Red (Clothes, Armor).
-   * **Sprite 2 (Skin):** Color = Peach (Face, Arms).
-   * **Sprite 3 (Highlight):** Color = Light Grey (Helmet, Sword gleam, White details).
-   * *All 3 sprites are stacked at the same relative $(X, Y)$ coordinate in Hi-Res mode.*
-2. **Lower Body / Feet ($Y+21$ to $Y+41$):**
-   * **Sprite 1 (Feet/Boots):** Color = Dark Red, placed at relative $(X, Y+21)$.
+Because NES heroes have distinct heads, bodies, and feet, they exceed the 21-pixel vertical height of a single C64 sprite. The redrawn C64 heroes (defined in `res/heros/*.asm`) use a **4-sprite multi-layer composite** ($24 \times 42$ pixels total):
+1. **Upper Body / Head / Accents ($Y+0$ to $Y+20$):**
+   * **Sprite 0 (Body):** Clothes, Armor, Tunic (e.g., Red for Fighter/Red Mage, Brown for Thief, Cyan for Black Belt/Black Mage, White for White Mage).
+   * **Sprite 1 (Feet/Boots):** Lower body extension, placed at relative $(X, Y+21)$.
+   * **Sprite 2 (Skin / Accents):** Face, arms, exposed skin (Peach = Color 10), or custom accents.
+   * **Sprite 3 (Highlight / Hair / Secondary):** Helmet gleam, hair, feather, hat shade.
+   * *Layers are drawn in Hi-Res mode ($1 \times 1$ crisp pixels) layered on top of each other.*
 
-### Raster IRQ Multiplexing for 4 Heroes
-With each hero requiring 4 sprites:
-$$\text{4 Heroes} \times \text{4 Sprites} = 16 \text{ Hardware Sprites}$$
-Because the VIC-II only has 8 physical sprite registers, displaying all 4 heroes simultaneously (such as in `NewGamePartyGeneration`) requires **Raster IRQ Multiplexing**:
+### Handling Atypical Layer Offsets (The White Mage Snag)
+While standard heroes share $(dX=0, dY=0)$ for upper layers and $(dX=0, dY=21)$ for feet, some heroes introduce unique layer offsets:
+* **White Mage (`res/heros/whitemage.asm`):**
+  * Sprite 0: Body (White) at $(0, 0)$
+  * Sprite 1: Feet (White) at $(0, 21)$
+  * **Sprite 2: Accents (Red robe triangles) at $(0, 3)$** $\leftarrow$ *Atypical $+3$ pixel vertical offset!*
+  * Sprite 3: Skin (Peach) at $(0, 0)$
+* **Solution:** To handle any hero class with irregular offsets, the sprite engine defines explicit relative offsets $(dX, dY)$ per layer inside the hero template table rather than hardcoding $Y+0$ and $Y+21$.
 
-```text
- Scanline
-    │
-    ▼
- Y ≈ 30   [Hero 0: Top-Left (4 Sprites)]    [Hero 1: Top-Right (4 Sprites)]
-          Sprites 0, 1, 2, 3                Sprites 4, 5, 6, 7
-          (Upper: 3 sprites; Feet: 1 sprite)
-          ─────────────────────────────────────────────────────────────────
- Y ≈ 85   === MID-FRAME RASTER INTERRUPT (Split Line) ===
-          Reassign VIC-II Registers 0-7:
-            • New Y coordinates (shifted down)
-            • New Sprite Pointers (Classes for Hero 2 & 3)
-            • New Colors & Bitmasks
-          ─────────────────────────────────────────────────────────────────
- Y ≈ 110  [Hero 2: Bot-Left (4 Sprites)]    [Hero 3: Bot-Right (4 Sprites)]
-          Sprites 0, 1, 2, 3                Sprites 4, 5, 6, 7
+---
+
+### The Expanded Virtual OAM Buffer (8 Bytes per Slot)
+
+To allow room for future expansion beyond the NES's 4-byte OAM entries (and to enable ultra-fast power-of-2 $8 \times N$ indexing via `ASL A, ASL A, ASL A`), each Virtual Sprite entry is formatted as an **8-byte descriptor**:
+
+```assembly
+; ==============================================================================
+; Virtual OAM Entry Format (8 bytes per hardware sub-sprite)
+; ==============================================================================
+; Offset  Name          Description
+; +$00    spr_x_lo      Horizontal pixel coordinate low byte (0-255)
+; +$01    spr_x_hi      Horizontal pixel coordinate MSB bitmask (%00000001)
+; +$02    spr_y         Vertical scanline coordinate (0-255)
+; +$03    spr_ptr       VIC-II 64-byte block pointer (e.g., $60-$7F in Bank 1)
+; +$04    spr_col       Native C64 hardware color (0-15: Red, Peach, Cyan, etc.)
+; +$05    spr_flags     Render flags: %00000000 = Hi-Res, %00000001 = MultiColor,
+;                                     %00000010 = Behind BG, %10000000 = Active/Visible
+; +$06    spr_dx        Relative X offset from parent actor origin (signed -128..+127)
+; +$07    spr_dy        Relative Y offset from parent actor origin (signed -128..+127)
 ```
 
-### Avoiding Scanline Clashes: Cursor Placement
-* On scanlines where Hero 0 and Hero 1 upper bodies reside, **6 hardware sprites** are active simultaneously ($3 + 3 = 6$).
-* The Finger Cursor (`DrawCursor`) is a 2-sprite composite (Base + Overlay).
-* If the cursor were placed on the exact same scanlines as the upper body, all **8 scanline sprites** would be consumed, leaving zero margin.
-* **Solution:** The finger cursor is placed on the **Class Name text line** (above the hero sprites) or on the **Name Entry line** (below the hero feet). This ensures the cursor never competes for raster scanlines with the 6 upper-body hero sprites.
+#### Actor Budget:
+* **4 Heroes:** 4 sub-sprites each = 16 sub-sprites ($16 \times 8 = 128$ bytes).
+* **1 Cursor (Finger):** 2 sub-sprites (Base + Overlay) = 2 sub-sprites ($2 \times 8 = 16$ bytes).
+* **Total Buffer Size:** **18 Virtual Sprite Slots = 144 bytes**.
+* **Memory Placement:** Allocated at `$0340–$03CF` (the C64 tape buffer area, completely clear of KERNAL vectors at `$0300–$0333` and zero page).
+
+---
+
+### Native C64 Color Tables (Zero Runtime Translation)
+
+Rather than translating NES master color codes ($00–$3F) through `lut_NES_to_C64` every frame, the hero sprite lookup tables store **native C64 hardware color numbers (0–15)** directly:
+
+```assembly
+lut_HeroClassSprites:
+    ; Fighter (Class 0):
+    ;          Block Pointer,       Color,               dX,  dY
+    .byte      BLOCK_FGT_BODY,      COLOR_RED,            0,   0   ; Layer 0: Body
+    .byte      BLOCK_FGT_FEET,      COLOR_RED,            0,  21   ; Layer 1: Feet
+    .byte      BLOCK_FGT_SKIN,      COLOR_PEACH,          0,   0   ; Layer 2: Skin
+    .byte      BLOCK_FGT_ACCENT,    COLOR_LIGHT_GREY,     0,   0   ; Layer 3: Hilight
+
+    ; White Mage (Class 4) - Handling the atypical offset:
+    .byte      BLOCK_WHM_BODY,      COLOR_WHITE,          0,   0   ; Layer 0: Body
+    .byte      BLOCK_WHM_FEET,      COLOR_WHITE,          0,  21   ; Layer 1: Feet
+    .byte      BLOCK_WHM_ACCENTS,   COLOR_RED,            0,   3   ; Layer 2: Red Accents (dY=+3!)
+    .byte      BLOCK_WHM_SKIN,      COLOR_PEACH,          0,   0   ; Layer 3: Skin
+```
+
+---
+
+### Solving the Scanline Multiplexing Clash: Moving the Finger to the Class Name
+
+In the Party Generation screen, displaying all 4 heroes plus the finger cursor presents a critical hardware bottleneck:
+* Hero 0 (Left) and Hero 1 (Right) upper bodies require **6 hardware sprites** simultaneously ($3 + 3 = 6$).
+* The Finger Cursor requires **2 hardware sprites** (Base + Overlay).
+* If the finger cursor sits at the hero sprite's vertical coordinate ($Y \approx 90$), total active sprites on those scanlines reaches $6 + 2 = \mathbf{8 \text{ sprites}}$, leaving zero margin and triggering multiplexer timing collisions with atypical offsets like the White Mage ($Y+3$).
+
+#### The Architectural Solution:
+**Move the finger cursor up to point at the Class Name text!**
+
+```
+ Scanline
+    │
+ Y ≈ 74   [ > FIGHTER ] (Cursor pointing at text)   [   THIEF   ]
+          Sprites 0 & 1: Finger Cursor (Scanlines 74-89)
+          ─────────────────────────────────────────────────────────────────
+ Y ≈ 90   [Hero 0 Upper Body]                       [Hero 1 Upper Body]
+          Sprites 0, 2, 3 (TL)                      Sprites 4, 6, 7 (TR)
+          (Scanlines 90-110: 6 hardware sprites active, 0 cursor conflict!)
+          ─────────────────────────────────────────────────────────────────
+ Y ≈ 111  [Hero 0 Feet]                             [Hero 1 Feet]
+          Sprite 1 (TL)                             Sprite 5 (TR)
+          (Scanlines 111-131: 2 hardware sprites active)
+          ─────────────────────────────────────────────────────────────────
+ Y ≈ 145  === MID-FRAME RASTER IRQ (Window Gap) ===
+          Reassign VIC-II Registers 0-7:
+            • New Y coordinates (+104 scanlines down to Bottom Boxes)
+            • New Sprite Pointers & Colors for Hero 2 & Hero 3
+          ─────────────────────────────────────────────────────────────────
+ Y ≈ 178  [ > Bl.BELT ] (If bottom slot active)     [   RedMAGE ]
+ Y ≈ 194  [Hero 2 Upper Body]                       [Hero 3 Upper Body]
+ Y ≈ 215  [Hero 2 Feet]                             [Hero 3 Feet]
+```
+
+#### Why This Cleanly Resolves the Architecture:
+1. **Zero Scanline Overlap:** The cursor occupies scanlines 74–89. The hero upper bodies begin at scanline 90. They never share a single raster line!
+2. **Complete Parity with Battle:** In Battle, the heroes are stacked in a single vertical column (Hero 0 at Y≈60, Hero 1 at Y≈100, Hero 2 at Y≈140, Hero 3 at Y≈180). Reusing this same multiplexer logic simply steps the raster split down through each hero slot.
+3. **Intuitive UI:** Pointing the finger directly at the class name (`> FIGHTER`) clearly signals to the player that directional input is changing the hero class.
 
 ---
 

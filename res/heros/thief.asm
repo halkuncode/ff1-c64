@@ -1,6 +1,6 @@
 ; Thief hi-res sprite
 ; sprite 0: body
-; color = 8 (brown))
+; color = 8 (brown)
 ; relitive position 0,0
 ; sorite 1: feet
 ; color = 8 (brown) 

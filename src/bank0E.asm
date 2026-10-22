@@ -981,10 +981,10 @@ PtyGen_DrawCursor:
 
 lut_PtyGenBuf:
   ; Hero 0: Fighter (Top-Left)
-  .BYTE $00, $00, $FF, $FF, $FF, $FF, 11,  9,  9,  3, 120,  90,  8,  1, 104,  90
+  .BYTE $00, $00, $FF, $FF, $FF, $FF, 11,  9,  9,  3, 120,  90,  8,  1,  80,  74
   ; Hero 1: Thief (Top-Right)
-  .BYTE $01, $00, $FF, $FF, $FF, $FF, 25,  9, 23,  3, 232,  90, 22,  1, 216,  90
+  .BYTE $01, $00, $FF, $FF, $FF, $FF, 25,  9, 23,  3, 232,  90, 22,  1, 192,  74
   ; Hero 2: Black Belt (Bottom-Left)
-  .BYTE $02, $00, $FF, $FF, $FF, $FF, 11, 22,  9, 16, 120, 194,  8, 14, 104, 194
+  .BYTE $02, $00, $FF, $FF, $FF, $FF, 11, 22,  9, 16, 120, 194,  8, 14,  80, 178
   ; Hero 3: Red Mage (Bottom-Right)
-  .BYTE $03, $00, $FF, $FF, $FF, $FF, 25, 22, 23, 16, 232, 194, 22, 14, 216, 194
+  .BYTE $03, $00, $FF, $FF, $FF, $FF, 25, 22, 23, 16, 232, 194, 22, 14, 192, 178
