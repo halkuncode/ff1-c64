@@ -1,0 +1,3 @@
+[submodule "orgsrc/FF1Disassembly"]
+	path = orgsrc/FF1Disassembly
+	url = https://github.com/Entroper/FF1Disassembly.git

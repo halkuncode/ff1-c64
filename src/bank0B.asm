@@ -12,7 +12,7 @@
 ; $8400 - $8BFF: Battle Formations (2048 bytes, 128 formations * 16 bytes)
 .align $100
 lut_BattleFormations:
-    .incbin "../orgsrc/Final Fantasy Disassembly/bin/0B_8400_battleformations.bin"
+    .incbin "../res/data/battleformations.bin"
 
 loop:
     jmp loop
