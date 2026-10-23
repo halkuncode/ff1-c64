@@ -365,10 +365,10 @@ UpdateJoy:
 ;;   the game uses the keyboard only)
 ;;  Scans C64 keyboard matrix for mapped controls:
 ;;    D-Pad:  W (Up), S (Down), A (Left), D (Right)
-;;    Btn A:  Space
+;;    Btn A:  Return or Space
 ;;    Btn B:  Backspace (Inst/Del) or Esc (Run/Stop)
-;;    Select: Left Shift or Right Shift
-;;    Start:  Return or Commodore (C=)
+;;    Select: Commodore (C=)
+;;    Start:  F1
 ;;
 ;;  OUT: 'joy' = 8-bit NES button format ($80=A, $40=B, $20=Select, $10=Start, $08=U, $04=D, $02=L, $01=R)
 ;;
@@ -386,7 +386,8 @@ ReadJoypadData:
 
     ; --- Keyboard Col 0 ($FE) ---
     ; Row 0 (bit 0) = INST/DEL (Button B)
-    ; Row 1 (bit 1) = RETURN (Start)
+    ; Row 1 (bit 1) = RETURN (Button A)
+    ; Row 4 (bit 4) = F1 (Start)
     LDA #$FE
     STA CIAPRA
     LDA CIAPRB
@@ -397,7 +398,13 @@ ReadJoypadData:
     ORA #BTN_B
     STA joy
 :   TXA
-    AND #$02        ; Row 1: Return
+    AND #$02        ; Row 1: Return (Button A)
+    BNE :+
+    LDA joy
+    ORA #BTN_A
+    STA joy
+:   TXA
+    AND #$10        ; Row 4: F1 (Start)
     BNE :+
     LDA joy
     ORA #BTN_START
@@ -408,7 +415,6 @@ ReadJoypadData:
     ; Row 1 (bit 1) = W (Up)
     ; Row 2 (bit 2) = A (Left)
     ; Row 5 (bit 5) = S (Down)
-    ; Row 7 (bit 7) = Left Shift (Select)
     LDA #$FD
     STA CIAPRA
     LDA CIAPRB
@@ -430,11 +436,6 @@ ReadJoypadData:
     LDA joy
     ORA #DOWN
     STA joy
-:   TXA
-    BMI :+          ; Row 7 (bit 7): Left Shift (0 when pressed)
-    LDA joy
-    ORA #BTN_SELECT
-    STA joy
 :
 
     ; --- Keyboard Col 2 ($FB) ---
@@ -449,36 +450,24 @@ ReadJoypadData:
     STA joy
 :
 
-    ; --- Keyboard Col 6 ($BF) ---
-    ; Row 4 (bit 4) = Right Shift (Select)
-    LDA #$BF
-    STA CIAPRA
-    LDA CIAPRB
-    AND #$10        ; Row 4: Right Shift
-    BNE :+
-    LDA joy
-    ORA #BTN_SELECT
-    STA joy
-:
-
     ; --- Keyboard Col 7 ($7F) ---
     ; Row 4 (bit 4) = Space (Button A)
-    ; Row 5 (bit 5) = Commodore C= (Start)
+    ; Row 5 (bit 5) = Commodore C= (Select)
     ; Row 7 (bit 7) = Run/Stop (Button B)
     LDA #$7F
     STA CIAPRA
     LDA CIAPRB
     TAX
-    AND #$10        ; Row 4: Space
+    AND #$10        ; Row 4: Space (Button A)
     BNE :+
     LDA joy
     ORA #BTN_A
     STA joy
 :   TXA
-    AND #$20        ; Row 5: Commodore (C=)
+    AND #$20        ; Row 5: Commodore (C=) (Select)
     BNE :+
     LDA joy
-    ORA #BTN_START
+    ORA #BTN_SELECT
     STA joy
 :   TXA
     BMI :+          ; Row 7 (bit 7): Run/Stop (0 when pressed)

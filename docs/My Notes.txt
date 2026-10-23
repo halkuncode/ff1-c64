@@ -4,3 +4,7 @@ default
 66 66 66
 AA AA AA
 FF FF FF
+
+
+Column Sequence=[1,2,3,4,3,4,1,2,1,2,3,4,3,4]
+Slice A→Slice B→Slice B→Slice A→Slice A→Slice B→Slice B

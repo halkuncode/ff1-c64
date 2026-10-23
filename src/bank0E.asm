@@ -377,6 +377,13 @@ TitleScreen_Loop:
 
 TitleScreen_OptionChosen:
     JSR PlaySFX_MenuSel     ; Play selection sound on choice!
+    LDA #0
+    STA joy_a
+    STA joy_b
+    STA joy_start
+    STA joy_select
+    STA joy
+    STA joy_prevdir
     LDA cursor
     LSR A                   ; C=1 if New Game (cursor=1), C=0 if Continue (cursor=0)
     RTS                     ; Option selected! Return to bank0F.asm (falls to halt_loop)
@@ -811,6 +818,11 @@ DoPartyGen_OnCharacter:
 
     LDA joy_a
     BEQ @CheckB
+    LDA #0
+    STA joy_a
+    STA joy_b
+    STA joy_start
+    STA joy_select
     JSR DoNameInput                 ; A pressed -> go to name input screen!
     BCS DoPartyGen_OnCharacter      ; If cancelled (B at cursor 0), redraw screen & resume class select
     CLC                             ; Name successfully entered! Return Carry Clear
@@ -893,6 +905,8 @@ DoNameInput:
     STA menustall           ; zero a bunch of misc vars being used here
     STA joy_a
     STA joy_b
+    STA joy_start
+    STA joy_select
     STA joy
     STA joy_prevdir
 
@@ -922,14 +936,6 @@ DoNameInput:
 
   @MainLoop:
     JSR CharName_Frame      ; Do a frame & get input
-
-    ; Check if Start (Return key) pressed -> Early confirm
-    LDA joy_start
-    BEQ :+
-      LDA #0
-      STA joy_start
-      JMP @Done
-  :
 
     LDA joy_a
     BNE @A_Pressed          ; Check if A or B pressed
@@ -1184,6 +1190,8 @@ PtyGen_DrawScreen:
     LDA #0
     STA joy_a
     STA joy_b
+    STA joy_start
+    STA joy_select
     STA joy
     STA joy_prevdir
 
@@ -1437,6 +1445,12 @@ NameInput_DrawName:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 DrawNameInputScreen:
+    ; Set border to black, background to blue
+    LDA #COLOR_BLACK
+    STA EXTCOL
+    LDA #COLOR_BLUE
+    STA BGCOL0
+
     ; Paint Screen RAM with character $00 (solid black block)
     LDX #$00
     LDA #$00
@@ -1481,6 +1495,8 @@ DrawNameInputScreen:
     LDA #0
     STA joy_a
     STA joy_b
+    STA joy_start
+    STA joy_select
     STA joy
     STA joy_prevdir
     STA menustall
@@ -1498,14 +1514,14 @@ DrawNameInputScreen:
     JSR DrawBox
 
     ; Draw the big bottom box containing alphabet input
-    ; (Centered at X=8, Y=6, Width=23, Height=18)
+    ; (Centered at X=8, Y=6, Width=23, Height=19)
     LDA #8
     STA box_x
     LDA #6
     STA box_y
     LDA #23
     STA box_wd
-    LDA #18
+    LDA #19
     STA box_ht
     JSR DrawBox
 
