@@ -32,14 +32,14 @@ lut_BattleCHR_Bank07:
 ; ;;  Monsters (8120): Imp - Wolf - Iguana - Giant
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 lut_Backdrop_00_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
-    .incbin "../res/backdrops/backdrop00.chr"
+    .incbin "../res/battle/backdrops/backdrop00.chr"
     .res 152, $00  ; Pad 152 bytes (136+152=288) to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_00_Graphic:  ; 110 tiles (880 bytes) -> Imp - Wolf - Iguana - Giant
-    .incbin "../res/monsters/imp.chr"     ; 16 tiles (128 bytes)
-    .incbin "../res/monsters/wolf.chr"    ; 16 tiles (128 bytes)
-    .incbin "../res/monsters/iguana.chr"  ; 36 tiles (288 bytes)
-    .incbin "../res/monsters/giant.chr"   ; 36 tiles (288 bytes)
+    .incbin "../res/battle/monsters/imp.chr"     ; 16 tiles (128 bytes)
+    .incbin "../res/battle/monsters/wolf.chr"    ; 16 tiles (128 bytes)
+    .incbin "../res/battle/monsters/iguana.chr"  ; 36 tiles (288 bytes)
+    .incbin "../res/battle/monsters/giant.chr"   ; 36 tiles (288 bytes)
     .res 48, $00                          ; 6 extra tiles (48 bytes) -> total 110 tiles (880 bytes)
     .res 880, $00                         ; Pad 880 bytes ($0370) to maintain $0800 boundary to next backdrop
 
@@ -48,7 +48,7 @@ lut_Monsters_00_Graphic:  ; 110 tiles (880 bytes) -> Imp - Wolf - Iguana - Giant
 ; ;;  Monsters (8920): Sahag - Pirate - Shark - BigEye
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 lut_Backdrop_01_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
-    .incbin "../res/backdrops/backdrop01.chr"
+    .incbin "../res/battle/backdrops/backdrop01.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_01_Graphic:  ; 110 tiles (1760 bytes) -> Sahag - Pirate - Shark - BigEye
@@ -169,7 +169,7 @@ lut_Monsters_01_Graphic:  ; 110 tiles (1760 bytes) -> Sahag - Pirate - Shark - B
 ; ;;  Monsters (9120): Bone - Creep - Hyena - Ogre
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 lut_Backdrop_02_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
-    .incbin "../res/backdrops/backdrop02.chr"
+    .incbin "../res//battle/backdrops/backdrop02.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_02_Graphic:  ; 110 tiles (1760 bytes) -> Bone - Creep - Hyena - Ogre
@@ -290,7 +290,7 @@ lut_Monsters_02_Graphic:  ; 110 tiles (1760 bytes) -> Bone - Creep - Hyena - Ogr
 ; ;;  Monsters (9920): Asp - Lobster - Bull - Troll
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 lut_Backdrop_03_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
-    .incbin "../res/backdrops/backdrop03.chr"
+    .incbin "../res//battle/backdrops/backdrop03.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_03_Graphic:  ; 110 tiles (1760 bytes) -> Asp - Lobster - Bull - Troll
@@ -411,7 +411,7 @@ lut_Monsters_03_Graphic:  ; 110 tiles (1760 bytes) -> Asp - Lobster - Bull - Tro
 ; ;;  Monsters (A120): Image - Geist - Worm - Eye
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 lut_Backdrop_04_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
-    .incbin "../res/backdrops/backdrop04.chr"
+    .incbin "../res//battle/backdrops/backdrop04.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_04_Graphic:  ; 110 tiles (1760 bytes) -> Image - Geist - Worm - Eye
@@ -532,7 +532,7 @@ lut_Monsters_04_Graphic:  ; 110 tiles (1760 bytes) -> Image - Geist - Worm - Eye
 ; ;;  Monsters (A920): Medusa - Catman - Pede - Tiger
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 lut_Backdrop_05_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
-    .incbin "../res/backdrops/backdrop05.chr"
+    .incbin "../res//battle/backdrops/backdrop05.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_05_Graphic:  ; 110 tiles (1760 bytes) -> Medusa - Catman - Pede - Tiger
@@ -653,7 +653,7 @@ lut_Monsters_05_Graphic:  ; 110 tiles (1760 bytes) -> Medusa - Catman - Pede - T
 ; ;;  Monsters (B120): Vamp - Gargoyle - Earth - Dragon 1
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 lut_Backdrop_06_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
-    .incbin "../res/backdrops/backdrop06.chr"
+    .incbin "../res//battle/backdrops/backdrop06.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_06_Graphic:  ; 110 tiles (1760 bytes) -> Vamp - Gargoyle - Earth - Dragon 1
@@ -774,7 +774,7 @@ lut_Monsters_06_Graphic:  ; 110 tiles (1760 bytes) -> Vamp - Gargoyle - Earth - 
 ; ;;  Monsters (B920): Slime - Spider - Manticor - Ankylo
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 lut_Backdrop_07_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
-    .incbin "../res/backdrops/backdrop07.chr"
+    .incbin "../res//battle/backdrops/backdrop07.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_07_Graphic:  ; 110 tiles (1760 bytes) -> Slime - Spider - Manticor - Ankylo

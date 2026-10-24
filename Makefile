@@ -68,7 +68,7 @@ $(OBJDIR)/bank09.o: res/menu/menufont.chr res/heros/heroes.bin
 $(OBJDIR)/bank0A.o: res/data/bank0A.dat
 $(OBJDIR)/bank0B.o: res/data/battleformations.bin
 $(OBJDIR)/bank0D.o: res/menu/orbs.chr res/audio/scoredata.bin
-$(OBJDIR)/bank07.o: res/monsters/imp.chr res/monsters/wolf.chr res/monsters/iguana.chr res/monsters/giant.chr
+$(OBJDIR)/bank07.o: res/battle/monsters/imp.chr res/battle/monsters/wolf.chr res/battle/monsters/iguana.chr res/battle/monsters/giant.chr
 
 $(TARGET): $(OBJS) $(CFG)
 	$(LD) $(LDFLAGS) $(OBJS)
