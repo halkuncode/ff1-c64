@@ -1,0 +1,68 @@
+$0000 ┌─────────────────────────────────────────────────────────────┐
+      │ $0000 - $0001 : 6510 Processor Port (DDR & PORT / Banking)  │
+      │ $0002 - $0006 : Bootloader Temp Pointers (ptr1, ptr2)       │
+      │ $0007 - $00EF : Zero Page Game Variables (joy, scroll, etc.)│
+      │ $00F0 - $00FF : ZP Pointer Temps (soft2000, NTsoft2000)     │
+$0100 ├─────────────────────────────────────────────────────────────┤
+      │ $0100 - $01FF : 6502 Hardware Stack Pointer ($01FF -> $0100)│
+$0200 ├─────────────────────────────────────────────────────────────┤
+      │ $0200 - $023F : Shadow OAM Sprite Buffer (64 bytes)         │
+      │ $0240 - $025F : Virtual Palette RAM (cur_pal, 32 bytes)     │
+      │ $0260 - $02FF : Joypad, IRQ Scratch & Input Buffers         │
+$0300 ├─────────────────────────────────────────────────────────────┤
+      │ $0300 - $030F : Cartridge Boot Relocation Stub (cartboot)   │
+      │ $0314 - $0319 : Hardware Interrupt Vectors (IRQ / NMI)      │
+      │ $0340 - $03DF : draw_buf (NES PPU Transfer Buffer, 96 bytes)│
+      │ $03E0 - $03FF : inroom_pal (In-Room Alternate Palette RAM)  │
+$0400 ├─────────────────────────────────────────────────────────────┤
+      │ $0400 - $04FF : tileset_prop (Tile properties / walk flags) │
+      │ $0500 - $057F : tsa_ul (16x16 Metatile Upper-Left 8x8 IDs)  │
+      │ $0580 - $05FF : tsa_ur (16x16 Metatile Upper-Right 8x8 IDs) │
+      │ $0600 - $067F : tsa_dl (16x16 Metatile Down-Left 8x8 IDs)   │
+      │ $0680 - $06FF : tsa_dr (16x16 Metatile Down-Right 8x8 IDs)  │
+      │ $0700 - $077F : tsa_attr (16x16 Metatile Color Attributes)  │
+      │ $0780 - $07AF : load_map_pal (Palette staging buffer)       │
+      │ $07B0 - $0FFF : Free RAM                                    │
+$1000 ├─────────────────────────────────────────────────────────────┤
+      │ $1000 - $1C4F : KERNEL Engine (Bank 0F copied to RAM)       │
+      │ $1C50 - $3FFF : Kernel Expansion Headroom (~9 KB Free RAM)  │
+$4000 ├─────────────────────────────────────────────────────────────┤
+      │ === VIC-II BANK 1 ($4000 - $7FFF) ACTIVE DISPLAY ===        │
+      │ $4000 - $43E7 : Screen RAM 0 (40x25 Tile Grid, 1000 bytes)  │
+      │ $43F8 - $43FF : Sprite 0-7 Pointers for Screen 0 (8 bytes)  │
+      │ $4400 - $47E7 : Screen RAM 1 (Double buffer / Menu screen)  │
+      │ $47F8 - $47FF : Sprite 0-7 Pointers for Screen 1 (8 bytes)  │
+      │ $4800 - $4FFF : Character Set 0 (Overworld Tiles, 2 KB)     │
+$5000 ├─────────────────────────────────────────────────────────────┤
+      │ $5000 - $57FF : Character Set 1 (Font / Dialogue, 2 KB)     │
+      │ $5800 - $5FFF : Sprite Graphic Pool (32 sprites x 64 bytes) │
+$6000 ├─────────────────────────────────────────────────────────────┤
+      │ $6000 - $63FF : unsram (Active Party, Gold, Items, 1 KB)    │
+      │ $6400 - $67FF : sram   (Packed Save Slot for Flash, 1 KB)   │
+      │ $6800 - $6EFF : Battle Staging & Message Buffers            │
+      │ $6F00 - $6FFF : mapobj (Overworld / Field Map Objects, 256B)│
+$7000 ├─────────────────────────────────────────────────────────────┤
+      │ $7000 - $7FFF : mapdata (Decompressed 16-Row Map Ring Buffer│
+      │                 16 rows x 256 metatiles = 4,096 bytes)      │
+$8000 ├─────────────────────────────────────────────────────────────┤
+      │ === EASYFLASH CARTRIDGE WINDOW ($8000 - $BFFF) ===          │
+      │ Swappable 16 KB PRG Banks ($DE00 selects bank 0-63):        │
+      │   Bank $00: Tileset & Properties (lut_OWTileset @ $8000)    │
+      │   Bank $01: Compressed World Map (lut_OWPtrTbl  @ $8000)    │
+      │   Bank $02: CHR Graphic Tiles                               │
+      │   Bank $0E: Menus & Party Generation                        │
+      │   Bank $0F: Master Kernel ROM (copied to $1000 on boot)     │
+$C000 ├─────────────────────────────────────────────────────────────┤
+      │ $C000 - $CFFF : Free High RAM (4 KB)                        │
+$D000 ├─────────────────────────────────────────────────────────────┤
+      │ === C64 HARDWARE I/O & REGISTERS ===                        │
+      │ $D000 - $D02E : VIC-II Video Controller Registers           │
+      │ $D400 - $D41C : SID Audio Chip Registers                    │
+      │ $D800 - $DBE7 : COLOR RAM (Fixed 4-bit nybble per 8x8 cell) │
+      │ $DC00 - $DC0F : CIA 1 (Keyboard Matrix & Joystick Port 2)   │
+      │ $DD00 - $DD0F : CIA 2 (VIC-II Bank Selection & NMI)         │
+      │ $DE00 - $DE02 : EasyFlash Cartridge Bank & Control Registers│
+$E000 ├─────────────────────────────────────────────────────────────┤
+      │ $E000 - $FFF9 : Cartridge Boot ROM / High RAM (8 KB)        │
+      │ $FFFA - $FFFF : 6502 Hardware Vectors (NMI, RESET, IRQ)     │
+$FFFF └─────────────────────────────────────────────────────────────┘

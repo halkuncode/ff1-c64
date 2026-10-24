@@ -1,14 +1,14 @@
 Modules list:
 -------------
 bank0F.o:
-    KERNEL            Offs=000000  Size=000C29  Align=00001  Fill=0000
+    KERNEL            Offs=000000  Size=000EEB  Align=00001  Fill=0000
 cartboot.o:
     BOOT_HI           Offs=000000  Size=0000C0  Align=00001  Fill=0000
     BOOT_VECTORS      Offs=000000  Size=000006  Align=00001  Fill=0000
 bank00.o:
     BANK_00           Offs=000000  Size=004000  Align=00001  Fill=0000
 bank01.o:
-    BANK_01           Offs=000000  Size=000003  Align=00001  Fill=0000
+    BANK_01           Offs=000000  Size=004000  Align=00001  Fill=0000
 bank02.o:
     BANK_02           Offs=000000  Size=004000  Align=00001  Fill=0000
 bank03.o:
@@ -41,9 +41,9 @@ Segment list:
 -------------
 Name                   Start     End    Size  Align
 ----------------------------------------------------
-KERNEL                001000  001C28  000C29  00001
+KERNEL                001000  001EEA  000EEB  00001
 BANK_00               008000  00BFFF  004000  00001
-BANK_01               008000  008002  000003  00001
+BANK_01               008000  00BFFF  004000  00001
 BANK_02               008000  00BFFF  004000  00001
 BANK_03               008000  00BFFF  004000  00001
 BANK_04               008000  00BFFF  004000  00001
@@ -63,31 +63,31 @@ BOOT_VECTORS          00FFFA  00FFFF  000006  00001
 
 Exports list by name:
 ---------------------
-CallMusicPlay_L           001009 RLA    ClearOAM                  001194 RLA    
-DrawBox                   001477 RLA    DrawComplexString         00136C RLA    
-DrawCursor                001B83 RLA    DrawPalette_L             00100F RLA    
+CallMusicPlay_L           001009 RLA    ClearOAM                  001204 RLA    
+DrawBox                   001739 RLA    DrawComplexString         00162E RLA    
+DrawCursor                001E45 RLA    DrawPalette_L             00100F RLA    
 EnterIntroStory           00811F RLA    EnterTitleScreen          008152 RLA    
-GameStart_L               001000 RLA    LoadMenuCHRPal            001563 RLA    
-LoadNewGameCHRPal         00155D RLA    MusicPlay_L               00B000 RLA    
-NewGamePartyGeneration    008368 RLA    OnIRQ                     00185B RLA    
-OnNMI                     001850 RLA    OnReset                   001844 RLA    
-UpdateJoy_L               00100C RLA    WaitForVBlank_L           001851 RLA    
+GameStart_L               001000 RLA    LoadMenuCHRPal            001825 RLA    
+LoadNewGameCHRPal         00181F RLA    MusicPlay_L               00B000 RLA    
+NewGamePartyGeneration    008368 RLA    OnIRQ                     001B1D RLA    
+OnNMI                     001B12 RLA    OnReset                   001B06 RLA    
+UpdateJoy_L               00100C RLA    WaitForVBlank_L           001B13 RLA    
 lut_BattleFormations      008400 RLA    lut_FingerSprite          008C00 RLA    
 lut_HeroSprites           008C80 RLA    lut_IntroStoryText        00BF20 RLA    
-lut_MenuCHR               008800 RLA    lut_ScreenRowHi           00145E RLA    
-lut_ScreenRowLo           001445 RLA    
+lut_MenuCHR               008800 RLA    lut_ScreenRowHi           001720 RLA    
+lut_ScreenRowLo           001707 RLA    
 
 
 Exports list by value:
 ----------------------
 GameStart_L               001000 RLA    CallMusicPlay_L           001009 RLA    
 UpdateJoy_L               00100C RLA    DrawPalette_L             00100F RLA    
-ClearOAM                  001194 RLA    DrawComplexString         00136C RLA    
-lut_ScreenRowLo           001445 RLA    lut_ScreenRowHi           00145E RLA    
-DrawBox                   001477 RLA    LoadNewGameCHRPal         00155D RLA    
-LoadMenuCHRPal            001563 RLA    OnReset                   001844 RLA    
-OnNMI                     001850 RLA    WaitForVBlank_L           001851 RLA    
-OnIRQ                     00185B RLA    DrawCursor                001B83 RLA    
+ClearOAM                  001204 RLA    DrawComplexString         00162E RLA    
+lut_ScreenRowLo           001707 RLA    lut_ScreenRowHi           001720 RLA    
+DrawBox                   001739 RLA    LoadNewGameCHRPal         00181F RLA    
+LoadMenuCHRPal            001825 RLA    OnReset                   001B06 RLA    
+OnNMI                     001B12 RLA    WaitForVBlank_L           001B13 RLA    
+OnIRQ                     001B1D RLA    DrawCursor                001E45 RLA    
 EnterIntroStory           00811F RLA    EnterTitleScreen          008152 RLA    
 NewGamePartyGeneration    008368 RLA    lut_BattleFormations      008400 RLA    
 lut_MenuCHR               008800 RLA    lut_FingerSprite          008C00 RLA    

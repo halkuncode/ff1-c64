@@ -15,7 +15,7 @@
 .export SwapPRG_L, SwapPRG
 .export CoordToNTAddr, lut_ScreenRowLo, lut_ScreenRowHi
 .export DrawCursor, UpdateSprites, VerifyChecksum
-.export lut_NES_to_C64
+.export lut_NES_to_C64, lut_OWTileColors
 
 .import EnterIntroStory, EnterTitleScreen, NewGamePartyGeneration
 .import lut_MenuCHR
@@ -56,6 +56,24 @@ DrawPalette_L:        JMP DrawPalette
 GameStart:
     lda #COLOR_BLACK	; Turn off diplay (screen background color to black ($00))
     sta BGCOL0
+
+
+    ; --- Test Coordinates Hook ---
+    lda #$92           ; OW X coordinate ($00 - $FF)
+    sta ow_scroll_x
+    lda #$9e           ; OW Y coordinate ($00 - $FF)
+    sta ow_scroll_y
+    lda #1             ; vehicle: 1 = on foot
+    sta vehicle
+
+    lda #$02           ; set default screen pointer ($4000) and charset ($4800)
+    sta VMCSB          ; Screen: $4000 (bits 7-4=0000), Charset: $4800 (bits 3-1=001 -> $02)
+
+    ldx #$FF           ; reset stack pointer
+    txs
+
+    jmp DoOverworld    ; jump so I can work on just the overworld for now. 
+;    ; ---------------------------
 
 	STA unk_FE          ; ?? I don't think this is ever used
 
@@ -153,7 +171,6 @@ GameStart:
     JSR SwapPRG_L
     JSR NewGamePartyGeneration      ; create a new party
 	JSR NewGame_LoadStartingStats   ;   and set their starting stats
-
     ; New Game and Continue meet here -- actually start up the game
   @Begin:
     JSR ClearZeroPage               ; clear Zero Page for good measure
@@ -179,12 +196,104 @@ GameStart:
 
 DoOverworld:
 	JSR PrepOverworld       ; do all overworld preparation
+    ;JSR ScreenWipe_Open     ; then do the screen wipe effect (Implment later) 
+                            ; then enter the overworld loop
+  ; JMP EnterOverworldLoop  ; <- flow into
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Main Overworld Game Logic Loop  [201]
+;;
+;;   This is where everything spawns from on the overworld.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+EnterOverworldLoop:
+    LDX #$FF            ; purge stack and wipe the stack pointer so it points to top of stack
+    TXS                 ;   overworld loop is the de-facto "top" of all gameflow.
+
+
 
 
 halt_loop:
     jsr WaitForVBlank_L
-    jsr CallMusicPlay_L
+    ;;jsr CallMusicPlay_L ;music musted for now
     jmp halt_loop
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Load Overworld Tileset Data  [645]
+;;
+;;    Copies $400 bytes of overworld tileset data to RAM.
+;;
+;;  This fills the following buffers:
+;;    tileset_prop
+;;    tsa_ul, tsa_ur, tsa_dl, tsa_dr
+;;    tsa_attr
+;;    load_map_pal
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LoadOWTilesetData:
+    LDA #BANK_OWINFO
+    JSR SwapPRG_L       ; swap to bank containing OW tileset data
+
+    LDA #0              ; set low bytes of
+    STA tmp             ;  source pointer
+    STA tmp+2           ;  and dest pointer
+
+    LDA #>lut_OWTileset ; high byte of source pointer
+    STA tmp+1
+
+    LDA #>tileset_data  ; high byte of dest pointer
+    STA tmp+3
+
+    LDX #4              ; high byte of loop counter ($400 iterations)
+    LDY #0              ; low byte of loop counter and index
+
+  @Loop:
+    LDA (tmp), Y        ; copy over a byte
+    STA (tmp+2), Y
+    INY                 ; inc our index
+    BNE @Loop           ; loop until it wraps
+
+    INC tmp+1           ; once it wraps, inc high bytes of both pointers
+    INC tmp+3
+    DEX                 ; and decrement overall loop counter
+
+    BNE @Loop           ; and keep looping until that expires ($400 iterations)
+
+    RTS                 ; then exit
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Set OW Scroll  [709]
+;;
+;;    Sets the scroll for the overworld map.  And optionally
+;;  turns the screen on (seperate entry point)
+;;
+;;    Changes to SetOWScroll can impact the timing of some raster effects.
+;;  See ScreenWipeFrame for details.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+SetOWScroll_PPUOn:
+SetOWScroll:
+    ; Enable MultiColor Mode and 40 Columns on VIC-II
+    LDA SCROLX
+    ORA #$10            ; Bit 4 = MultiColor Mode ON
+    STA SCROLX
+
+    ; Ensure 25 rows and screen enabled
+    LDA SCROLY
+    ORA #$10            ; Bit 4 = Screen ON
+    STA SCROLY
+    RTS
 
 
 
@@ -243,7 +352,44 @@ PrepOverworld:
     STA mapflags        ; zeroing map flags indicates we're on the overworld map
 
     JSR LoadOWCHR           ; load up necessary CHR
-	RTS
+    JSR LoadOWTilesetData   ; the tileset
+    JSR LoadMapPalettes     ; palettes
+    JSR DrawFullMap         ; then draw the map
+
+    ; LDA ow_scroll_x      ; get ow scroll X
+    ; AND #$10             ; isolate the '16' bit (nametable bit)
+    ; CMP #$10             ; move it to C (C set if we're to use NT @ $2400)
+    ; ROL A                ; roll that bit into bit 0
+    ; AND #$01             ; isolate it
+    ; ORA #$08             ; OR with 8 (sprites use right-hand pattern table)
+    ; STA NTsoft2000       ; record this as our soft2000
+    ; STA soft2000
+
+    JSR WaitForVBlank_L       ; wait for a VBlank
+    JSR DrawMapPalette        ; before drawing the palette
+    JSR SetOWScroll_PPUOn     ; the setting the scroll and turning PPU on
+    ; LDA #0                  ;  .. but then immediately turn PPU off!
+    ; STA $2001               ;     (stupid -- why doesn't it just call the other SetOWScroll that doesn't turn PPU on)
+
+    LDX vehicle
+    LDA @lut_VehicleMusic, X  ; use the current vehicle as an index
+    STA music_track           ;   to get the proper music track -- and play it
+
+    ; LDA #BANK_BTLDATA     ; swap to battle rate bank and get the battle rate for the overworld
+    ; JSR SwapPRG_L         ;  (first entry in the table).  And record it to 'battlerate'.
+    ; LDA lut_BattleRates   ; However, this value goes unused because the battle rate for overworld
+    ; STA battlerate        ; is hardcoded... so this is effectively useless for OW (it's used for SM, though).
+
+    RTS                   ; then exit!
+
+  ;;  The lut for knowing which track to play based on the current vehicle
+
+  @lut_VehicleMusic:
+  .BYTE $44               ; unused
+  .BYTE $44               ; on foot
+  .BYTE $44,$44           ; canoe (2nd byte unused)
+  .BYTE $45,$45,$45,$45   ; ship (last 3 bytes unused)
+  .BYTE $46               ; airship
 
 
 
@@ -428,6 +574,346 @@ CallMusicPlay:
     PLA
     RTS 
 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Draw Full Map   [3821]
+;;
+;;    Draws 15 rows of tiles for the map, filling the entire screen.
+;;  It accomplishes this by adding 15 to the map scroll, then faking
+;;  upward movement to draw rows bottom first.
+;;
+;;    For Standard maps, this does no map decompression.  However for the overworld,
+;;  each row is decompressed prior to drawing.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawFullMap:
+    ; Initialize row counter for 13 metatile rows (0 to 12)
+    LDA #0
+    STA tmp+14          ; metatile row index (0..12)
+
+@RowLoop:
+    ; Calculate world Y: mapdraw_y = (ow_scroll_y + row_index) & $FF
+    LDA ow_scroll_y
+    CLC
+    ADC tmp+14
+    STA mapdraw_y
+
+    ; Decompress this overworld row into mapdata ($7000 + (mapdraw_y & $0F) * $100)
+    JSR LoadOWMapRow
+
+    ; Set map_row_ptr (tmp+8, tmp+9) to start of decompressed row in RAM
+    LDA #<mapdata
+    STA tmp+8
+    LDA mapdraw_y
+    AND #$0F
+    ORA #>mapdata
+    STA tmp+9
+
+    ; Calculate Screen RAM row pointers & Color RAM row pointers
+    ; top screen row = tmp+14 * 2
+    LDA tmp+14
+    ASL A               ; * 2
+    TAX
+    LDA lut_ScreenRowLo, X
+    STA tmp+0           ; scr_top_ptr low
+    STA tmp+2           ; col_top_ptr low (same offset!)
+    LDA lut_ScreenRowHi, X
+    STA tmp+1           ; scr_top_ptr high ($40..$43)
+    CLC
+    ADC #$98
+    STA tmp+3           ; col_top_ptr high ($D8..$DB, Color RAM)
+
+    ; Check if there is a bottom screen row (for row_index < 12)
+    CPX #24             ; row 24 is the 25th row on screen, so no row 25
+    BCS @NoBottomRow
+    INX
+    LDA lut_ScreenRowLo, X
+    STA tmp+4           ; scr_bot_ptr low
+    STA tmp+6           ; col_bot_ptr low
+    LDA lut_ScreenRowHi, X
+    STA tmp+5           ; scr_bot_ptr high ($40..$43)
+    CLC
+    ADC #$98
+    STA tmp+7           ; col_bot_ptr high ($D8..$DB, Color RAM)
+
+@NoBottomRow:
+    ; Now plot 20 metatiles horizontally across 40 character columns
+    LDA #0
+    STA tmp+10          ; tmp+10 = metatile column index (0..19)
+
+@ColLoop:
+    ; world_x = (ow_scroll_x + col_index) & $FF
+    LDA ow_scroll_x
+    CLC
+    ADC tmp+10
+    TAY                 ; Y = world_x index into decompressed row
+    LDA (tmp+8), Y      ; A = metatile ID (0..127)
+    TAY                 ; Y = metatile ID index into TSA tables
+
+    ; Fetch quadrant character tile IDs
+    LDA tsa_ul, Y
+    STA tmp+12          ; char_ul
+    LDA tsa_ur, Y
+    STA tmp+13          ; char_ur
+    LDA tsa_dl, Y
+    STA tmp+15          ; char_dl
+    LDA tsa_dr, Y
+    PHA                 ; save char_dr on stack
+
+    ; col_index * 2 gives character column offset on screen (0, 2, 4, ... 38)
+    LDA tmp+10
+    ASL A
+    TAY                 ; Y = char column offset
+
+    ; Plot top-left tile (Screen RAM & Color RAM)
+    LDA tmp+12
+    STA (tmp+0), Y
+    TAX
+    LDA lut_OWTileColors, X
+    STA (tmp+2), Y
+
+    ; Plot top-right tile
+    INY
+    LDA tmp+13
+    STA (tmp+0), Y
+    TAX
+    LDA lut_OWTileColors, X
+    STA (tmp+2), Y
+    DEY
+
+    ; Plot bottom row (if row_index < 12)
+    LDA tmp+14
+    CMP #12
+    BCS @SkipBottomPlot
+
+    ; Plot bottom-left tile
+    LDA tmp+15
+    STA (tmp+4), Y
+    TAX
+    LDA lut_OWTileColors, X
+    STA (tmp+6), Y
+
+    ; Plot bottom-right tile
+    INY
+    PLA                 ; retrieve char_dr from stack
+    STA (tmp+4), Y
+    TAX
+    LDA lut_OWTileColors, X
+    STA (tmp+6), Y
+    JMP @ColNext
+
+@SkipBottomPlot:
+    PLA                 ; discard saved char_dr from stack
+
+@ColNext:
+    INC tmp+10
+    LDA tmp+10
+    CMP #20             ; 20 metatiles wide (40 columns)
+    BNE @ColLoop
+
+    ; Next metatile row
+    INC tmp+14
+    LDA tmp+14
+    CMP #13             ; 13 metatile rows (rows 0..12 = screen rows 0..24)
+    BEQ @Done
+    JMP @RowLoop
+
+@Done:
+    RTS
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  lut_OWTileColors
+;;
+;;  Lookup table mapping each of the 256 Overworld 8x8 character tiles ($00-$FF)
+;;  to its corresponding MultiColor Color RAM nybble ($08-$0F with bit 3 set).
+;;
+;;  Tile Ranges:
+;;    $00-$1F (  0- 31): $09 (White)       - Mountains
+;;    $20-$3A ( 32- 58): $0D (Green)       - Terrain / grass / paths
+;;    $3B-$61 ( 59- 97): $0E (Blue)        - Water / rivers / sea
+;;    $62-$68 ( 98-104): $0A (Red / Brown) - Bridges / dirt
+;;    $69-$6A (105-106): $0E (Blue)        - Waterfall
+;;    $6B-$72 (107-114): $0B (Cyan)        - Marsh / swamp
+;;    $73-$7B (115-123): $0F (Yellow)      - Desert tower
+;;    $7C-$EA (124-234): $09 (White)       - Buildings / castles / towns
+;;    $EB-$F3 (235-243): $0F (Yellow)      - Desert sands
+;;    $F4-$FF (244-255): $09 (White)       - Docks / structures
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_OWTileColors:
+    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $00-$0F
+    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $10-$1F
+    .byte $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D  ; $20-$2F
+    .byte $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0E, $0E, $0E, $0E, $0E  ; $30-$3F
+    .byte $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E  ; $40-$4F
+    .byte $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E  ; $50-$5F
+    .byte $0E, $0E, $0A, $0A, $0A, $0A, $0A, $0A, $0A, $0E, $0E, $0B, $0B, $0B, $0B, $0B  ; $60-$6F
+    .byte $0B, $0B, $0B, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $09, $09, $09, $09  ; $70-$7F
+    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $80-$8F
+    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $90-$9F
+    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $A0-$AF
+    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $B0-$BF
+    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $C0-$CF
+    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $D0-$DF
+    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $0F, $0F, $0F, $0F, $0F  ; $E0-$EF
+    .byte $0F, $0F, $0F, $0F, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $F0-$FF
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Map routines' Semi-local RTS   [4158]
+;;
+;;   It is branched/jumped to by map loading routines
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+Map_RTS:
+    RTS
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Load World Map Row  [4178]
+;;
+;;  Called to load a single row of an overworld map.  Since only so many can be in RAM at once
+;;    a new row needs to be loaded every time the player moves up or down on the overworld map.
+;;
+;;  IN:   mapflags  = indicates whether or not we're on the overworld map
+;;        mapdraw_y = indicates which row needs to be loaded
+;;
+;;  TMP:  tmp to tmp+7 used
+;;
+;;  NOTES:  overworld map cannot cross bank boundary.  Entire map and all its pointers must all fit on one bank
+;;     (which shouldn't be a problem).
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LoadOWMapRow:
+    LDA mapflags     ; get StandardMap flag (to test to see if we're really in the overworld or not)
+    LSR A            ; shift flag into C
+    BCS Map_RTS      ; if flag is set (in standard map), we're not in the overworld, so don't do anything -- just exit
+
+    LDA #BANK_OWMAP  ; swap to bank containing overworld map
+    JSR SwapPRG_L
+
+    LDA #>lut_OWPtrTbl ; set (tmp+6) to the start of the pointers for the rows of the OW map.
+    STA tmp+7          ; we will then index this pointer table to get the pointer for the start of the row
+    LDA #<lut_OWPtrTbl ; Need to use a pointer because there are 256 rows, which means 512 bytes for indexing
+    STA tmp+6          ; so normal indexing won't work -- have to use indirect mode
+
+    LDA mapdraw_y    ; Load the row we need to load
+    TAX              ; stuff it in X (temporary)
+    ASL A            ; double it (2 bytes per pointer)
+    BCC :+           ; if there was carry...
+      INC tmp+7      ; inc the high byte of our temp pointer
+:   TAY              ; put low byte in Y for indexing
+    LDA (tmp+6), Y   ; load low byte of row pointer
+    STA tmp          ; put it in tmp
+    INY              ; inc our index
+    LDA (tmp+6), Y   ; load high byte, and put it in tmp+1
+    STA tmp+1        ; (tmp) is now our source pointer for the row
+
+    TXA              ; get our row number (previously stuffed in X)
+    AND #$0F         ; mask out the low 4 bits
+    ORA #>mapdata    ; and ORA with high byte of mapdata destination
+    STA tmp+3        ; use this as high byte of dest pointer (to receive decompressed map)
+    LDA #<mapdata    ; the row will be decompressed to $7x00-$7xFF
+    STA tmp+2        ; where 'x' is the low 4 bits of the row number
+                     ; (tmp+2) is now our dest pointer for the row
+
+           ; no RTS or JMP -- code seamlessly runs into DecompressMap
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DecompressMap  [4227]
+;;
+;;   Decompresses a map from the given source buffer, and puts it in the given dest buffer
+;;
+;;  IN:  (tmp)   = pointer to source buffer (containing compressed map -- it's assumed it's between $8000-BFFF)
+;;       (tmp+2) = pointer to dest buffer (to receive decompressed map. typically $7xxx)
+;;
+;;  TMP: tmp to tmp+5 used
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DecompressMap:
+    LDY #0          ; zero Y, our index
+    LDA (tmp), Y    ; read a byte from source
+    BPL @SingleTile ; if high byte clear (not a run), jump ahead to place a single tile
+    CMP #$FF        ; otherwise check for $FF (termination code)
+    BEQ Map_RTS     ; if == $FF, branch to exit
+
+    ; code reaches here if loaded source byte was $80-FE (need a run of this tile)
+    AND #$7F        ; take low 7 bits (tile to run)
+    STA tmp+4       ; put tile in temp ram
+    INC tmp         ; inc low byte of src pointer (need to leave Y=0)
+    BNE @TileRun    ; if it didn't wrap, jump ahead to TileRun sublabel
+
+      INC tmp+1     ; low byte of src pointer wrapped, so inc high byte
+      BIT tmp+1     ; check to see if high byte went over $BF (crossed bank boundary)
+      BVC @TileRun  ; if it didn't, proceed to TileRun
+      JSR @NextBank ; otherwise, we need to swap in the next bank, first
+
+  @TileRun:
+    LDA (tmp), Y    ; get next src byte (length of run)
+    TAX             ; put length of run in X
+    LDA tmp+4       ; get tile ID
+  @RunLoop:
+      STA (tmp+2), Y ; write tile ID to dest buffer
+      INY            ; INY to increment our dest index
+      BEQ @Full256   ; if Y wrapped... this run was a full 256 tiles long (maximum). Jump ahead
+      DEX            ; decrement X (our run length)
+      BNE @RunLoop   ; if it isn't zero yet, we jump back to the loop
+
+      TYA            ; add Y to the low byte of our dest pointer
+      CLC
+      ADC tmp+2
+      STA tmp+2
+      BCC :+         ; if adding Y caused a carry, we'll need to inc the high byte
+    @Full256:
+        INC tmp+3    ; inc high byte of dest pointer
+ :    INC tmp        ; inc low byte of src pointer
+      BNE DecompressMap ; if it didn't wrap, jump back to main map loading loop
+      JMP @IncSrcHigh   ; otherwise (did wrap), need to increment the high byte of the source pointer
+
+  @SingleTile:
+    STA (tmp+2), Y       ; write tile to dest buffer
+    INC tmp+2            ; increment low byte of dest pointer
+    BNE :+               ; if it wrapped...
+      INC tmp+3          ; inc high byte of dest pointer
+ :  INC tmp              ; inc low byte of src pointer
+    BNE DecompressMap    ; if no wrapping, just continue with map decompression. Otherwise...
+
+  @IncSrcHigh:
+    INC tmp+1            ; increment high byte of source pointer
+    BIT tmp+1            ; check to see if we've reached end of PRG bank (BIT will set V if the value is >= $C0)
+    BVC DecompressMap    ; if we haven't, just continue with map decompression
+    JSR @NextBank        ; otherwise swap in the next bank
+    JMP DecompressMap    ; and continue decompression
+
+;; NextBank local subroutine
+;; called via JSR when a map crosses a bank boundary (so a new bank needs to be swapped in)
+@NextBank:
+    LDA #>$8000   ; reset high byte of source pointer to start of the bank: $8000
+    STA tmp+1
+    LDA tmp+5     ; get original bank number
+    CLC
+    ADC #$01      ; increment it by 1
+    JMP SwapPRG_L ; swap that new bank in and exit
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;  DrawPalette  [5863]
@@ -515,6 +1001,66 @@ lut_NES_to_C64:
     .byte COLOR_LIGHTRED,   COLOR_LIGHTRED,   COLOR_LIGHTRED,   COLOR_YELLOW
     .byte COLOR_YELLOW,     COLOR_LIGHTGREEN, COLOR_LIGHTGREEN, COLOR_CYAN
     .byte COLOR_CYAN,       COLOR_LIGHTGREY,  COLOR_BLACK,      COLOR_BLACK
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Draw Map Palette  [5872]
+;;
+;;    Draws the normal palette, or the "in room" palette depending on whether or
+;;  not the player is currently inside rooms.  This is called by maps only.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawMapPalette:
+    LDA #COLOR_BLACK
+    STA EXTCOL          ; Border = Black ($00)
+    STA BGCOL0          ; BGCOL0 = Black ($00)
+    LDA #COLOR_GREEN
+    STA BGCOL1          ; BGCOL1 = Dark/Normal Green ($05)
+    LDA #COLOR_GREY
+    STA BGCOL2          ; BGCOL2 = Mid Grey ($0C / 12)
+    RTS
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Load Map Palettes  [5934]
+;;
+;;    Note palettes are not loaded from ROM, but rather they're loaded from
+;;  the load_map_pal temporary buffer (temporary because it gets overwritten
+;;  due to it sharing space with draw_buf).  So this must be called pretty much
+;;  immediately after the tileset is loaded.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LoadMapPalettes:
+    RTS                 ; dummied out for now
+
+;     LDX #$2F                ; X is loop counter
+;   @Loop:
+;       LDA load_map_pal, X   ; copy colors from temp palette buffer
+;       STA cur_pal, X        ; to our actual palette
+;       DEX
+;       BPL @Loop             ; loop until X wraps ($30 iterations)
+; 
+;     LDA #BANK_MAPMANPAL
+;     JSR SwapPRG_L           ; swap to bank containing mapman palettes
+; 
+;     LDA ch_class            ; get lead party member's class
+;     ASL A                   ; double it, and put it in X
+;     TAX
+; 
+;     LDA lut_MapmanPalettes, X   ; use that as an index to get that class's mapman palette
+;     STA cur_pal+$12
+;     LDA lut_MapmanPalettes+1, X
+;     STA cur_pal+$16
+; 
+;     RTS                     ; then exit
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -1162,9 +1708,9 @@ LoadOWCHR:                     ; overworld map -- does not load any palettes
     LDA #BANK_MAPCHR
     JSR SwapPRG_L
     JSR LoadOWBGCHR
-    ;JSR LoadPlayerMapmanCHR
+    ;JSR LoadPlayerMapmanCHR    ; skipped for now - sprite architecture under rework
     ;JMP LoadOWObjectCHR
-	RTS   ; return for now as we work on the loader. 
+    RTS
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
