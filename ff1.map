@@ -1,0 +1,150 @@
+Modules list:
+-------------
+bank0F.o:
+    KERNEL            Offs=000000  Size=000C29  Align=00001  Fill=0000
+cartboot.o:
+    BOOT_HI           Offs=000000  Size=0000C0  Align=00001  Fill=0000
+    BOOT_VECTORS      Offs=000000  Size=000006  Align=00001  Fill=0000
+bank00.o:
+    BANK_00           Offs=000000  Size=004000  Align=00001  Fill=0000
+bank01.o:
+    BANK_01           Offs=000000  Size=000003  Align=00001  Fill=0000
+bank02.o:
+    BANK_02           Offs=000000  Size=004000  Align=00001  Fill=0000
+bank03.o:
+    BANK_03           Offs=000000  Size=004000  Align=00001  Fill=0000
+bank04.o:
+    BANK_04           Offs=000000  Size=004000  Align=00001  Fill=0000
+bank05.o:
+    BANK_05           Offs=000000  Size=004000  Align=00001  Fill=0000
+bank06.o:
+    BANK_06           Offs=000000  Size=004000  Align=00001  Fill=0000
+bank07.o:
+    BANK_07           Offs=000000  Size=004000  Align=00001  Fill=0000
+bank08.o:
+    BANK_08           Offs=000000  Size=004000  Align=00001  Fill=0000
+bank09.o:
+    BANK_09           Offs=000000  Size=001280  Align=00001  Fill=0000
+bank0A.o:
+    BANK_0A           Offs=000000  Size=004000  Align=00001  Fill=0000
+bank0B.o:
+    BANK_0B           Offs=000000  Size=000C03  Align=00100  Fill=0000
+bank0C.o:
+    BANK_0C           Offs=000000  Size=000003  Align=00001  Fill=0000
+bank0D.o:
+    BANK_0D           Offs=000000  Size=004000  Align=00001  Fill=0000
+bank0E.o:
+    BANK_0E           Offs=000000  Size=000894  Align=00001  Fill=0000
+
+
+Segment list:
+-------------
+Name                   Start     End    Size  Align
+----------------------------------------------------
+KERNEL                001000  001C28  000C29  00001
+BANK_00               008000  00BFFF  004000  00001
+BANK_01               008000  008002  000003  00001
+BANK_02               008000  00BFFF  004000  00001
+BANK_03               008000  00BFFF  004000  00001
+BANK_04               008000  00BFFF  004000  00001
+BANK_05               008000  00BFFF  004000  00001
+BANK_06               008000  00BFFF  004000  00001
+BANK_07               008000  00BFFF  004000  00001
+BANK_08               008000  00BFFF  004000  00001
+BANK_09               008000  00927F  001280  00001
+BANK_0A               008000  00BFFF  004000  00001
+BANK_0B               008000  008C02  000C03  00100
+BANK_0C               008000  008002  000003  00001
+BANK_0D               008000  00BFFF  004000  00001
+BANK_0E               008000  008893  000894  00001
+BOOT_HI               00E000  00E0BF  0000C0  00001
+BOOT_VECTORS          00FFFA  00FFFF  000006  00001
+
+
+Exports list by name:
+---------------------
+CallMusicPlay_L           001009 RLA    ClearOAM                  001194 RLA    
+DrawBox                   001477 RLA    DrawComplexString         00136C RLA    
+DrawCursor                001B83 RLA    DrawPalette_L             00100F RLA    
+EnterIntroStory           00811F RLA    EnterTitleScreen          008152 RLA    
+GameStart_L               001000 RLA    LoadMenuCHRPal            001563 RLA    
+LoadNewGameCHRPal         00155D RLA    MusicPlay_L               00B000 RLA    
+NewGamePartyGeneration    008368 RLA    OnIRQ                     00185B RLA    
+OnNMI                     001850 RLA    OnReset                   001844 RLA    
+UpdateJoy_L               00100C RLA    WaitForVBlank_L           001851 RLA    
+lut_BattleFormations      008400 RLA    lut_FingerSprite          008C00 RLA    
+lut_HeroSprites           008C80 RLA    lut_IntroStoryText        00BF20 RLA    
+lut_MenuCHR               008800 RLA    lut_ScreenRowHi           00145E RLA    
+lut_ScreenRowLo           001445 RLA    
+
+
+Exports list by value:
+----------------------
+GameStart_L               001000 RLA    CallMusicPlay_L           001009 RLA    
+UpdateJoy_L               00100C RLA    DrawPalette_L             00100F RLA    
+ClearOAM                  001194 RLA    DrawComplexString         00136C RLA    
+lut_ScreenRowLo           001445 RLA    lut_ScreenRowHi           00145E RLA    
+DrawBox                   001477 RLA    LoadNewGameCHRPal         00155D RLA    
+LoadMenuCHRPal            001563 RLA    OnReset                   001844 RLA    
+OnNMI                     001850 RLA    WaitForVBlank_L           001851 RLA    
+OnIRQ                     00185B RLA    DrawCursor                001B83 RLA    
+EnterIntroStory           00811F RLA    EnterTitleScreen          008152 RLA    
+NewGamePartyGeneration    008368 RLA    lut_BattleFormations      008400 RLA    
+lut_MenuCHR               008800 RLA    lut_FingerSprite          008C00 RLA    
+lut_HeroSprites           008C80 RLA    MusicPlay_L               00B000 RLA    
+lut_IntroStoryText        00BF20 RLA    
+
+
+Imports list:
+-------------
+CallMusicPlay_L (bank0F.o):
+    bank0E.o                  src/bank0E.asm:11
+ClearOAM (bank0F.o):
+    bank0E.o                  src/bank0E.asm:11
+DrawBox (bank0F.o):
+    bank0E.o                  src/bank0E.asm:10
+DrawComplexString (bank0F.o):
+    bank0E.o                  src/bank0E.asm:10
+DrawCursor (bank0F.o):
+    bank0E.o                  src/bank0E.asm:11
+DrawPalette_L (bank0F.o):
+    bank0E.o                  src/bank0E.asm:11
+EnterIntroStory (bank0E.o):
+    bank0F.o                  src/bank0F.asm:20
+EnterTitleScreen (bank0E.o):
+    bank0F.o                  src/bank0F.asm:20
+GameStart_L (bank0F.o):
+    bank0E.o                  src/bank0E.asm:11
+LoadMenuCHRPal (bank0F.o):
+    bank0E.o                  src/bank0E.asm:10
+LoadNewGameCHRPal (bank0F.o):
+    bank0E.o                  src/bank0E.asm:10
+MusicPlay_L (bank0D.o):
+    bank0F.o                  src/bank0F.asm:24
+NewGamePartyGeneration (bank0E.o):
+    bank0F.o                  src/bank0F.asm:20
+OnIRQ (bank0F.o):
+    cartboot.o                src/cartboot.asm:7
+OnNMI (bank0F.o):
+    cartboot.o                src/cartboot.asm:7
+OnReset (bank0F.o):
+    cartboot.o                src/cartboot.asm:7
+UpdateJoy_L (bank0F.o):
+    bank0E.o                  src/bank0E.asm:10
+WaitForVBlank_L (bank0F.o):
+    bank0E.o                  src/bank0E.asm:10
+lut_BattleFormations (bank0B.o):
+    bank0F.o                  src/bank0F.asm:23
+lut_FingerSprite (bank09.o):
+    bank0F.o                  src/bank0F.asm:22
+lut_HeroSprites (bank09.o):
+    bank0F.o                  src/bank0F.asm:22
+lut_IntroStoryText (bank0D.o):
+    bank0E.o                  src/bank0E.asm:13
+lut_MenuCHR (bank09.o):
+    bank0F.o                  src/bank0F.asm:21
+lut_ScreenRowHi (bank0F.o):
+    bank0E.o                  src/bank0E.asm:12
+lut_ScreenRowLo (bank0F.o):
+    bank0E.o                  src/bank0E.asm:12
+

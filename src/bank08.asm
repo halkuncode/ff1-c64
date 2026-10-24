@@ -32,7 +32,7 @@ lut_BattleCHR_Bank08:
 ; ;;  Monsters (8120): Mummy - Coctric - Wyvern - Tyro
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 lut_Backdrop_08_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
-    .incbin "../res/backdrops/backdrop08.chr"
+    .incbin "../res/battle/backdrops/backdrop08.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_08_Graphic:  ; 110 tiles (1760 bytes) -> Mummy - Coctric - Wyvern - Tyro
@@ -153,7 +153,7 @@ lut_Monsters_08_Graphic:  ; 110 tiles (1760 bytes) -> Mummy - Coctric - Wyvern -
 ; ;;  Monsters (8920): Caribe - Gator - Ocho - Hydra
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 lut_Backdrop_09_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
-    .incbin "../res/backdrops/backdrop09.chr"
+    .incbin "../res/battle/backdrops/backdrop09.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_09_Graphic:  ; 110 tiles (1760 bytes) -> Caribe - Gator - Ocho - Hydra
@@ -274,7 +274,7 @@ lut_Monsters_09_Graphic:  ; 110 tiles (1760 bytes) -> Caribe - Gator - Ocho - Hy
 ; ;;  Monsters (9120): Sentry - Water - Naga - Chimera
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 lut_Backdrop_10_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
-    .incbin "../res/backdrops/backdrop10.chr"
+    .incbin "../res/battle/backdrops/backdrop10.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_10_Graphic:  ; 110 tiles (1760 bytes) -> Sentry - Water - Naga - Chimera
@@ -395,7 +395,7 @@ lut_Monsters_10_Graphic:  ; 110 tiles (1760 bytes) -> Sentry - Water - Naga - Ch
 ; ;;  Monsters (9920): Wizard - Garland - Dragon 2 - Golem
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 lut_Backdrop_11_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
-    .incbin "../res/backdrops/backdrop11.chr"
+    .incbin "../res/battle/backdrops/backdrop11.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_11_Graphic:  ; 110 tiles (1760 bytes) -> Wizard - Garland - Dragon 2 - Golem
@@ -516,7 +516,7 @@ lut_Monsters_11_Graphic:  ; 110 tiles (1760 bytes) -> Wizard - Garland - Dragon 
 ; ;;  Monsters (A120): Badman - Astos - Madpony - Warmech
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 lut_Backdrop_12_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
-    .incbin "../res/backdrops/backdrop12.chr"
+    .incbin "../res/battle/backdrops/backdrop12.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_12_Graphic:  ; 110 tiles (1760 bytes) -> Badman - Astos - Madpony - Warmech
@@ -637,7 +637,7 @@ lut_Monsters_12_Graphic:  ; 110 tiles (1760 bytes) -> Badman - Astos - Madpony -
 ; ;;  Monsters (A920): Kary -- Lich
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 lut_Backdrop_13_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
-    .incbin "../res/backdrops/backdrop13.chr"
+    .incbin "../res/battle/backdrops/backdrop13.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_13_Graphic:  ; 110 tiles (1760 bytes) -> Kary -- Lich
@@ -758,7 +758,7 @@ lut_Monsters_13_Graphic:  ; 110 tiles (1760 bytes) -> Kary -- Lich
 ; ;;  Monsters (B120): Kraken -- Tiamat
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 lut_Backdrop_14_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
-    .incbin "../res/backdrops/backdrop14.chr"
+    .incbin "../res/battle/backdrops/backdrop14.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_14_Graphic:  ; 110 tiles (1760 bytes) -> Kraken -- Tiamat
@@ -879,7 +879,7 @@ lut_Monsters_14_Graphic:  ; 110 tiles (1760 bytes) -> Kraken -- Tiamat
 ; ;;  Monsters (B920):  ---- Chaos ----
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 lut_Backdrop_15_Graphic:  ; 18 C64 MultiColor tiles (144 bytes)
-    .incbin "../res/backdrops/backdrop15.chr"
+    .incbin "../res/battle/backdrops/backdrop15.chr"
     .res 144, $00  ; Pad 144 bytes to maintain 288-byte ($120) offset to monsters
 
 lut_Monsters_15_Graphic:  ; 110 tiles (1760 bytes) ->  ---- Chaos ----

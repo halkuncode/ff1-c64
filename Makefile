@@ -12,11 +12,12 @@ SRCDIR      = src
 OBJDIR      = obj
 CFG         = ff1c64.cfg
 TARGET      = ff1.crt
+MAPFILE     = ff1.map
 LABELFILE   = ff1.lbl
 RETRO_LABELS = ff1.labels
 
 ASFLAGS     = -g -I $(SRCDIR)
-LDFLAGS     = -C $(CFG) -Ln $(LABELFILE)
+LDFLAGS     = -C $(CFG) -Ln $(LABELFILE) -m $(MAPFILE)
 
 INCS        = $(SRCDIR)/c64.inc $(SRCDIR)/constants.inc $(SRCDIR)/variables.inc
 
@@ -49,11 +50,14 @@ BIN_ORDER = \
     bank0D.bin+bank0E.bin+bank0F.bin+bank00.bin+\
     padding.bin
 
-.PHONY: all build clean run vice
+.PHONY: all build clean run vice space
 
 all: $(TARGET)
 
 build: all
+
+space: all
+	python scripts/check_space.py
 
 $(OBJDIR):
 	cmd.exe /c if not exist $(OBJDIR) mkdir $(OBJDIR)
@@ -64,6 +68,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.asm $(INCS) | $(OBJDIR)
 res/heros/heroes.bin: scripts/build_heroes.py res/heros/fighter.asm res/heros/thief.asm res/heros/blackbelt.asm res/heros/redmage.asm res/heros/whitemage.asm res/heros/blackmage.asm
 	python scripts/build_heroes.py
 
+$(OBJDIR)/bank02.o: res/maps/Overworld/overworld.chr
 $(OBJDIR)/bank09.o: res/menu/menufont.chr res/heros/heroes.bin
 $(OBJDIR)/bank0A.o: res/data/bank0A.dat
 $(OBJDIR)/bank0B.o: res/data/battleformations.bin
@@ -86,6 +91,7 @@ clean:
 	cmd.exe /c if exist *.out del /q *.out
 	cmd.exe /c if exist $(LABELFILE) del /q $(LABELFILE)
 	cmd.exe /c if exist $(RETRO_LABELS) del /q $(RETRO_LABELS)
+	cmd.exe /c if exist $(MAPFILE) del /q $(MAPFILE)
 	cmd.exe /c if exist $(TARGET) del /q $(TARGET)
 
 run: all

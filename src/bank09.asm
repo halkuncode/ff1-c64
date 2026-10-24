@@ -43,5 +43,3 @@ lut_FingerSprite:
 lut_HeroSprites:
     .incbin "../res/heros/heroes.bin"
 
-; Pad the remainder of the 16KB bank ($9680 - $BFFF = 10624 bytes = $2980)
-.res $2980, $00

@@ -1222,8 +1222,8 @@ LoadOWBGCHR:
     STA tmp
     LDA #$80
     STA tmp+1        ; source address is $8000
-    LDX #$10         ; 16 rows to load (full pattern table)
-    LDA #0           ; dest address is $0000
+    LDX #$08         ; 8 pages to load (2048 bytes = 256 C64 tiles -> $4800-$4FFF)
+    LDA #0           ; dest address is $0000 (maps to C64 $4800)
     JMP CHRLoadToA
 
 
