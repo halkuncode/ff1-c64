@@ -7,7 +7,7 @@
 .export GameStart_L
 
 .export DrawComplexString_L, DrawBox_L, CallMusicPlay_L, UpdateJoy_L, DrawPalette_L
-.export DrawComplexString, DrawBox, CallMusicPlay, UpdateJoy, DrawPalette, LoadMenuCHRPal, ClearOAM
+.export DrawComplexString, DrawBox, CallMusicPlay, CallMusicPlay_NoSwap, UpdateJoy, DrawPalette, LoadMenuCHRPal, ClearOAM
 .export LoadBorderPalette_Blue, LoadBorderPalette_Black
 .export LoadMenuCHR, LoadMenuBGCHRAndPalettes, LoadBattleBGCHRAndPalettes, LoadBatSprCHRPalettes, LoadNewGameCHRPal
 .export GameStart, OnReset, OnNMI, OnIRQ
@@ -152,12 +152,169 @@ GameStart:
     LDA #BANK_PARTYGEN              ; swap in party generation bank
     JSR SwapPRG_L
     JSR NewGamePartyGeneration      ; create a new party
+	JSR NewGame_LoadStartingStats   ;   and set their starting stats
 
-@Begin:  
+    ; New Game and Continue meet here -- actually start up the game
+  @Begin:
+    JSR ClearZeroPage               ; clear Zero Page for good measure
+    
+    LDA unsram_ow_scroll_x          ; fetch OW scroll from unsram
+    STA ow_scroll_x
+    LDA unsram_ow_scroll_y
+    STA ow_scroll_y
+    
+    LDA unsram_vehicle              ; fetch vehicle from unsram (wouldn't
+    STA vehicle_next                ;   this always be 'on-foot'?)
+    STA vehicle
+    
+  ; JMP DoOverworld                 ; <- Flow into DoOverworld!
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Do Overworld  [186]
+;;
+;;    Called when you enter (or exit to) the overworld.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DoOverworld:
+	JSR PrepOverworld       ; do all overworld preparation
+
+
 halt_loop:
     jsr WaitForVBlank_L
     jsr CallMusicPlay_L
     jmp halt_loop
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Clear Zero Page  [1013]
+;;
+;;    Clears Zero Page RAM ($0002-$00EF). Preserves $00 (DDR) and
+;;  $01 (PORT) 6510 hardware I/O registers to prevent crashing.
+;;
+;;    This is done after game start as a preparation measure.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ClearZeroPage:
+    LDX #$EF          ; start from $EF and count down
+    LDA #0
+  @Loop:
+      STA 0, X
+      DEX
+      CPX #$01        ; Stop before clearing $01 (PORT) and $00 (DDR)
+      BNE @Loop       ; clear RAM from $02-EF
+
+    LDA #$1B          ; scramble the NPC directional RNG seed
+    ORA npcdir_seed   ;  to make it a little more random
+    STA npcdir_seed
+
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Prep Overworld  [1728]
+;;
+;;    Sets up everything for entering (or re-entering) the world map.
+;;  INCLUDING map decompression.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PrepOverworld:
+    LDA #0
+    ;;STA $2000           ; disable NMIs (use 64 eqivilant) 
+    ;;STA $2001           ; turn off PPU ""
+    ;;STA $4015           ; silence APU ""
+
+    STA scroll_y        ; zero a whole bunch of other things:
+    STA tileprop
+    STA tileprop+1
+    STA inroom
+    STA entering_shop
+    STA facing
+    STA joy_a
+    STA joy_b
+    STA joy_start
+    STA joy_select
+    STA mapflags        ; zeroing map flags indicates we're on the overworld map
+
+    JSR LoadOWCHR           ; load up necessary CHR
+	RTS
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  NewGame_LoadStartingStats  [1811]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+NewGame_LoadStartingStats:
+    LDA #BANK_STARTINGSTATS ; swap in bank containing starting stats
+    JSR SwapPRG_L
+    
+    LDX #$00                ; load up the starting stats for each character
+    JSR @LoadStats
+    LDX #$40
+    JSR @LoadStats
+    LDX #$80
+    JSR @LoadStats
+    LDX #$C0
+  ; JMP @LoadStats
+    
+
+  @LoadStats:
+    LDA ch_class, X         ; get the class
+    ASL A                   ; $10 bytes of starting data for each class
+    ASL A
+    ASL A
+    ASL A
+    TAY                     ; source index in Y
+    
+    ;; lut_ClassStartingStats table contains $B bytes of data, padded to $10
+    ;;   byte 0 is a redundant and unused class ID byte.
+    ;;   The rest is as outlined below
+    
+    LDA lut_ClassStartingStats+1, Y ; starting HP
+    STA ch_curhp, X
+    STA ch_maxhp, X
+    
+    LDA lut_ClassStartingStats+2, Y ; base stats
+    STA ch_str, X
+    LDA lut_ClassStartingStats+3, Y
+    STA ch_agil, X
+    LDA lut_ClassStartingStats+4, Y
+    STA ch_int, X
+    LDA lut_ClassStartingStats+5, Y
+    STA ch_vit, X
+    LDA lut_ClassStartingStats+6, Y
+    STA ch_luck, X
+    
+    LDA lut_ClassStartingStats+7, Y ; sub stats
+    STA ch_dmg, X
+    LDA lut_ClassStartingStats+8, Y
+    STA ch_hitrate, X
+    LDA lut_ClassStartingStats+9, Y
+    STA ch_evade, X
+    LDA lut_ClassStartingStats+$A, Y
+    STA ch_magdef, X
+    
+    ; Award starting MP if the class ID is >= RM, but < KN
+    LDA ch_class, X
+    CMP #CLS_RM
+    BCC :+
+      CMP #CLS_KN
+      BCS :+
+        LDA #$02                ; start with 2 MP
+        STA ch_curmp, X
+        STA ch_maxmp, X
+  : RTS
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -227,33 +384,49 @@ DisableAPU:
     sta SIGVOL      ; Master Volume & Filter Mode = 0 (silence)
     rts
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  CallMusicPlay   [1613]
+;;
+;;    Calls the music play routine.  Comes in two flavors.  Both are the same, only
+;;  CallMusicPlay_NoSwap does not swap the original bank back in.  Therefore CallMusicPlay_NoSwap
+;;  should only be called from this bank (bank F) and only if the bank that's swapped in
+;;  is unimportant.
+;;
+;;    The Music Play routine should be called once per frame unless all sound is stopped.  If sound is active,
+;;  failure to call the music Play routine will result in unsteady tempo and other ugly audio effects.
+;;
+;;  IN:  cur_bank = bank to swap back to on exit (CallMusicPlay only)
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;;  CallMusicPlay  [1613]
-;;
+CallMusicPlay_NoSwap:
+    LDA #BANK_MUSIC     ; swap to music bank (where MusicPlay is)
+    JSR SwapPRG_L
+    JMP MusicPlay_L     ; jump to it, and return (do not swap back)
+
 CallMusicPlay:
-    pha
-    txa
-    pha
-    tya
-    pha
-    lda cur_bank
-    pha
+    PHA
+    TXA
+    PHA
+    TYA
+    PHA
+    LDA cur_bank
+    PHA
 
-    lda #BANK_MUSIC
-    jsr SwapPRG
-    jsr MusicPlay_L
+    LDA #BANK_MUSIC     ; swap to music bank (for MusicPlay)
+    JSR SwapPRG_L
+    JSR MusicPlay_L     ; call MusicPlay
 
-    pla
-    jsr SwapPRG
+    PLA
+    JSR SwapPRG_L       ; swap back to original bank
 
-    pla
-    tay
-    pla
-    tax
-    pla
-    rts 
+    PLA
+    TAY
+    PLA
+    TAX
+    PLA
+    RTS 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -819,7 +992,7 @@ DrawBoxRow_Mid:
     LDY #0
     LDA #$FA           ; FA = L border tile
     STA (ppu_dest), Y
-    LDA #COLOR_WHITE
+    LDA #COLOR_LIGHTBLUE ; Color 14 (bit 3=1 enables multicolor for border)
     STA (color_dest), Y
     INY
 
@@ -827,7 +1000,7 @@ DrawBoxRow_Mid:
 @Loop:
     LDA #$FF           ; FF = inner box body tile (blank space, blue bg shines through)
     STA (ppu_dest), Y
-    LDA #COLOR_WHITE
+    LDA #COLOR_WHITE   ; Color 1 (bit 3=0 keeps innards hi-res)
     STA (color_dest), Y
     INY
     DEX
@@ -835,7 +1008,7 @@ DrawBoxRow_Mid:
 
     LDA #$FB           ; FB = R border tile
     STA (ppu_dest), Y
-    LDA #COLOR_WHITE
+    LDA #COLOR_LIGHTBLUE ; Color 14 (multicolor border)
     STA (color_dest), Y
 
     ; Advance ppu_dest and color_dest to next row (+40)
@@ -872,7 +1045,7 @@ DrawBoxRow_Bot:
     LDY #0
     LDA #$FC            ; FC = DL border tile
     STA (ppu_dest), Y
-    LDA #COLOR_WHITE
+    LDA #COLOR_LIGHTBLUE ; Color 14 (multicolor border)
     STA (color_dest), Y
     INY
 
@@ -880,7 +1053,7 @@ DrawBoxRow_Bot:
 @Loop:
     LDA #$FD            ; FD = bottom border tile
     STA (ppu_dest), Y
-    LDA #COLOR_WHITE
+    LDA #COLOR_LIGHTBLUE ; Color 14 (multicolor border)
     STA (color_dest), Y
     INY
     DEX
@@ -888,7 +1061,7 @@ DrawBoxRow_Bot:
 
     LDA #$FE            ; FE = DR border tile
     STA (ppu_dest), Y
-    LDA #COLOR_WHITE
+    LDA #COLOR_LIGHTBLUE ; Color 14 (multicolor border)
     STA (color_dest), Y
 
     RTS
@@ -912,7 +1085,7 @@ DrawBoxRow_Top:
     LDY #0
     LDA #$F7            ; F7 = UL border tile
     STA (ppu_dest), Y
-    LDA #COLOR_WHITE
+    LDA #COLOR_LIGHTBLUE ; Color 14 (multicolor border)
     STA (color_dest), Y
     INY
 
@@ -920,7 +1093,7 @@ DrawBoxRow_Top:
 @Loop:
     LDA #$F8            ; F8 = U border tile
     STA (ppu_dest), Y
-    LDA #COLOR_WHITE
+    LDA #COLOR_LIGHTBLUE ; Color 14 (multicolor border)
     STA (color_dest), Y
     INY
     DEX
@@ -928,7 +1101,7 @@ DrawBoxRow_Top:
 
     LDA #$F9            ; F9 = UR border tile
     STA (ppu_dest), Y
-    LDA #COLOR_WHITE
+    LDA #COLOR_LIGHTBLUE ; Color 14 (multicolor border)
     STA (color_dest), Y
 
     ; Advance ppu_dest and color_dest to next row (+40)
@@ -983,6 +1156,76 @@ LoadNewGameCHRPal:
 LoadMenuCHRPal:                ; does not load 'lit orb' palette, or the two middle palettes ($03C0-03CB)
     JSR LoadMenuBGCHRAndPalettes
     JMP LoadBatSprCHRPalettes
+
+
+LoadOWCHR:                     ; overworld map -- does not load any palettes
+    LDA #BANK_MAPCHR
+    JSR SwapPRG_L
+    JSR LoadOWBGCHR
+    ;JSR LoadPlayerMapmanCHR
+    ;JMP LoadOWObjectCHR
+	RTS   ; return for now as we work on the loader. 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Load Player Mapman CHR  [9710]
+;;
+;;   Loads CHR for the player mapman graphic based on the lead party member's class
+;;
+;;  TMP:  tmp and tmp+1 used
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LoadPlayerMapmanCHR:
+    LDA #0          ; #0 -> tmp
+    STA tmp
+    LDA ch_class    ; Get lead party member's class
+    ORA #$90        ; ORA with #$90, and put in tmp+1
+    STA tmp+1       ; (tmp) is now $9x00 (where x=lead party member's class).
+                    ;    This points to mapman graphics for that class
+    LDX #1          ; X=1  (load 1 row of tiles)
+    LDA #$10        ; A=$10 (high byte of dest address:  $1000)
+    JMP CHRLoadToA  ; jump to CHR loader
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Load OW Object CHR  [9734]
+;;
+;;   Loads CHR for all overworld objects and mapmans
+;;   This includes:  ship, canoe, airship, bridge, canal, etc
+;;   It is assumed the proper CHR bank is swapped in.
+;;
+;;  IN:   tmp  = assumed to contain 0  (this routine does not explicitly clear it)
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LoadOWObjectCHR:
+    LDA #$9C         ; source address is $9C00 (note:  low byte not explicitly cleared)
+    STA tmp+1
+    LDX #$06         ; 6 rows to load
+    LDA #$11         ; dest address is $1100
+    JMP CHRLoadToA
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Load OW BG CHR  [9750]
+;;
+;;   Loads all CHR for Overworld BG tiles (full left-hand pattern table)
+;;   It is assumed the proper CHR bank is swapped in
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LoadOWBGCHR:
+    LDA #0
+    STA tmp
+    LDA #$80
+    STA tmp+1        ; source address is $8000
+    LDX #$10         ; 16 rows to load (full pattern table)
+    LDA #0           ; dest address is $0000
+    JMP CHRLoadToA
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1258,20 +1501,31 @@ LoadMenuBGCHRAndPalettes:
     JMP LoadBorderPalette_Blue       ; Set up menu border and background colors
 
 LoadBorderPalette_Blue:
-    lda #$01                   ; NES Blue ($01)
-    bne :+                     ; Always branch
+    LDA #COLOR_WHITE           ; Multicolor 1 = 01 (White)
+    STA BGCOL1
+    LDA #COLOR_DARKGREY        ; Multicolor 2 = 11 (Dark Grey, $0B)
+    STA BGCOL2
+    LDA #COLOR_BLUE            ; Background = Blue
+    STA BGCOL0
+    LDA #COLOR_BLACK           ; Screen border = Black
+    STA EXTCOL
+    LDA SCROLX
+    ORA #$10                   ; Enable MultiColor text mode
+    STA SCROLX
+    RTS
 
 LoadBorderPalette_Black:
-    lda #$0F                   ; NES Black ($0F)
-
-:   sta cur_pal + $0E          ; Blue/Black to window background
-    lda #$0F                   ; NES Black ($0F)
-    sta cur_pal + $0C          ; Black to border color 0
-    lda #$00                   ; NES Grey ($00)
-    sta cur_pal + $0D          ; Grey to color 1
-    lda #$30                   ; NES White ($30)
-    sta cur_pal + $0F          ; White to color 3
-    jmp DrawPalette            ; Flush Virtual Palette to VIC-II hardware
+    LDA #COLOR_WHITE           ; Multicolor 1 = 01 (White)
+    STA BGCOL1
+    LDA #COLOR_DARKGREY        ; Multicolor 2 = 11 (Dark Grey, $0B)
+    STA BGCOL2
+    LDA #COLOR_BLACK           ; Background = Black
+    STA BGCOL0
+    STA EXTCOL
+    LDA SCROLX
+    ORA #$10                   ; Enable MultiColor text mode
+    STA SCROLX
+    RTS
 
 LoadBatSprCHRPalettes:
     LDA #BANK_MENUCHR          ; Bank 9 (contains lut_FingerSprite)
@@ -1434,13 +1688,14 @@ lut_DTE1:
 SwapPRG_L:       JMP SwapPRG
 
 SwapPRG:
-    sta cur_bank
     pha
     txa
     pha
-    ldx cur_bank
-    lda lut_EasyFlashBanks, x
-    sta EASYFLASH_BANK
+    tsx
+    lda $0102, x                ; Fetch original A (bank ID) from stack
+    tax
+    lda lut_EasyFlashBanks, x   ; Lookup EasyFlash physical bank
+    sta EASYFLASH_BANK          ; Perform hardware bank switch
     pla
     tax
     pla

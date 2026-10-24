@@ -28,13 +28,17 @@ BANK_THIS = $0E
 TitleScreen_Copyright:
     JSR IntroTitlePrepare      ; clear NT, start music, reset input/cursor, etc
 
-    ; Set border to black, background to blue
+    ; Set border to black, background to blue, and multicolor border registers
     LDA #$0F
     STA cur_pal + $0C          ; Virtual palette border = Black ($0F) for title screen
     LDA #COLOR_BLACK
     STA EXTCOL
     LDA #COLOR_BLUE
     STA BGCOL0
+    LDA #COLOR_WHITE
+    STA BGCOL1
+    LDA #COLOR_DARKGREY
+    STA BGCOL2
 
     ; Paint Screen RAM ($4000-$43E7) with character $00 (solid block)
     LDX #$00
@@ -67,10 +71,10 @@ TitleScreen_Copyright:
     ORA #VIC_BANK1
     STA CI2PRA
 
-    ; Set standard VIC-II text mode: 40 cols, 25 rows, screen ON
+    ; Set VIC-II text mode: 40 cols, 25 rows, screen ON, MultiColor mode ON
     LDA #$1B
     STA SCROLY
-    LDA #$08
+    LDA #$18
     STA SCROLX
     LDA #$02                   ; Screen: $4000, Charset: $4800
     STA VMCSB
@@ -332,7 +336,7 @@ TitleScreen_Loop:
     JSR WaitForVBlank_L     ; Wait for VBlank so UpdateSprites flushes to VIC-II hardware
     JSR TitleScreen_DrawRespondRate ; Redraw respond rate digit
 
-    JSR UpdateJoy_L         ; Scan keyboard & joystick
+    JSR UpdateJoy_L         ; Scan keyboard
     LDA #BANK_THIS
     STA cur_bank
 
@@ -1138,13 +1142,17 @@ PtyGen_Joy:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 PtyGen_DrawScreen:
-    ; Set border to black, background to blue
+    ; Set border to black, background to blue, and multicolor border registers
     LDA #$0F
     STA cur_pal + $0C          ; Virtual palette border = Black ($0F) for title screen
     LDA #COLOR_BLACK
     STA EXTCOL
     LDA #COLOR_BLUE
     STA BGCOL0
+    LDA #COLOR_WHITE
+    STA BGCOL1
+    LDA #COLOR_DARKGREY
+    STA BGCOL2
 
     ; Paint Screen RAM with character $00 (solid black block)
     LDX #$00
@@ -1179,7 +1187,7 @@ PtyGen_DrawScreen:
 
     LDA #$1B
     STA SCROLY
-    LDA #$08
+    LDA #$18                   ; 40 cols, MultiColor text mode ON
     STA SCROLX
     LDA #$02                   ; Screen: $4000, Charset: $4800
     STA VMCSB
@@ -1445,11 +1453,15 @@ NameInput_DrawName:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 DrawNameInputScreen:
-    ; Set border to black, background to blue
+    ; Set border to black, background to blue, and multicolor border registers
     LDA #COLOR_BLACK
     STA EXTCOL
     LDA #COLOR_BLUE
     STA BGCOL0
+    LDA #COLOR_WHITE
+    STA BGCOL1
+    LDA #COLOR_DARKGREY
+    STA BGCOL2
 
     ; Paint Screen RAM with character $00 (solid black block)
     LDX #$00
@@ -1484,7 +1496,7 @@ DrawNameInputScreen:
 
     LDA #$1B
     STA SCROLY
-    LDA #$08
+    LDA #$18                   ; 40 cols, MultiColor text mode ON
     STA SCROLX
     LDA #$02                   ; Screen: $4000, Charset: $4800
     STA VMCSB
