@@ -65,16 +65,62 @@ DEV_SKIP_TO_MAP = 0
 ; ==============================================================================
 
 GameStart:
-    lda #COLOR_BLACK	; Turn off diplay (screen background color to black ($00))
-    sta BGCOL0
+    SEI                 ; Keep interrupts disabled during hardware setup
+    CLD
 
-	lda #$02			; set default screen pointer ($4000) and charset ($4800)
-    sta VMCSB			; Screen: $4000 (bits 7-4=0000), Charset: $4800 (bits 3-1=001 -> $02)
+    LDA #COLOR_BLACK	; Turn off display (border and background to black ($00))
+    STA BGCOL0
+    STA EXTCOL
 
-	LDX #$FF            ; reset stack pointer
+	LDA #$02			; Set default screen pointer ($4000) and charset ($4800)
+    STA VMCSB			; Screen: $4000 (bits 7-4=0000), Charset: $4800 (bits 3-1=001 -> $02)
+
+	LDX #$FF            ; Reset stack pointer
     TXS
 
-    ; Cold boot: initialize variables
+    ; 1. Hardware CIA1 setup (keyboard matrix) & silence timers
+    LDA #$7F
+    STA CIAICR         ; Disable CIA1 timer IRQs
+    STA CI2ICR         ; Disable CIA2 NMI timers
+    LDA CIAICR         ; Acknowledge any pending CIA interrupts
+    LDA CI2ICR
+    LDA #$FF
+    STA CIDDRA         ; Port A all outputs (Keyboard columns)
+    STA CIAPRA         ; Port A all lines high (unselected)
+    LDA #$00
+    STA CIDDRB         ; Port B all inputs (Keyboard rows)
+
+    ; 2. Reset Sprite Multiplexer & turn off hardware sprites
+    STA spr_multiplex_mode ; 0 = Standard single-zone VBlank IRQ
+    STA spr_irq_zone
+    STA shadow_spr_en
+    STA SPENA
+
+    ; 3. Setup standard VBlank Raster IRQ at line 250
+    LDA #1
+    STA IRQMSK
+    LDA #250
+    STA RASTER
+    LDA SCROLY
+    AND #$7F
+    STA SCROLY
+    LDA #$FF
+    STA VICIRQ
+
+    ; 4. Clear Zero Page before enabling interrupts
+    JSR ClearZeroPage   ; Clear Zero Page ($02-$EF)
+
+    CLI                 ; Enable interrupts now that all hardware is cleanly initialized
+
+    ; Check if cold boot or warm reset (Start/F1 pressed during intro)
+    LDA startintrocheck
+    CMP #$4D
+    BEQ @TitleScreen
+
+    LDA #$4D
+    STA startintrocheck ; Mark as initialized so Start/F1 goes straight to title screen
+
+    ; Initialize startup variables
     LDA #0
     STA btlformation
     STA ow_tile
@@ -2339,8 +2385,7 @@ OnReset:
 
     jsr ClearBGPalette ; clear the BG palette (set border and BG colors to black)
 
-    cli            ; Enable interrupts now that all vectors and hardware are ready
-    jmp GameStart_L    ; jump to the start of the game!
+    jmp GameStart_L    ; jump to the start of the game (GameStart will CLI when ready)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

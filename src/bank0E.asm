@@ -143,7 +143,7 @@ IntroStory_Joy:
     LDA joy
     AND #BTN_START        ; see if start was pressed
     BEQ :+                ;  if not, just exit
-      INC joy_start       ; register Start press so IntroStory_Frame exits to title
+      JMP GameStart_L     ; if it was pressed, restart game (brings up title screen)
 :   RTS
 
 
@@ -323,17 +323,18 @@ EnterTitleScreen:
 
     JSR TitleScreen_DrawRespondRate ; Draw initial respond rate digit
 
-    ; Debounce: ensure Start (F1) and Confirm (Return/Space) are released before accepting input
+    ; Debounce: ensure all buttons/keys (F1, Space, Return) are released before accepting input
 @WaitRelease:
     JSR WaitForVBlank_L
     JSR UpdateJoy_L
     LDA joy
-    AND #(BTN_START | BTN_A)
     BNE @WaitRelease
 
     LDA #0
     STA joy_a
+    STA joy_b
     STA joy_start
+    STA joy_prevdir
 
 TitleScreen_Loop:
     JSR ClearOAM            ; Clear shadow sprite buffer
@@ -682,20 +683,18 @@ IntroStory_Frame:
     JSR DrawPalette_L          ; and draw the animating palette
 
     LDA #0
-    STA joy_a                  ; clear A, B, and Start button catchers
+    STA joy_a                  ; clear A and B button catchers
     STA joy_b
-    STA joy_start
 
     LDA #BANK_THIS             ; set current bank (needed when calling CallMusicPlay from
     STA cur_bank               ;   a swappable bank)
     JSR CallMusicPlay_L        ; Then call music play to keep music playing!
 
-    JSR IntroStory_Joy         ; update joypad
+    JSR IntroStory_Joy         ; update joypad (Start jumps to GameStart_L -> TitleScreen)
 
-    LDA joy_a                  ; check to see if A, B, or Start were pressed
+    LDA joy_a                  ; check to see if either A or B were pressed
     ORA joy_b
-    ORA joy_start
-    BNE :+                     ; if so, break out of intro to title screen
+    BNE :+                     ; if not...
       RTS                      ; ... exit normally
 
 :   PLA                        ; if either A or B pressed, PLA to drop the last

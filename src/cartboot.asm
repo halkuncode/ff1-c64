@@ -18,6 +18,10 @@ reset:
     lda #BANK_DEFAULT
     sta PORT
 
+    ; Clear warm-reset check on cold boot
+    lda #0
+    sta $F9             ; startintrocheck = $F9
+
     ; Copy loader routine to RAM at $0300
     ldx #$00
 CopySelfToRAM:
