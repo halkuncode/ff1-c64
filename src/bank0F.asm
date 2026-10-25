@@ -53,23 +53,26 @@ DrawPalette_L:        JMP DrawPalette
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; ==============================================================================
+; DEV / QUICK BOOT CONFIGURATION
+; ==============================================================================
+; Set DEV_SKIP_TO_MAP = 1 to skip Intro Story, Title Screen, and Party Generation,
+; assigning a default 4-hero party (Fighter, Thief, White Mage, Black Mage) with
+; their starting stats, and jumping straight to the Overworld outside Coneria.
+;
+; Set DEV_SKIP_TO_MAP = 0 to boot normally from the beginning (Intro -> Title -> PartyGen).
+DEV_SKIP_TO_MAP = 1
+; ==============================================================================
+
 GameStart:
     lda #COLOR_BLACK	; Turn off diplay (screen background color to black ($00))
     sta BGCOL0
-
-
-	STA unk_FE          ; ?? I don't think this is ever used
 
 	lda #$02			; set default screen pointer ($4000) and charset ($4800)
     sta VMCSB			; Screen: $4000 (bits 7-4=0000), Charset: $4800 (bits 3-1=001 -> $02)
 
 	LDX #$FF            ; reset stack pointer
     TXS
-
-    ; Check if cold boot or warm reset (Enter/Start pressed during intro)
-    LDA startintrocheck
-    CMP #$4D
-    BEQ @TitleScreen
 
     ; Cold boot: initialize variables
     LDA #0
@@ -109,8 +112,23 @@ GameStart:
 	LDA #$01                        ; start on foot
 	STA unsram_vehicle
 
-    LDA #$4D
-    STA startintrocheck             ; Mark as initialized so warm reset goes to title screen
+.if DEV_SKIP_TO_MAP
+    ; Quick-boot: skip Intro, Title, and PartyGen. Assign a default party:
+    ; Fighter, Thief, White Mage, Black Mage
+    LDA #CLS_FT
+    STA ch_class
+    LDA #CLS_TH
+    STA ch_class + $40
+    LDA #CLS_WM
+    STA ch_class + $80
+    LDA #CLS_BM
+    STA ch_class + $C0
+
+    JSR NewGame_LoadStartingStats   ; Compute starting stats, HP, and MP
+
+    ; Default starting position outside Coneria: X=$92, Y=$9E (from lut_InitUnsramFirstPage)
+    JMP @Begin
+.endif
 
     LDA #BANK_INTRO                 ; Cold boot: do the intro story!
     JSR SwapPRG_L
