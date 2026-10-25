@@ -58,23 +58,6 @@ GameStart:
     sta BGCOL0
 
 
-    ; --- Test Coordinates Hook ---
-    lda #$92           ; OW X coordinate ($00 - $FF)
-    sta ow_scroll_x
-    lda #$9e           ; OW Y coordinate ($00 - $FF)
-    sta ow_scroll_y
-    lda #1             ; vehicle: 1 = on foot
-    sta vehicle
-
-    lda #$02           ; set default screen pointer ($4000) and charset ($4800)
-    sta VMCSB          ; Screen: $4000 (bits 7-4=0000), Charset: $4800 (bits 3-1=001 -> $02)
-
-    ldx #$FF           ; reset stack pointer
-    txs
-
-    jmp DoOverworld    ; jump so I can work on just the overworld for now. 
-;    ; ---------------------------
-
 	STA unk_FE          ; ?? I don't think this is ever used
 
 	lda #$02			; set default screen pointer ($4000) and charset ($4800)
