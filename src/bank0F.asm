@@ -15,7 +15,7 @@
 .export SwapPRG_L, SwapPRG
 .export CoordToNTAddr, lut_ScreenRowLo, lut_ScreenRowHi
 .export DrawCursor, UpdateSprites, VerifyChecksum
-.export lut_NES_to_C64, lut_OWTileColors
+.export lut_NES_to_C64, lut_OWTileColors, lut_OWMetatileColors
 
 .import EnterIntroStory, EnterTitleScreen, NewGamePartyGeneration
 .import lut_MenuCHR
@@ -720,7 +720,9 @@ DrawFullMap:
     LDA (tmp+8), Y      ; A = metatile ID (0..127)
     TAY                 ; Y = metatile ID index into TSA tables
 
-    ; Fetch quadrant character tile IDs
+    ; Fetch metatile color & quadrant character tile IDs
+    LDA lut_OWMetatileColors, Y
+    STA tmp+11          ; metatile color for all 4 character cells
     LDA tsa_ul, Y
     STA tmp+12          ; char_ul
     LDA tsa_ur, Y
@@ -738,16 +740,14 @@ DrawFullMap:
     ; Plot top-left tile (Screen RAM & Color RAM)
     LDA tmp+12
     STA (tmp+0), Y
-    TAX
-    LDA lut_OWTileColors, X
+    LDA tmp+11
     STA (tmp+2), Y
 
     ; Plot top-right tile
     INY
     LDA tmp+13
     STA (tmp+0), Y
-    TAX
-    LDA lut_OWTileColors, X
+    LDA tmp+11
     STA (tmp+2), Y
     DEY
 
@@ -759,16 +759,14 @@ DrawFullMap:
     ; Plot bottom-left tile
     LDA tmp+15
     STA (tmp+4), Y
-    TAX
-    LDA lut_OWTileColors, X
+    LDA tmp+11
     STA (tmp+6), Y
 
     ; Plot bottom-right tile
     INY
     PLA                 ; retrieve char_dr from stack
     STA (tmp+4), Y
-    TAX
-    LDA lut_OWTileColors, X
+    LDA tmp+11
     STA (tmp+6), Y
     JMP @ColNext
 
@@ -790,6 +788,37 @@ DrawFullMap:
 
 @Done:
     RTS
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  lut_OWMetatileColors
+;;
+;;  Lookup table mapping each of the 128 Overworld metatile IDs ($00-$7F)
+;;  to its MultiColor Color RAM nybble ($08-$0F with bit 3 set).
+;;  Selecting color by metatile type resolves the bug where shared 8x8 character
+;;  tiles between river/lake water and sand caused desert sands to appear blue.
+;;
+;;  Color Mapping by Metatile Type:
+;;    $09 (White):       Mountains, Castles, Towns, Buildings, Docks
+;;    $0D (Green):       Forests, Woods, Grass terrain
+;;    $0E (Blue):        Water, Ocean, Rivers, Lakes, Waterfall
+;;    $0F (Yellow):      Desert, Sand, Oasis, Mirage Tower
+;;    $0A (Brown):       Bridges / dirt tracks
+;;    $0B (Cyan):        Marsh / Swamp
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_OWMetatileColors:
+    .byte $0D, $09, $09, $0D, $0D, $0D, $0E, $0E, $0E, $09, $09, $09, $09, $0F, $09, $09  ; $00-$0F
+    .byte $09, $09, $09, $0D, $0D, $0D, $0E, $0E, $0E, $09, $09, $09, $09, $0F, $0F, $09  ; $10-$1F
+    .byte $09, $09, $09, $0D, $0D, $0D, $0E, $0E, $0E, $09, $09, $09, $09, $09, $09, $09  ; $20-$2F
+    .byte $09, $09, $09, $09, $09, $09, $0F, $0F, $09, $09, $09, $09, $09, $09, $09, $09  ; $30-$3F
+    .byte $0E, $0E, $0F, $0F, $0E, $0F, $0E, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $40-$4F
+    .byte $0E, $0E, $0F, $0F, $0A, $0B, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $50-$5F
+    .byte $0A, $0A, $0B, $0B, $0F, $0F, $0D, $0D, $0D, $0D, $0D, $09, $0D, $09, $0D, $09  ; $60-$6F
+    .byte $0A, $0A, $0B, $0B, $0F, $0F, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $70-$7F
 
 
 

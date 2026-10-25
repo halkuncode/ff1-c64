@@ -5,7 +5,7 @@
 ; SKIP_TO_MAP = 1: Quick-boot directly to Party Generation, where F1 immediately
 ;                  confirms default party and enters the overworld map.
 ; SKIP_TO_MAP = 0: Normal game flow (Intro -> Title -> Normal Party Generation).
-SKIP_TO_MAP = 0
+SKIP_TO_MAP = 1
 ; ==============================================================================
 
 ;;;;;;;;;;;;;;;;;;
