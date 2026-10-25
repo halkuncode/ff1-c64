@@ -147,6 +147,10 @@ GameStart:
 	LDA #$01                        ; start on foot
 	STA unsram_vehicle
 
+.if SKIP_TO_MAP
+    JMP @NewGame                    ; Skip Intro and Title, jump straight to Party Gen
+.endif
+
     LDA #BANK_INTRO                 ; Cold boot: do the intro story!
     JSR SwapPRG_L
     JSR EnterIntroStory

@@ -833,12 +833,15 @@ DoPartyGen_OnCharacter:
   @MainLoop:
     JSR PtyGen_Frame                ; Do a frame and update joypad input
 
+.if SKIP_TO_MAP
     LDA joy_start
     BEQ :+
     PLA                             ; Drop return address from JSR DoPartyGen_OnCharacter
     PLA
     JMP PtyGen_Confirmed            ; Start (F1) pressed -> confirm party immediately & go to map!
 :
+.endif
+
     LDA joy_a
     BEQ @CheckB
     LDA #0
