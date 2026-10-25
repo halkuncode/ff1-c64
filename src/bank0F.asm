@@ -61,7 +61,7 @@ DrawPalette_L:        JMP DrawPalette
 ; their starting stats, and jumping straight to the Overworld outside Coneria.
 ;
 ; Set DEV_SKIP_TO_MAP = 0 to boot normally from the beginning (Intro -> Title -> PartyGen).
-DEV_SKIP_TO_MAP = 1
+DEV_SKIP_TO_MAP = 0
 ; ==============================================================================
 
 GameStart:
@@ -214,13 +214,58 @@ EnterOverworldLoop:
     LDX #$FF            ; purge stack and wipe the stack pointer so it points to top of stack
     TXS                 ;   overworld loop is the de-facto "top" of all gameflow.
 
+    LDA #0
+    STA move_ctr_x      ; repeat delay counter
 
+@Loop:
+    JSR WaitForVBlank_L
+    JSR UpdateJoy_L
 
+    ; Check if in repeat delay
+    LDA move_ctr_x
+    BEQ @CheckInput
+    DEC move_ctr_x
+    JMP @Loop
 
-halt_loop:
-    jsr WaitForVBlank_L
-    ;;jsr CallMusicPlay_L ;music musted for now
-    jmp halt_loop
+@CheckInput:
+    LDA joy
+    AND #(UP | DOWN | LEFT | RIGHT)
+    BEQ @Loop           ; no directional key pressed
+
+    ; Mutually exclusive Up / Down
+    LDA joy
+    AND #UP
+    BEQ @CheckDown
+    DEC ow_scroll_y
+    JMP @CheckHoriz
+@CheckDown:
+    LDA joy
+    AND #DOWN
+    BEQ @CheckHoriz
+    INC ow_scroll_y
+
+@CheckHoriz:
+    ; Mutually exclusive Left / Right
+    LDA joy
+    AND #LEFT
+    BEQ @CheckRight
+    DEC ow_scroll_x
+    JMP @DoRedraw
+@CheckRight:
+    LDA joy
+    AND #RIGHT
+    BEQ @DoRedraw
+    INC ow_scroll_x
+
+@DoRedraw:
+    ; Repeat delay (6 frames ≈ 10 tiles/sec)
+    LDA #6
+    STA move_ctr_x
+
+    ; Redraw map at new coordinates
+    JSR DrawFullMap
+
+    JMP @Loop
 
 
 
@@ -1110,6 +1155,8 @@ ReadJoypadData:
     ; Row 4 (bit 4) = F1 (Start)
     LDA #$FE
     STA CIAPRA
+    NOP
+    NOP
     LDA CIAPRB
     TAX
     AND #$01        ; Row 0: Inst/Del
@@ -1137,6 +1184,8 @@ ReadJoypadData:
     ; Row 5 (bit 5) = S (Down)
     LDA #$FD
     STA CIAPRA
+    NOP
+    NOP
     LDA CIAPRB
     TAX
     AND #$02        ; Row 1: W
@@ -1162,6 +1211,8 @@ ReadJoypadData:
     ; Row 2 (bit 2) = D (Right)
     LDA #$FB
     STA CIAPRA
+    NOP
+    NOP
     LDA CIAPRB
     AND #$04        ; Row 2: D
     BNE :+
@@ -1176,6 +1227,8 @@ ReadJoypadData:
     ; Row 7 (bit 7) = Run/Stop (Button B)
     LDA #$7F
     STA CIAPRA
+    NOP
+    NOP
     LDA CIAPRB
     TAX
     AND #$10        ; Row 4: Space (Button A)
@@ -1207,6 +1260,7 @@ ReadJoypadData:
 ;;
 ;;  Examines 'joy' and 'joy_ignore' to determine button edge transitions.
 ;;  Increments joy_start, joy_select, joy_a, joy_b when pressed from released state.
+;;  DO NOT IMPLMENT A CONTROLLER ON PORT 2 THIS GAME IS KEYBAORD ONLY
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
