@@ -740,6 +740,8 @@ NewGamePartyGeneration:
     LDA #$00        ; Null-terminates draw buffer for character name
     STA $60
 
+    JMP @Confirmed  ; Skip party generation (comment out to customize party)
+
 @Char_0:                    ; To Character generation for each of the 4 characters
     LDA #$00                ;   branching back to the previous char if cancelled
     STA char_index
