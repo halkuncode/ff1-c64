@@ -53,17 +53,6 @@ DrawPalette_L:        JMP DrawPalette
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; ==============================================================================
-; DEV / QUICK BOOT CONFIGURATION
-; ==============================================================================
-; Set DEV_SKIP_TO_MAP = 1 to skip Intro Story, Title Screen, and Party Generation,
-; assigning a default 4-hero party (Fighter, Thief, White Mage, Black Mage) with
-; their starting stats, and jumping straight to the Overworld outside Coneria.
-;
-; Set DEV_SKIP_TO_MAP = 0 to boot normally from the beginning (Intro -> Title -> PartyGen).
-DEV_SKIP_TO_MAP = 0
-; ==============================================================================
-
 GameStart:
     SEI                 ; Keep interrupts disabled during hardware setup
     CLD
@@ -157,24 +146,6 @@ GameStart:
 	
 	LDA #$01                        ; start on foot
 	STA unsram_vehicle
-
-.if DEV_SKIP_TO_MAP
-    ; Quick-boot: skip Intro, Title, and PartyGen. Assign a default party:
-    ; Fighter, Thief, White Mage, Black Mage
-    LDA #CLS_FT
-    STA ch_class
-    LDA #CLS_TH
-    STA ch_class + $40
-    LDA #CLS_WM
-    STA ch_class + $80
-    LDA #CLS_BM
-    STA ch_class + $C0
-
-    JSR NewGame_LoadStartingStats   ; Compute starting stats, HP, and MP
-
-    ; Default starting position outside Coneria: X=$92, Y=$9E (from lut_InitUnsramFirstPage)
-    JMP @Begin
-.endif
 
     LDA #BANK_INTRO                 ; Cold boot: do the intro story!
     JSR SwapPRG_L

@@ -740,8 +740,6 @@ NewGamePartyGeneration:
     LDA #$00        ; Null-terminates draw buffer for character name
     STA $60
 
-    JMP @Confirmed  ; Skip party generation (comment out to customize party)
-
 @Char_0:                    ; To Character generation for each of the 4 characters
     LDA #$00                ;   branching back to the previous char if cancelled
     STA char_index
@@ -770,12 +768,12 @@ NewGamePartyGeneration:
     JSR PtyGen_Frame        ; Keep multiplexer, music, and joypad running
     LDA joy_a
     ORA joy_start
-    BNE @Confirmed          ; Pressing Space or Return confirms party!
+    BNE PtyGen_Confirmed    ; Pressing Space or Return confirms party!
     LDA joy_b
     BEQ @ConfirmLoop
     JMP @Char_3             ; Pressing B returns to Char 3 generation
 
-@Confirmed:
+PtyGen_Confirmed:
     JSR PlaySFX_MenuSel
 
     ; Move class and name selection into actual character stats
@@ -835,6 +833,12 @@ DoPartyGen_OnCharacter:
   @MainLoop:
     JSR PtyGen_Frame                ; Do a frame and update joypad input
 
+    LDA joy_start
+    BEQ :+
+    PLA                             ; Drop return address from JSR DoPartyGen_OnCharacter
+    PLA
+    JMP PtyGen_Confirmed            ; Start (F1) pressed -> confirm party immediately & go to map!
+:
     LDA joy_a
     BEQ @CheckB
     LDA #0
