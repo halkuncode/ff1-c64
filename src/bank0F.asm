@@ -16,12 +16,15 @@
 .export CoordToNTAddr, lut_ScreenRowLo, lut_ScreenRowHi
 .export DrawCursor, UpdateSprites, VerifyChecksum
 .export lut_NES_to_C64, lut_OWTileColors, lut_OWMetatileColors
+.export LoadPrice
 
 .import EnterIntroStory, EnterTitleScreen, NewGamePartyGeneration
 .import lut_MenuCHR
 .import lut_FingerSprite, lut_HeroSprites
 .import lut_BattleFormations
 .import MusicPlay_L
+.import PrintCharStat, PrintPrice, PrintGold
+.import PrintNumber_1Digit, PrintNumber_2Digit, PrintNumber_3Digit, PrintNumber_5Digit, PrintNumber_6Digit
 
 
 ;;;;
@@ -1588,9 +1591,19 @@ DrawComplexString:
     BEQ @DoubleLineBreak
     CMP #$02                      ; $02 = Item / class name
     BEQ @Code_02
+    CMP #$03                      ; $03 = Item price
+    BEQ @Code_03
+    CMP #$04                      ; $04 = Current gold
+    BEQ @Code_04
     CMP #$05                      ; $05 = Single line break
     BEQ @SingleLineBreak
-    JMP @SingleLineBreak
+
+    CMP #$10
+    BCC @SingleLineBreak          ; < $10 defaults to line break
+    CMP #$14
+    BCC @Code_10to13              ; $10-$13 = Character stat (characters 0-3)
+
+    JMP @SingleLineBreak          ; >= $14 defaults to single line break
 
 @DoubleLineBreak:
     INC dest_y
@@ -1638,6 +1651,139 @@ DrawComplexString:
     JSR @Draw_NoStall
     JMP @Restore
 
+@Code_03:
+    LDY #0
+    LDA (text_ptr), Y             ; Fetch item ID from string
+    INC text_ptr
+    BNE :+
+    INC text_ptr+1
+:   JSR @Save
+    TAX
+    LDA #BANK_MENUS
+    STA cur_bank
+    JSR SwapPRG_L
+    TXA
+    JSR PrintPrice
+    JSR @Draw_NoStall
+    JMP @Restore
+
+@Code_04:
+    JSR @Save
+    LDA #BANK_MENUS
+    STA cur_bank
+    JSR SwapPRG_L
+    JSR PrintGold
+    JSR @Draw_NoStall
+    JMP @Restore
+
+@Code_10to13:
+    ; Character index: $00, $40, $80, $C0
+    ROR A
+    ROR A
+    ROR A
+    AND #$C0
+    STA char_index
+
+    LDY #0
+    LDA (text_ptr), Y             ; Fetch stat code from string
+    INC text_ptr
+    BNE :+
+    INC text_ptr+1
+:
+    CMP #$00                      ; Stat Code $00 = Character Name
+    BNE @StatNot00
+
+    ; Stat 0: Copy 4-byte name to format_buf-4 .. format_buf-1
+    LDX char_index
+    LDA ch_name, X
+    STA format_buf-4
+    LDA ch_name+1, X
+    STA format_buf-3
+    LDA ch_name+2, X
+    STA format_buf-2
+    LDA ch_name+3, X
+    STA format_buf-1
+    LDA #0
+    STA format_buf
+
+    JSR @Save
+    LDA #<(format_buf-4)
+    STA text_ptr
+    LDA #>(format_buf-4)
+    STA text_ptr+1
+    JSR @Draw_NoStall
+    JMP @Restore
+
+@StatNot00:
+    CMP #$01                      ; Stat Code $01 = Class Name
+    BNE @StatNot01
+    LDX char_index
+    LDA ch_class, X
+    CLC
+    ADC #$F0
+    JMP @DrawItem
+
+@StatNot01:
+    CMP #$02                      ; Stat Code $02 = Ailment blurb ("HP", "ST", "PO", etc.)
+    BNE @StatNot02
+    LDX char_index
+    LDA ch_ailments, X
+    CLC
+    ADC #$FC
+    JMP @DrawItem
+
+@StatNot02:
+    CMP #$0C
+    BCC @StatPrintStat            ; $03-$0B: PrintCharStat
+
+    CMP #$14
+    BCC @StatCode_0Cto13          ; $0C-$13: Weapons/Armor
+
+    CMP #$2C
+    BCC @StatCode_14to2B          ; $14-$2B: Spells
+
+@StatPrintStat:
+    ; Stat codes $03-$0B, and $2C-$FF: handled by PrintCharStat in BANK_MENUS
+    TAX                           ; Stat code in X
+    JSR @Save
+    LDA #BANK_MENUS
+    STA cur_bank
+    JSR SwapPRG_L
+    TXA
+    JSR PrintCharStat
+    JSR @Draw_NoStall
+    JMP @Restore
+
+@StatCode_0Cto13:
+    ; Stat codes $0C-$0F (Weapons), $10-$13 (Armor)
+    JMP @Draw_NoStall
+
+@StatCode_14to2B:
+    ; Magic spell name:
+    SEC
+    SBC #$14
+    TAX
+    LDA @lut_MagicStat, X
+    CLC
+    ADC char_index
+    TAX
+    ASL A
+    AND #$38
+    CLC
+    ADC #$AF
+    STA tmp
+    LDA ch_spells, X
+    BEQ @SpellEmpty
+    CLC
+    ADC tmp
+    JMP @DrawItem
+@SpellEmpty:
+    JMP @Draw_NoStall
+
+@lut_MagicStat:
+    .BYTE $00,$01,$02, $04,$05,$06, $08,$09,$0A, $0C,$0D,$0E
+    .BYTE $10,$11,$12, $14,$15,$16, $18,$19,$1A, $1C,$1D,$1E
+
 @Save:
     LDY text_ptr
     STY tmp_hi
@@ -1661,6 +1807,42 @@ DrawComplexString:
     LDA ret_bank
     JSR SwapPRG_L
     RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  LoadPrice  [10573]
+;;
+;;  Loads item price into tmp (low) and tmp+1 (high), tmp+2 = 0
+;;  IN:  A = item ID
+;;  OUT: tmp, tmp+1 = price
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LoadPrice:
+    ASL A        ; double item index (2 bytes per price)
+    STA tmp+2    ; store low byte in tmp+2 ($12)
+
+    LDA #>(lut_ItemPrices>>1)  ; high byte of pointer, right-shifted by 1
+    ROL A                      ; rotate left by 1 to catch carry from above ASL
+    STA tmp+3                  ; store high byte in tmp+3 ($13)
+
+    LDA #BANK_ITEMPRICES
+    JSR SwapPRG_L  ; swap to bank D (for item prices)
+
+    LDY #0         ; zero Y (our source index)
+    LDA (tmp+2), Y ; get low byte of price
+    STA tmp
+    INY
+    LDA (tmp+2), Y ; and high byte
+    STA tmp+1
+
+    LDA #0
+    STA tmp+2       ; 3rd byte is always 0 (no item costs more than 65535)
+
+    LDA #BANK_MENUS ; swap back to bank E
+    JMP SwapPRG_L   ; and return
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;

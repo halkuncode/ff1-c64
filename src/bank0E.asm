@@ -7,10 +7,15 @@
 .export EnterIntroStory, EnterTitleScreen, NewGamePartyGeneration, DoPartyGen_OnCharacter
 .export PtyGen_DrawText, PtyGen_DrawOneText, PtyGen_DrawCursor, PtyGen_Frame, PtyGen_Joy
 .export DoNameInput, CharName_Frame, CharName_DrawCursor, NameInput_DrawName, DrawNameInputScreen
+.export PrintCharStat, PrintPrice, PrintGold
+.export PrintNumber_1Digit, PrintNumber_2Digit, PrintNumber_3Digit, PrintNumber_4Digit, PrintNumber_5Digit, PrintNumber_6Digit
+.export FormatNumber_2Digits, FormatNumber_3Digits, FormatNumber_4Digits, FormatNumber_5Digits, FormatNumber_6Digits
+.export TrimZeros_2Digits, TrimZeros_3Digits, TrimZeros_4Digits, TrimZeros_5Digits, TrimZeros_6Digits
 .import LoadMenuCHRPal, LoadNewGameCHRPal, DrawComplexString, WaitForVBlank_L, UpdateJoy_L, DrawBox
 .import GameStart_L, CallMusicPlay_L, ClearOAM, DrawPalette_L, DrawCursor
 .import lut_ScreenRowLo, lut_ScreenRowHi
 .import lut_IntroStoryText
+.import LoadPrice
 
 BANK_THIS = $0E
 
@@ -1635,3 +1640,515 @@ lut_PtyGenBuf:
   .BYTE $02, $00, $FF, $FF, $FF, $FF, 11, 22,  9, 16, 120, 194,  8, 14,  80, 178
   ; Hero 3: Red Mage (Bottom-Right)
   .BYTE $03, $00, $FF, $FF, $FF, $FF, 25, 22, 23, 16, 232, 194, 22, 14, 192, 178
+
+
+; ==============================================================================
+; Character Stat & Number Formatting Routines
+; ==============================================================================
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Print Character Stat  [$8D70 :: 0x38D80]
+;;
+;;    Called by DrawComplexString to print a specific character stat
+;;  String is printed to 'format_buf'
+;;
+;;  IN:  char_index = character index ($00, $40, $80, or $C0)
+;;       A          = ID of stat to draw (between $03-0B and 2C-FF .. other values invalid)
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PrintCharStat:
+    CMP #$03      ; is ID == $03?
+    BNE :+
+      JMP @Level  ; if yes, print Level
+:   CMP #$04
+    BEQ @Exp      ; if $04, print Exp
+    CMP #$05
+    BEQ @CurHP    ; if $05, print CurHP
+    CMP #$06
+    BEQ @MaxHP    ; etc
+    CMP #$07
+    BEQ @Str
+    CMP #$08
+    BEQ @Agil
+    CMP #$09
+    BEQ @Int
+    CMP #$0A
+    BEQ @Vit
+    CMP #$0B
+    BEQ @Luck
+
+    CMP #$3C
+    BCS @CodeAbove3B   ; see if ID is >= #$3C
+
+    CMP #$2C
+    BCC @ExpToNext   ; see if ID is < #$2C (should never happen)
+
+    ;;; code reaches here if the ID is between $2C-3B  (prints MP... cur or max)
+      SEC
+      SBC #$0C         ; subtract #$C  ($20-2F -- index + $20)
+      CLC
+      ADC char_index   ; add character index
+      TAX
+      LDA ch_mp-$20, X ; get MP  (need to subtract $20 because index is +$20)
+      STA tmp          ;  and print it as 1 Digit
+      JMP PrintNumber_1Digit
+
+
+@CodeAbove3B:
+    CMP #$42
+    BCS @ExpToNext     ; see if ID is >= $42
+
+    ;;; code reaches here if ID is between $3C-41  (prints substats, like Damage, Hit%, etc)
+      SEC
+      SBC #$3C            ; subtract #$3C  ($00-05)
+      CLC
+      ADC char_index      ; add character index
+      TAX
+      LDA ch_substats, X  ; get the substat
+      STA tmp             ; write it as low byte
+      LDA #0              ; set mid byte to 0 (need a mid byte for 3 Digit printing)
+      STA tmp+1           ;  and print as 3 digits
+      JMP PrintNumber_3Digit
+
+    ;;; all other codes default to Exp to Next level
+@ExpToNext:
+      LDX char_index         ; get the index
+      LDA ch_exptonext, X    ; low byte of Exp To Next
+      STA tmp
+      LDA ch_exptonext+1, X  ; mid byte
+      STA tmp+1
+      LDA #0                 ; high byte is 0 (5 digit numbers need a high byte)
+      STA tmp+2              ; print it as 5 digits
+      JMP PrintNumber_5Digit
+
+@Exp:
+    LDA #<(ch_exp - ch_stats)
+    JMP @Stat6Digit
+
+@CurHP:
+    LDA #<(ch_curhp - ch_stats)
+    JMP @Stat3Digit
+
+@MaxHP:
+    LDA #<(ch_maxhp - ch_stats)
+    JMP @Stat3Digit
+
+@Str:
+    LDA #<(ch_str - ch_stats)
+    JMP @Stat2Digit
+
+@Agil:
+    LDA #<(ch_agil - ch_stats)
+    JMP @Stat2Digit
+
+@Int:
+    LDA #<(ch_int - ch_stats)
+    JMP @Stat2Digit
+
+@Vit:
+    LDA #<(ch_vit - ch_stats)
+    JMP @Stat2Digit
+
+@Luck:
+    LDA #<(ch_luck - ch_stats)
+    JMP @Stat2Digit
+
+@Stat1Digit:
+    CLC
+    ADC char_index
+    TAX
+    LDA ch_stats, X
+    STA tmp
+    JMP PrintNumber_1Digit
+
+@Stat2Digit:
+    CLC
+    ADC char_index
+    TAX
+    LDA ch_stats, X
+    STA tmp
+    JMP PrintNumber_2Digit
+
+@Stat3Digit:
+    CLC
+    ADC char_index     ; add character index to stat ID (currently in A)
+    TAX                ; use this to index stat from start of player stats ($6100)
+    LDA ch_stats, X
+    STA tmp
+    LDA ch_stats+1, X  ; read a 2-byte number
+    STA tmp+1          ; and print it as 3-digits
+    JMP PrintNumber_3Digit
+
+@Stat6Digit:
+    CLC
+    ADC char_index      ; add character index to stat ID (currently in A)
+    TAX                 ; use this to index stat from start of player stats ($6100)
+    LDA ch_stats, X
+    STA tmp
+    LDA ch_stats+1, X   ; read a 3-byte number
+    STA tmp+1
+    LDA ch_stats+2, X
+    STA tmp+2           ; and print it as 6-digits
+    JMP PrintNumber_6Digit
+
+;;  Stat Code = $03 -- character level
+@Level:
+    LDX char_index   ; Get Character index
+    LDA ch_level, X  ; Get character's level
+    CLC
+    ADC #$01         ; Add 1 to it ($00 is "Level 1")
+    STA tmp          ; and print it as 2-digit
+    JMP PrintNumber_2Digit
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Print Price  [$8E44 :: 0x38E54]
+;;
+;;    Fetches desired item price, then prints it to a temp drawing buffer
+;;
+;;  IN:  A = item ID whose price we're printing
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PrintPrice:
+    JSR LoadPrice             ; just load the price
+    JMP PrintNumber_5Digit    ; and print it as 5-digits!
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Print Gold   [$8E4A :: 0x38E5A]
+;;
+;;    Loads and prints current gold amount into a temporary drawing buffer
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PrintGold:
+    LDA gold     ; just copy the gold to the routine input vars
+    STA tmp
+    LDA gold+1
+    STA tmp+1
+    LDA gold+2
+    STA tmp+2
+    JMP PrintNumber_6Digit
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Print Number   [$8E5C :: 0x38E6C]
+;;
+;;    These routines print a number of a desired number of digits to format_buf.
+;;  The number is right-aligned with zeros trimmed off the front
+;;  (ie:  "  67" instead of "0067").  A pointer to the start of the buffer
+;;  is then stored at text_ptr.
+;;
+;;  IN:  tmp = 3-byte number to print
+;;
+;;  OUT: format_buf = buffer receiving the printed string
+;;       text_ptr   = pointer to start of buffer
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PrintNumber_1Digit:
+    LDA tmp              ; no real formatting involved in 1-digit numbers
+    ORA #$80             ; convert to tile ID ($80-$89)
+    STA format_buf-1
+    LDA #<(format_buf-1)
+    JMP PrintNumber_Exit
+
+PrintNumber_2Digit:
+    JSR FormatNumber_2Digits
+    JSR TrimZeros_2Digits
+    LDA #<(format_buf-2)
+    JMP PrintNumber_Exit
+
+PrintNumber_3Digit:
+    JSR FormatNumber_3Digits
+    JSR TrimZeros_3Digits
+    LDA #<(format_buf-3)
+    JMP PrintNumber_Exit
+
+PrintNumber_4Digit:
+    JSR FormatNumber_4Digits
+    JSR TrimZeros_4Digits
+    LDA #<(format_buf-4)
+    JMP PrintNumber_Exit
+
+PrintNumber_5Digit:
+    JSR FormatNumber_5Digits
+    JSR TrimZeros_5Digits
+    LDA #<(format_buf-5)
+    JMP PrintNumber_Exit
+
+PrintNumber_6Digit:
+    JSR FormatNumber_6Digits
+    JSR TrimZeros_6Digits
+    LDA #<(format_buf-6)
+    JMP PrintNumber_Exit
+
+PrintNumber_Exit:
+    STA text_ptr          ; low byte of pointer in A
+    LDA #>format_buf      ; high byte
+    STA text_ptr+1
+    LDA #0
+    STA format_buf        ; ensure null-terminated
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Trim Zeros  [$8E9F :: 0x38EAF]
+;;
+;;    Replaces leading '0' characters ($80) with a blank space character ($FF)
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+TrimZeros_6Digits:
+    LDA format_buf-6
+    CMP #$80
+    BNE TrimZeros_RTS
+    LDA #$FF
+    STA format_buf-6
+
+TrimZeros_5Digits:
+    LDA format_buf-5
+    CMP #$80
+    BNE TrimZeros_RTS
+    LDA #$FF
+    STA format_buf-5
+
+TrimZeros_4Digits:
+    LDA format_buf-4
+    CMP #$80
+    BNE TrimZeros_RTS
+    LDA #$FF
+    STA format_buf-4
+
+TrimZeros_3Digits:
+    LDA format_buf-3
+    CMP #$80
+    BNE TrimZeros_RTS
+    LDA #$FF
+    STA format_buf-3
+
+TrimZeros_2Digits:
+    LDA format_buf-2
+    CMP #$80
+    BNE TrimZeros_RTS
+    LDA #$FF
+    STA format_buf-2
+
+TrimZeros_RTS:
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Format Number  [$8ED2 :: 0x38EE2]
+;;
+;;   Converts binary number in tmp to decimal digits ($80-$89) in format_buf.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+FormatNumber_6Digits:
+    LDX #8
+@Loop:
+    LDA tmp+2
+    CMP lut_DecD6_hi, X
+    BEQ @Equal
+    BCS @Good
+
+@Less:
+    DEX
+    BPL @Loop
+
+    LDX #$80
+    STX format_buf-6
+    JMP FormatNumber_5Digits
+
+@Equal:
+    LDA tmp+1
+    CMP lut_DecD6_md, X
+    BEQ @Equal2
+    BCC @Less
+    BCS @Good
+
+@Equal2:
+    LDA tmp
+    CMP lut_DecD6_lo, X
+    BCC @Less
+
+@Good:
+    LDA tmp
+    SEC
+    SBC lut_DecD6_lo, X
+    STA tmp
+    LDA tmp+1
+    SBC lut_DecD6_md, X
+    STA tmp+1
+    LDA tmp+2
+    SBC lut_DecD6_hi, X
+    STA tmp+2
+
+    TXA
+    CLC
+    ADC #$81
+    STA format_buf-6
+
+
+FormatNumber_5Digits:
+    LDX #8
+@Loop:
+    LDA tmp+2
+    CMP lut_DecD5_hi, X
+    BEQ @Equal
+    BCS @Good
+
+@Less:
+    DEX
+    BPL @Loop
+
+    LDX #$80
+    STX format_buf-5
+    JMP FormatNumber_4Digits
+
+@Equal:
+    LDA tmp+1
+    CMP lut_DecD5_md, X
+    BEQ @Equal2
+    BCC @Less
+    BCS @Good
+
+@Equal2:
+    LDA tmp
+    CMP lut_DecD5_lo, X
+    BCC @Less
+
+@Good:
+    LDA tmp
+    SEC
+    SBC lut_DecD5_lo, X
+    STA tmp
+    LDA tmp+1
+    SBC lut_DecD5_md, X
+    STA tmp+1
+    LDA tmp+2
+    SBC lut_DecD5_hi, X
+    STA tmp+2
+    TXA
+    CLC
+    ADC #$81
+    STA format_buf-5
+
+
+FormatNumber_4Digits:
+    LDX #8
+@Loop:
+    LDA tmp+1
+    CMP lut_DecD4_md, X
+    BEQ @Equal
+    BCS @Good
+
+@Less:
+    DEX
+    BPL @Loop
+
+    LDX #$80
+    STX format_buf-4
+    JMP FormatNumber_3Digits
+
+@Equal:
+    LDA tmp
+    CMP lut_DecD4_lo, X
+    BCC @Less
+
+@Good:
+    LDA tmp
+    SEC
+    SBC lut_DecD4_lo, X
+    STA tmp
+    LDA tmp+1
+    SBC lut_DecD4_md, X
+    STA tmp+1
+    TXA
+    CLC
+    ADC #$81
+    STA format_buf-4
+
+
+FormatNumber_3Digits:
+    LDX #8
+@Loop:
+    LDA tmp+1
+    CMP lut_DecD3_md, X
+    BEQ @Equal
+    BCS @Good
+
+@Less:
+    DEX
+    BPL @Loop
+
+    LDX #$80
+    STX format_buf-3
+    JMP FormatNumber_2Digits
+
+@Equal:
+    LDA tmp
+    CMP lut_DecD3_lo, X
+    BCC @Less
+
+@Good:
+    LDA tmp
+    SEC
+    SBC lut_DecD3_lo, X
+    STA tmp
+    LDA tmp+1
+    SBC lut_DecD3_md, X
+    STA tmp+1
+    TXA
+    CLC
+    ADC #$81
+    STA format_buf-3
+
+
+FormatNumber_2Digits:
+    LDX #0
+    LDA tmp
+@Loop:
+    CMP #10
+    BCC @Done
+    SBC #10
+    INX
+    BNE @Loop
+
+@Done:
+    ORA #$80
+    STA format_buf-1
+    TXA
+    ORA #$80
+    STA format_buf-2
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Decimal conversion LUTs  [$8FD1 :: 0x38FE1]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_DecD6_hi:  .BYTE ^100000,^200000,^300000,^400000,^500000,^600000,^700000,^800000,^900000
+lut_DecD6_md:  .BYTE >100000,>200000,>300000,>400000,>500000,>600000,>700000,>800000,>900000
+lut_DecD6_lo:  .BYTE <100000,<200000,<300000,<400000,<500000,<600000,<700000,<800000,<900000
+
+lut_DecD5_hi:  .BYTE ^10000,^20000,^30000,^40000,^50000,^60000,^70000,^80000,^90000
+lut_DecD5_md:  .BYTE >10000,>20000,>30000,>40000,>50000,>60000,>70000,>80000,>90000
+lut_DecD5_lo:  .BYTE <10000,<20000,<30000,<40000,<50000,<60000,<70000,<80000,<90000
+
+lut_DecD4_md:  .BYTE >1000,>2000,>3000,>4000,>5000,>6000,>7000,>8000,>9000
+lut_DecD4_lo:  .BYTE <1000,<2000,<3000,<4000,<5000,<6000,<7000,<8000,<9000
+
+lut_DecD3_md:  .BYTE >100,>200,>300,>400,>500,>600,>700,>800,>900
+lut_DecD3_lo:  .BYTE <100,<200,<300,<400,<500,<600,<700,<800,<900

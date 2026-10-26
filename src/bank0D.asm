@@ -667,8 +667,16 @@ lut_SID_SR:
 orb_chr_data:
     .incbin "../res/menu/orbs.chr"
 
-; Reserved $B700 - $BF1F (2,080 bytes)
-.res $0820, $00
+; Reserved $B700 - $BBFF ($0500 = 1,280 bytes)
+.res $0500, $00
+
+; ==============================================================================
+; $BC00 - $BCFF: Item Prices (256 bytes)
+; ==============================================================================
+    .incbin "../res/data/itemprices.bin"
+
+; Reserved $BD00 - $BF1F ($0220 = 544 bytes)
+.res $0220, $00
 
 ; ==============================================================================
 ; $BF20 - $BFFF: Intro Story Text (224 bytes)
