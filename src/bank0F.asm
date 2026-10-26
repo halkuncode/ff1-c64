@@ -236,57 +236,182 @@ EnterOverworldLoop:
     TXS                 ;   overworld loop is the de-facto "top" of all gameflow.
 
     LDA #0
-    STA move_ctr_x      ; repeat delay counter
+    STA move_speed
+    STA mapdraw_job
 
 @Loop:
     JSR WaitForVBlank_L
     JSR UpdateJoy_L
 
-    ; Check if in repeat delay
-    LDA move_ctr_x
-    BEQ @CheckInput
-    DEC move_ctr_x
+    JSR OverworldMovement
+
+    LDA move_speed
+    BNE :+
+      JSR ProcessOWInput
+:
     JMP @Loop
 
-@CheckInput:
-    LDA joy
-    AND #(UP | DOWN | LEFT | RIGHT)
-    BEQ @Loop           ; no directional key pressed
 
-    ; Mutually exclusive Up / Down
-    LDA joy
-    AND #UP
-    BEQ @CheckDown
-    DEC ow_scroll_y
-    JMP @CheckHoriz
-@CheckDown:
-    LDA joy
-    AND #DOWN
-    BEQ @CheckHoriz
-    INC ow_scroll_y
 
-@CheckHoriz:
-    ; Mutually exclusive Left / Right
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Process OW input   [479]
+;;
+;;    Updates joy data and does input processing for the overworld.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ProcessOWInput:
     LDA joy
-    AND #LEFT
-    BEQ @CheckRight
-    DEC ow_scroll_x
-    JMP @DoRedraw
-@CheckRight:
+    AND #(RIGHT | LEFT | DOWN | UP)
+    BEQ @Exit           ; if no direction pressed, exit
+
+    ; Check if movement is legal
+    JSR OWCanMove
+    BCS @Exit
+
+    ; Determine facing direction (priority: Right, Left, Down, Up)
     LDA joy
     AND #RIGHT
-    BEQ @DoRedraw
+    BNE @SetRight
+    LDA joy
+    AND #LEFT
+    BNE @SetLeft
+    LDA joy
+    AND #DOWN
+    BNE @SetDown
+    LDA #UP
+    BNE @SetFacing
+@SetRight:
+    LDA #RIGHT
+    BNE @SetFacing
+@SetLeft:
+    LDA #LEFT
+    BNE @SetFacing
+@SetDown:
+    LDA #DOWN
+@SetFacing:
+    STA facing
+    JSR StartMapMove
+
+@Exit:
+    RTS
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Overworld movement  [685]
+;;
+;;    Processes drawing and movement on the overworld map.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+OverworldMovement:
+    LDA mapdraw_job
+    BEQ @Exit
+    JSR DoMapDrawJob
+    LDA #0
+    STA move_speed      ; movement step complete
+@Exit:
+    RTS
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  OWCanMove  [1086]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+OWCanMove:
+    CLC                 ; Allow movement everywhere for now
+    RTS
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  StartMapMove  [3879]
+;;
+;;    Sets move_speed based on vehicle and prepares incoming map rows.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+StartMapMove:
+    ; Option 1: Vehicle speed logic (mirroring NES lines 3952-3958)
+    LDA vehicle
+    CMP #$02
+    BCC @OnFoot
+    LSR A               ; canoe=1, ship=2, airship=4
+    STA move_speed
+    BNE @CheckDir
+@OnFoot:
+    LDA #$01
+    STA move_speed
+
+@CheckDir:
+    ; Option 2: NES decompression logic (mirroring NES line 4026)
+    ; Only decompress when moving vertically; zero decompression when moving horizontally!
+    LDA facing
+    LSR A
+    BCS @Right
+    LSR A
+    BCS @Left
+    LSR A
+    BCS @Down
+    LSR A
+    BCS @Up
+    RTS
+
+@Right:
+    ; Horizontal move: rows already in mapdata ring buffer!
     INC ow_scroll_x
+    JMP @DoneDir
 
-@DoRedraw:
-    ; Repeat delay (6 frames ≈ 10 tiles/sec)
-    LDA #6
-    STA move_ctr_x
+@Left:
+    ; Horizontal move: rows already in mapdata ring buffer!
+    DEC ow_scroll_x
+    JMP @DoneDir
 
-    ; Redraw map at new coordinates
-    JSR DrawFullMap
+@Down:
+    ; Vertical move: decompress new bottom incoming row into mapdata
+    INC ow_scroll_y
+    LDA ow_scroll_y
+    CLC
+    ADC #12
+    STA mapdraw_y
+    JSR LoadOWMapRow
+    JMP @DoneDir
 
-    JMP @Loop
+@Up:
+    ; Vertical move: decompress new top incoming row into mapdata
+    DEC ow_scroll_y
+    LDA ow_scroll_y
+    STA mapdraw_y
+    JSR LoadOWMapRow
+
+@DoneDir:
+    LDA #$01
+    STA mapdraw_job     ; flag that map needs redraw
+    RTS
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Do Map Draw Job  [4048]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DoMapDrawJob:
+    LDA mapdraw_job
+    BEQ @Done
+    JSR DrawFullMap     ; Option 3: Optimized full map redraw
+    LDA #0
+    STA mapdraw_job
+@Done:
+    RTS
 
 
 
@@ -421,6 +546,21 @@ PrepOverworld:
     JSR LoadOWCHR           ; load up necessary CHR
     JSR LoadOWTilesetData   ; the tileset
     JSR LoadMapPalettes     ; palettes
+
+    ; Pre-decompress initial 13 rows (0 to 12) into mapdata ring buffer
+    LDA #0
+    STA tmp+14
+@InitMapLoop:
+    LDA ow_scroll_y
+    CLC
+    ADC tmp+14
+    STA mapdraw_y
+    JSR LoadOWMapRow
+    INC tmp+14
+    LDA tmp+14
+    CMP #13
+    BNE @InitMapLoop
+
     JSR DrawFullMap         ; then draw the map
 
     ; LDA ow_scroll_x      ; get ow scroll X
@@ -657,138 +797,135 @@ CallMusicPlay:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 DrawFullMap:
-    ; Initialize row counter for 13 metatile rows (0 to 12)
+    ; Loop for rows 0 to 11 (24 screen rows: top and bottom halves)
     LDA #0
-    STA tmp+14          ; metatile row index (0..12)
+    STA tmp+14          ; metatile row index (0..11)
 
 @RowLoop:
-    ; Calculate world Y: mapdraw_y = (ow_scroll_y + row_index) & $FF
+    ; Get pointer to decompressed row in mapdata ($7000 + (row & $0F) * 256)
     LDA ow_scroll_y
     CLC
     ADC tmp+14
-    STA mapdraw_y
-
-    ; Decompress this overworld row into mapdata ($7000 + (mapdraw_y & $0F) * $100)
-    JSR LoadOWMapRow
-
-    ; Set map_row_ptr (tmp+8, tmp+9) to start of decompressed row in RAM
-    LDA #<mapdata
-    STA tmp+8
-    LDA mapdraw_y
     AND #$0F
     ORA #>mapdata
     STA tmp+9
+    LDA #<mapdata
+    STA tmp+8
 
     ; Calculate Screen RAM row pointers & Color RAM row pointers
     ; top screen row = tmp+14 * 2
     LDA tmp+14
-    ASL A               ; * 2
+    ASL A
     TAX
     LDA lut_ScreenRowLo, X
-    STA tmp+0           ; scr_top_ptr low
-    STA tmp+2           ; col_top_ptr low (same offset!)
+    STA tmp+0           ; scr_top low
+    STA tmp+2           ; col_top low
     LDA lut_ScreenRowHi, X
-    STA tmp+1           ; scr_top_ptr high ($40..$43)
+    STA tmp+1           ; scr_top high ($40..$43)
     CLC
     ADC #$98
-    STA tmp+3           ; col_top_ptr high ($D8..$DB, Color RAM)
+    STA tmp+3           ; col_top high ($D8..$DB)
 
-    ; Check if there is a bottom screen row (for row_index < 12)
-    CPX #24             ; row 24 is the 25th row on screen, so no row 25
-    BCS @NoBottomRow
     INX
     LDA lut_ScreenRowLo, X
-    STA tmp+4           ; scr_bot_ptr low
-    STA tmp+6           ; col_bot_ptr low
+    STA tmp+4           ; scr_bot low
+    STA tmp+6           ; col_bot low
     LDA lut_ScreenRowHi, X
-    STA tmp+5           ; scr_bot_ptr high ($40..$43)
+    STA tmp+5           ; scr_bot high ($40..$43)
     CLC
     ADC #$98
-    STA tmp+7           ; col_bot_ptr high ($D8..$DB, Color RAM)
+    STA tmp+7           ; col_bot high ($D8..$DB)
 
-@NoBottomRow:
-    ; Now plot 20 metatiles horizontally across 40 character columns
+    ; Plot 20 metatiles (40 columns) across top and bottom rows
     LDA #0
-    STA tmp+10          ; tmp+10 = metatile column index (0..19)
+    STA tmp+10          ; tmp+10 = screen column index (0, 2, 4, ... 38)
+    LDA ow_scroll_x
+    STA tmp+11          ; tmp+11 = current world X
 
 @ColLoop:
-    ; world_x = (ow_scroll_x + col_index) & $FF
-    LDA ow_scroll_x
-    CLC
-    ADC tmp+10
-    TAY                 ; Y = world_x index into decompressed row
+    LDY tmp+11
     LDA (tmp+8), Y      ; A = metatile ID (0..127)
-    TAY                 ; Y = metatile ID index into TSA tables
+    TAX                 ; X = metatile ID
 
-    ; Fetch metatile color & quadrant character tile IDs
-    LDA lut_OWMetatileColors, Y
-    STA tmp+11          ; metatile color for all 4 character cells
-    LDA tsa_ul, Y
-    STA tmp+12          ; char_ul
-    LDA tsa_ur, Y
-    STA tmp+13          ; char_ur
-    LDA tsa_dl, Y
-    STA tmp+15          ; char_dl
-    LDA tsa_dr, Y
-    PHA                 ; save char_dr on stack
+    LDY tmp+10          ; Y = screen column
+    ; Write Color RAM for all 4 cells (top-left, top-right, bot-left, bot-right)
+    LDA lut_OWMetatileColors, X
+    STA (tmp+2), Y      ; col_top left
+    STA (tmp+6), Y      ; col_bot left
+    LDA tsa_ul, X
+    STA (tmp+0), Y      ; scr_top left
+    LDA tsa_dl, X
+    STA (tmp+4), Y      ; scr_bot left
 
-    ; col_index * 2 gives character column offset on screen (0, 2, 4, ... 38)
-    LDA tmp+10
-    ASL A
-    TAY                 ; Y = char column offset
-
-    ; Plot top-left tile (Screen RAM & Color RAM)
-    LDA tmp+12
-    STA (tmp+0), Y
-    LDA tmp+11
-    STA (tmp+2), Y
-
-    ; Plot top-right tile
     INY
-    LDA tmp+13
-    STA (tmp+0), Y
-    LDA tmp+11
-    STA (tmp+2), Y
-    DEY
+    LDA lut_OWMetatileColors, X
+    STA (tmp+2), Y      ; col_top right
+    STA (tmp+6), Y      ; col_bot right
+    LDA tsa_ur, X
+    STA (tmp+0), Y      ; scr_top right
+    LDA tsa_dr, X
+    STA (tmp+4), Y      ; scr_bot right
 
-    ; Plot bottom row (if row_index < 12)
-    LDA tmp+14
-    CMP #12
-    BCS @SkipBottomPlot
-
-    ; Plot bottom-left tile
-    LDA tmp+15
-    STA (tmp+4), Y
-    LDA tmp+11
-    STA (tmp+6), Y
-
-    ; Plot bottom-right tile
     INY
-    PLA                 ; retrieve char_dr from stack
-    STA (tmp+4), Y
-    LDA tmp+11
-    STA (tmp+6), Y
-    JMP @ColNext
-
-@SkipBottomPlot:
-    PLA                 ; discard saved char_dr from stack
-
-@ColNext:
-    INC tmp+10
-    LDA tmp+10
-    CMP #20             ; 20 metatiles wide (40 columns)
+    STY tmp+10
+    INC tmp+11          ; next world X
+    CPY #40
     BNE @ColLoop
 
-    ; Next metatile row
     INC tmp+14
     LDA tmp+14
-    CMP #13             ; 13 metatile rows (rows 0..12 = screen rows 0..24)
-    BEQ @Done
-    JMP @RowLoop
+    CMP #12             ; rows 0..11 done?
+    BNE @RowLoop
 
-@Done:
+    ; Now draw row 12 (screen row 24: top half only!)
+    LDA ow_scroll_y
+    CLC
+    ADC #12
+    AND #$0F
+    ORA #>mapdata
+    STA tmp+9
+    LDA #<mapdata
+    STA tmp+8
+
+    LDX #24
+    LDA lut_ScreenRowLo, X
+    STA tmp+0
+    STA tmp+2
+    LDA lut_ScreenRowHi, X
+    STA tmp+1
+    CLC
+    ADC #$98
+    STA tmp+3
+
+    LDA #0
+    STA tmp+10
+    LDA ow_scroll_x
+    STA tmp+11
+
+@LastRowLoop:
+    LDY tmp+11
+    LDA (tmp+8), Y
+    TAX
+
+    LDY tmp+10
+    LDA lut_OWMetatileColors, X
+    STA (tmp+2), Y
+    LDA tsa_ul, X
+    STA (tmp+0), Y
+    INY
+
+    LDA lut_OWMetatileColors, X
+    STA (tmp+2), Y
+    LDA tsa_ur, X
+    STA (tmp+0), Y
+    INY
+
+    STY tmp+10
+    INC tmp+11
+    CPY #40
+    BNE @LastRowLoop
+
     RTS
-
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
