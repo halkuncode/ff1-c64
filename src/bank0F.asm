@@ -1948,7 +1948,7 @@ DrawBox:
     STA dest_x
     LDA dest_y        ; get dest Y coord
     CLC
-    ADC #$02          ; and inc by 2
+    ADC #$01          ; and increment it by 1 (top inner row)
     STA dest_y        ; dest_x and dest_y are now our output coords (where text starts)
 
     RTS
@@ -3256,7 +3256,7 @@ lut_Class_dY:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 lut_MMOptionCursor_Y:
-    .byte 162, 170, 178, 186, 194
+    .byte 194, 202, 210, 218, 226
 
 mm_h0_feet_ptr: .byte 0
 mm_h0_feet_col: .byte 0
@@ -3296,22 +3296,19 @@ MainMenu_IRQ:
     ; Check if SubTarget cursor is on Hero 0 or 1
     lda menu_cursor_mode
     cmp #1
-    bne @ToArmZone1
+    bne @ArmZone1
     lda menu_cursor_index
     cmp #2
-    bcc @HasSubTargetTop
-@ToArmZone1:
-    jmp @ArmZone1
+    bcs @ArmZone1
 
-@HasSubTargetTop:
     ; SubTarget cursor in Zone 0
-    ldx #104
+    ldx #136                   ; Hero 0 cursor X (col 14)
     lda menu_cursor_index
     beq :+
-    ldx #216
+    ldx #224                   ; Hero 1 cursor X (col 25)
 :   stx SP1X
     stx SP5X
-    lda #74
+    lda #58                    ; Points directly to character name (row 1)
     sta SP1Y
     sta SP5Y
 
@@ -3337,8 +3334,8 @@ MainMenu_IRQ:
     ora #%00100010
     sta SPENA
 
-    ; Arm split at line 86 to display feet on Sprites 0 & 4
-    lda #86
+    ; Arm split at line 80 to switch Sprites 1 & 5 to Hero 0 & 1 Feet at line 87
+    lda #80
     sta RASTER
     lda SCROLY
     and #$7F
@@ -3358,27 +3355,38 @@ MainMenu_IRQ:
     jmp $FEBC
 
 @Zone3:
-    ; Scanline 86: Switch Sprite 0 & 4 to Hero 0 & 1 Feet at line 87
+    ; Scanline 74: Switch Sprite 1 to Hero 0 Feet, Sprite 5 to Hero 1 Feet
     lda ch_ailments + 0
     cmp #$01
     beq :+
+    lda #192                   ; Restore Hero 0 X
+    sta SP1X
     lda #87
-    sta SP0Y
+    sta SP1Y
     lda mm_h0_feet_ptr
-    sta $43F8
+    sta $43F9
     lda mm_h0_feet_col
-    sta SP0COL
+    sta SP1COL
 :
     lda ch_ailments + $40
     cmp #$01
     beq :+
+    lda #24                    ; Restore Hero 1 X
+    sta SP5X
+    lda MSIGX
+    ora #%00100000             ; Restore MSB for Sprite 5 (X=280)
+    sta MSIGX
     lda #87
-    sta SP4Y
+    sta SP5Y
     lda mm_h1_feet_ptr
-    sta $43FC
+    sta $43FD
     lda mm_h1_feet_col
-    sta SP4COL
+    sta SP5COL
 :
+    lda SPMC
+    and #%11011101
+    sta SPMC
+
     lda #135
     sta RASTER
     lda SCROLY
@@ -3399,49 +3407,18 @@ MainMenu_IRQ:
     jsr SetupMMHero3
 
     lda menu_cursor_mode
-    beq @OptionBoxCursor
+    beq @OptionBoxZone1
     cmp #1
-    beq @SubTargetLower
-    ; If no cursor, feet are already on Sprites 1 & 5
+    beq @SubTargetLowerZone1
     jmp @ArmZone0Direct
 
-@OptionBoxCursor:
-    lda #32
-    sta SP1X
-    sta SP5X
-
-    ldx menu_cursor_index
-    cpx #5
-    bcc :+
-    ldx #0
-:   lda lut_MMOptionCursor_Y, x
-    sta SP1Y
-    sta SP5Y
-
-    lda MSIGX
-    and #%11011101
-    sta MSIGX
-
-    lda #BLOCK_FINGER_OVERLAY
-    sta $43F9
-    lda #COLOR_WHITE
-    sta SP1COL
-
-    lda #BLOCK_FINGER_BASE
-    sta $43FD
-    lda #COLOR_WHITE
-    sta SP5COL
-
-    lda SPMC
-    ora #%00100000
-    sta SPMC
-
-    lda SPENA
-    ora #%00100010
-    sta SPENA
-
-    ; Arm split at line 174 to restore Hero 2 & 3 feet on Sprites 0 & 4
-    lda #174
+@OptionBoxZone1:
+    ; Normal Option Mode:
+    ; Hero 2 & 3 upper bodies run scanlines 162..182 on Sprites 0,2,3,4,6,7.
+    ; Hero 2 & 3 feet run scanlines 183..203 on Sprites 1,5.
+    ; Upper bodies finish at 182!
+    ; Arm Zone 2 at scanline 185 to configure Sprite 0 & 4 as Option Cursor!
+    lda #185
     sta RASTER
     lda SCROLY
     and #$7F
@@ -3450,19 +3427,19 @@ MainMenu_IRQ:
     sta spr_irq_zone
     jmp $FEBC
 
-@SubTargetLower:
+@SubTargetLowerZone1:
     lda menu_cursor_index
     cmp #2
     bcs :+
     jmp @ArmZone0Direct
 :
-    ldx #104
+    ldx #136                   ; Hero 2 cursor X (col 14)
     cmp #2
     beq :+
-    ldx #216
+    ldx #224                   ; Hero 3 cursor X (col 25)
 :   stx SP1X
     stx SP5X
-    lda #162
+    lda #154                   ; Points directly to character name (row 13)
     sta SP1Y
     sta SP5Y
 
@@ -3488,8 +3465,8 @@ MainMenu_IRQ:
     ora #%00100010
     sta SPENA
 
-    ; Arm split at line 174 to restore Hero 2 & 3 feet on Sprites 0 & 4
-    lda #174
+    ; Arm split at line 176 to switch Sprites 1 & 5 to Hero 2 & 3 feet at line 183
+    lda #176
     sta RASTER
     lda SCROLY
     and #$7F
@@ -3499,28 +3476,82 @@ MainMenu_IRQ:
     jmp $FEBC
 
 @Zone2:
-    ; Scanline 174: Switch Sprite 0 to Hero 2 Feet, Sprite 4 to Hero 3 Feet
+    lda menu_cursor_mode
+    cmp #1
+    beq @Zone2_SubTarget
+
+    ; Option Box Cursor in Zone 2!
+    ; Sprites 0 and 4 are free (Hero 2 & 3 upper bodies finished at 182).
+    ; Sprites 1 and 5 (Hero 2 & 3 feet) continue rendering scanlines 183..203.
+    lda #52
+    sta SP0X
+    sta SP4X
+
+    ldx menu_cursor_index
+    cpx #5
+    bcc :+
+    ldx #0
+:   lda lut_MMOptionCursor_Y, x
+    sta SP0Y
+    sta SP4Y
+
+    lda MSIGX
+    and #%11101110             ; Clear bit 0 and bit 4 (X=48 < 256)
+    sta MSIGX
+
+    lda #BLOCK_FINGER_OVERLAY
+    sta $43F8                  ; Sprite 0 = Overlay
+    lda #COLOR_WHITE
+    sta SP0COL
+
+    lda #BLOCK_FINGER_BASE
+    sta $43FC                  ; Sprite 4 = Base
+    lda #COLOR_WHITE
+    sta SP4COL
+
+    lda SPMC
+    ora #%00010000             ; Sprite 4 is MultiColor
+    and #%11111110             ; Sprite 0 is Hi-Res
+    sta SPMC
+
+    ; Enable SP0 (cursor), SP1 (hero 2 feet), SP4 (cursor), SP5 (hero 3 feet)
+    lda #%00110011
+    sta SPENA
+    jmp @ArmZone0Direct
+
+@Zone2_SubTarget:
+    ; Switch Sprite 1 to Hero 2 feet, Sprite 5 to Hero 3 feet
     lda ch_ailments + $80
     cmp #$01
     beq :+
-    lda #175
-    sta SP0Y
+    lda #192                   ; Restore Hero 2 X
+    sta SP1X
+    lda #183
+    sta SP1Y
     lda mm_h2_feet_ptr
-    sta $43F8
+    sta $43F9
     lda mm_h2_feet_col
-    sta SP0COL
+    sta SP1COL
 :
     lda ch_ailments + $C0
     cmp #$01
     beq :+
-    lda #175
-    sta SP4Y
+    lda #24                    ; Restore Hero 3 X
+    sta SP5X
+    lda MSIGX
+    ora #%00100000             ; Restore MSB for Sprite 5 (X=280)
+    sta MSIGX
+    lda #183
+    sta SP5Y
     lda mm_h3_feet_ptr
-    sta $43FC
+    sta $43FD
     lda mm_h3_feet_col
-    sta SP4COL
+    sta SP5COL
 :
-    ; Arm scanline 250 for VBlank
+    lda SPMC
+    and #%11011101
+    sta SPMC
+
 @ArmZone0Direct:
     lda #250
     sta RASTER
@@ -3548,7 +3579,7 @@ SetupMMHero0:
     and #%11110000
     sta MSIGX
 
-    lda #168
+    lda #192
     sta SP0X
     sta SP1X
     sta SP2X
@@ -3702,16 +3733,16 @@ SetupMMHero2:
     and #%11110000
     sta MSIGX
 
-    lda #168
+    lda #192
     sta SP0X
     sta SP1X
     sta SP2X
     sta SP3X
 
-    lda #154
+    lda #162
     sta SP0Y
     sta SP3Y
-    lda #175
+    lda #183
     sta SP1Y
 
     lda ch_class + $80
@@ -3722,7 +3753,7 @@ SetupMMHero2:
     asl a
     tay
 
-    lda #154
+    lda #162
     clc
     adc lut_Class_dY + 2, y
     sta SP2Y
@@ -3785,10 +3816,10 @@ SetupMMHero3:
     sta SP6X
     sta SP7X
 
-    lda #154
+    lda #162
     sta SP4Y
     sta SP7Y
-    lda #175
+    lda #183
     sta SP5Y
 
     lda ch_class + $C0
@@ -3799,7 +3830,7 @@ SetupMMHero3:
     asl a
     tay
 
-    lda #154
+    lda #162
     clc
     adc lut_Class_dY + 2, y
     sta SP6Y

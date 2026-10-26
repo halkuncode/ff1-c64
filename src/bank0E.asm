@@ -2600,6 +2600,7 @@ DrawMainMenu:
 DrawMainMenuGoldBox:
     LDA #5                         ; Draw MainItem Box 5 (GP Box)
     JSR DrawMainItemBox
+    INC dest_y                     ; dest_y = 12 (centered in 5-row box)
     LDA #$01                       ; Menu string 1 = "[Gold] G"
     JMP DrawMenuString
 
@@ -2614,44 +2615,40 @@ DrawOrbBox:
     LDA #0                         ; Draw MainItem Box 0
     JSR DrawMainItemBox
 
-    ; Fire Orb (top-left inside box: dest_x = 3, dest_y = 2)
-    LDA #3
+    ; Fire Orb (top-left inside box: dest_x = 7, dest_y = 2)
+    LDA #7
     STA dest_x
     LDA #2
     STA dest_y
     LDA orb_fire
     LDX #$64
-    LDY #COLOR_LIGHTRED
     JSR DrawOneOrb
 
-    ; Water Orb (top-right inside box: dest_x = 6, dest_y = 2)
-    LDA #6
+    ; Water Orb (top-right inside box: dest_x = 9, dest_y = 2)
+    LDA #9
     STA dest_x
     LDA #2
     STA dest_y
     LDA orb_water
     LDX #$68
-    LDY #COLOR_LIGHTBLUE
     JSR DrawOneOrb
 
-    ; Air Orb (bottom-left inside box: dest_x = 3, dest_y = 4)
-    LDA #3
+    ; Air Orb (bottom-left inside box: dest_x = 7, dest_y = 4)
+    LDA #7
     STA dest_x
     LDA #4
     STA dest_y
     LDA orb_air
     LDX #$6C
-    LDY #COLOR_LIGHTGREEN
     JSR DrawOneOrb
 
-    ; Earth Orb (bottom-right inside box: dest_x = 6, dest_y = 4)
-    LDA #6
+    ; Earth Orb (bottom-right inside box: dest_x = 9, dest_y = 4)
+    LDA #9
     STA dest_x
     LDA #4
     STA dest_y
     LDA orb_earth
     LDX #$70
-    LDY #COLOR_BROWN
     JMP DrawOneOrb
 
 
@@ -2660,9 +2657,12 @@ DrawOrbBox:
 ;;  DrawOneOrb
 ;;
 ;;  Draws a 2x2 tile orb at (dest_x, dest_y).
+;;  Hi-res characters:
+;;    - Grey (COLOR_LIGHTGREY = 15) when not lit (tile $76)
+;;    - White (COLOR_WHITE = 1) when lit (element tile from X)
+;;
 ;;  IN:  A = orb status (0 = unlit, nonzero = lit)
 ;;       X = base tile ID when lit
-;;       Y = color when lit
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -2670,8 +2670,11 @@ DrawOneOrb:
     CMP #0
     BNE @IsLit
     LDX #$76                       ; Unlit orb base tile ($76)
-    LDY #COLOR_DARKGREY            ; Unlit color ($0B)
+    LDY #COLOR_BLACK               ; Unlit color: 0 (Black)
+    JMP @WriteOrb
 @IsLit:
+    LDY #COLOR_WHITE               ; Lit color: 1 (White)
+@WriteOrb:
     STY tmp                        ; save color in tmp ($10)
     STX tmp+1                      ; save tile in tmp+1 ($11)
 
@@ -2825,16 +2828,16 @@ DrawMainMenuCharBoxBody:
     LDA #0
     STA str_buf + 15
 
-    ; Draw row 2 (levels 4-7) at dest_y + 5
+    ; Draw row 2 (levels 4-7) at dest_y + 9
     LDA dest_y
     CLC
-    ADC #5
+    ADC #9
     STA dest_y
     LDA #<(str_buf + 8)
     STA text_ptr
     JSR DrawMenuComplexString
 
-    ; Terminate row 1 (levels 0-3) and draw at dest_y + 4
+    ; Terminate row 1 (levels 0-3) and draw at dest_y + 8
     LDA #0
     STA str_buf + 7
     DEC dest_y
@@ -2842,7 +2845,7 @@ DrawMainMenuCharBoxBody:
     STA text_ptr
     JSR DrawMenuComplexString
 
-    ; Draw "MAGIC" header at dest_y + 3
+    ; Draw "MAGIC" header at dest_y + 7
     LDA #$52                       ; "MA" DTE tile
     STA str_buf
     LDA #$4A                       ; "GI" DTE tile
@@ -2859,7 +2862,7 @@ DrawMainMenuCharBoxBody:
     ; Restore dest_y back to dest_y + 0
     LDA dest_y
     SEC
-    SBC #3
+    SBC #7
     STA dest_y
 
 @NoMP:
@@ -2872,29 +2875,30 @@ DrawMainMenuCharBoxBody:
     ORA #$10
     STA tmp+9                      ; tmp+9 = stat control code ($10-$13)
 
-    ; Build single-spaced string for Name, Level, and Ailment/HP:
-    ; Row 0: Name
-    ; Row 1: Level
-    ; Row 2: Ailment + HP
+    ; Build string for Name, Level, Ailment, and CurHP/MaxHP:
+    ; Row 0: Name (stat 0)
+    ; Row 2: "L" ($95) + Level (stat 3)
+    ; Row 4: Ailment (stat 2)
+    ; Row 5: CurHP (stat 5) + "/" ($7A) + MaxHP (stat 6)
     LDA tmp+9
     STA str_buf + 0                ; Control code ($10-$13)
     LDA #$00                       ; Stat 0 = Name (4 chars)
     STA str_buf + 1
-    LDA #$05                       ; Single line break ($05) -> Row 1
+    LDA #$01                       ; Double line break ($01) -> Row 2
     STA str_buf + 2
-    LDA #$C6                       ; 'L' tile
+    LDA #$95                       ; 'L' tile ($95)
     STA str_buf + 3
     LDA tmp+9
     STA str_buf + 4                ; Control code ($10-$13)
     LDA #$03                       ; Stat 3 = Level (2 digits)
     STA str_buf + 5
-    LDA #$05                       ; Single line break ($05) -> Row 2
+    LDA #$01                       ; Double line break ($01) -> Row 4
     STA str_buf + 6
     LDA tmp+9
     STA str_buf + 7                ; Control code ($10-$13)
     LDA #$02                       ; Stat 2 = Ailment ("HP", "ST", "PO")
     STA str_buf + 8
-    LDA #$FF                       ; Space
+    LDA #$05                       ; Single line break ($05) -> Row 5
     STA str_buf + 9
     LDA tmp+9
     STA str_buf + 10               ; Control code ($10-$13)
@@ -2945,13 +2949,13 @@ DrawMenuComplexString:
 ; ==============================================================================
 
 lut_MainItemBoxes:
-    .BYTE   1,  1, 10,  6      ; Box 0: Orb Box (X=1, Y=1, W=10, H=6)
-    .BYTE  12,  1, 13, 10      ; Box 1: Character 0 stat box (X=12, Y=1, W=13, H=10)
-    .BYTE  26,  1, 13, 10      ; Box 2: Character 1 stat box (X=26, Y=1, W=13, H=10)
-    .BYTE  12, 12, 13, 10      ; Box 3: Character 2 stat box (X=12, Y=12, W=13, H=10)
-    .BYTE  26, 12, 13, 10      ; Box 4: Character 3 stat box (X=26, Y=12, W=13, H=10)
-    .BYTE   1,  7, 10,  4      ; Box 5: GP box (X=1, Y=7, W=10, H=4)
-    .BYTE   1, 12, 10, 10      ; Box 6: Option box (X=1, Y=12, W=10, H=10)
+    .BYTE   5,  0,  8,  8      ; Box 0: Orb Box (X=5, Y=0, W=8, H=8)
+    .BYTE  15,  0, 10, 12      ; Box 1: Character 0 stat box (X=15, Y=0, W=10, H=12)
+    .BYTE  26,  0, 10, 12      ; Box 2: Character 1 stat box (X=26, Y=0, W=10, H=12)
+    .BYTE  15, 12, 10, 12      ; Box 3: Character 2 stat box (X=15, Y=12, W=10, H=12)
+    .BYTE  26, 12, 10, 12      ; Box 4: Character 3 stat box (X=26, Y=12, W=10, H=12)
+    .BYTE   4, 10, 10,  5      ; Box 5: GP box (X=4, Y=10, W=10, H=5)
+    .BYTE   5, 17,  8,  7      ; Box 6: Option box (X=5, Y=17, W=8, H=7)
     .BYTE   1,  1,  8,  4      ; Box 7: Item title box (X=1, Y=1, W=8, H=4)
     .BYTE   1, 18, 38,  6      ; Box 8: Item description box (X=1, Y=18, W=38, H=6)
     .BYTE   1,  5, 38, 13      ; Box 9: Item list box (X=1, Y=5, W=38, H=13)
@@ -2962,12 +2966,11 @@ lut_MainItemBoxes:
 ; ==============================================================================
 
 str_MainMenuOptions:
-    ; " ITEM" [Single Break: $05] " MAGIC" [Single Break: $05] ...
-    .BYTE $FF, $92, $9D, $8E, $96, $05
-    .BYTE $FF, $96, $8A, $90, $92, $8C, $05
-    .BYTE $FF, $CF, $D0, $D1, $D2, $D3, $05
-    .BYTE $FF, $8A, $9B, $96, $98, $9B, $05
-    .BYTE $FF, $CA, $CB, $CC, $CD, $CE, $00
+    .BYTE $92, $9D, $8E, $96, $05             ; "ITEM"
+    .BYTE $96, $8A, $90, $92, $8C, $05       ; "MAGIC"
+    .BYTE $CF, $D0, $D1, $D2, $D3, $05       ; "WEAPON" (condensed: $CF..$D3)
+    .BYTE $8A, $9B, $96, $98, $9B, $05       ; "ARMOR"
+    .BYTE $CA, $CB, $CC, $CD, $CE, $00       ; "STATUS" (condensed: $CA..$CE)
 
 lut_MenuText:
     .WORD lut_MenuStrings + $0000, lut_MenuStrings + $0001, str_MainMenuOptions, lut_MenuStrings + $0027
