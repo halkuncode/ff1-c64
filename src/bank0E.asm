@@ -1655,7 +1655,7 @@ lut_PtyGenBuf:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Print Character Stat  [$8D70 :: 0x38D80]
+;;  Print Character Stat  [136]
 ;;
 ;;    Called by DrawComplexString to print a specific character stat
 ;;  String is printed to 'format_buf'
@@ -1812,7 +1812,7 @@ PrintCharStat:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Print Price  [$8E44 :: 0x38E54]
+;;  Print Price  [287]
 ;;
 ;;    Fetches desired item price, then prints it to a temp drawing buffer
 ;;
@@ -1827,7 +1827,7 @@ PrintPrice:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Print Gold   [$8E4A :: 0x38E5A]
+;;  Print Gold   [302]
 ;;
 ;;    Loads and prints current gold amount into a temporary drawing buffer
 ;;
@@ -1845,7 +1845,7 @@ PrintGold:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Print Number   [$8E5C :: 0x38E6C]
+;;  Print Number   [320]
 ;;
 ;;    These routines print a number of a desired number of digits to format_buf.
 ;;  The number is right-aligned with zeros trimmed off the front
@@ -1907,7 +1907,7 @@ PrintNumber_Exit:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Trim Zeros  [$8E9F :: 0x38EAF]
+;;  Trim Zeros  [380]
 ;;
 ;;    Replaces leading '0' characters ($80) with a blank space character ($FF)
 ;;
@@ -1954,7 +1954,7 @@ TrimZeros_RTS:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Format Number  [$8ED2 :: 0x38EE2]
+;;  Format Number  [432]
 ;;
 ;;   Converts binary number in tmp to decimal digits ($80-$89) in format_buf.
 ;;
@@ -2142,7 +2142,7 @@ FormatNumber_2Digits:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Decimal conversion LUTs  [$8FD1 :: 0x38FE1]
+;;  Decimal conversion LUTs  [643]
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -2167,7 +2167,7 @@ lut_DecD3_lo:  .BYTE <100,<200,<300,<400,<500,<600,<700,<800,<900
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Enter Main Menu  [$ADB3 :: 0x3ADC3]
+;;  Enter Main Menu  [6154]
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -2293,7 +2293,7 @@ MainMenuLoop:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Main Menu Sub Target  [$AE71 :: 0x3AE81]
+;;  Main Menu Sub Target  [6294]
 ;;
 ;;  Selects one of the 4 party members (0..3) using 2x2 D-pad navigation.
 ;;  OUT:  C = set if B pressed (cancelled)
@@ -2341,7 +2341,7 @@ MainMenuSubTarget:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Move Main Menu Sub Cursor  [$B68C :: 0x3B69C]
+;;  Move Main Menu Sub Cursor  [7846]
 ;;
 ;;  Navigates a 2x2 grid:
 ;;    0: Top-Left  (Hero 0)    1: Top-Right (Hero 1)
@@ -2374,7 +2374,7 @@ MoveMainMenuSubCursor:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Move Cursor Up / Down  [$B6AB :: 0x3B6CB]
+;;  Move Cursor Up / Down  [7877]
 ;;
 ;;  Navigates vertical list (cursor 0..cursor_max-1) with wrapping.
 ;;
@@ -2421,7 +2421,7 @@ MoveCursorUpDown:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Menu Frame  [$B65D :: 0x3B66D]
+;;  Menu Frame  [7800]
 ;;
 ;;  Synchronizes to VBlank, updates audio, and refreshes joypad inputs.
 ;;
@@ -2489,7 +2489,7 @@ EnterStatusMenu:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Draw Main Menu  [$B84A :: 0x3B85A]
+;;  Draw Main Menu  [8233]
 ;;
 ;;  Clears the screen, draws all 7 boxes (Orb, GP, Option, 4 Hero Boxes),
 ;;  and populates their contents.
@@ -2593,7 +2593,7 @@ DrawMainMenu:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Draw Main Menu Gold Box  [$B86E :: 0x3B87E]
+;;  Draw Main Menu Gold Box  [8269]
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -2607,7 +2607,7 @@ DrawMainMenuGoldBox:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Draw Orb Box  [$B878 :: 0x3B888]
+;;  Draw Orb Box  [8284]
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -2735,7 +2735,7 @@ DrawOneOrb:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  DrawMainMenuOptionBox  [$B911 :: 0x3B921]
+;;  DrawMainMenuOptionBox  [8413]
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -2748,7 +2748,7 @@ DrawMainMenuOptionBox:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  DrawMainItemBox  [$B8EF :: 0x3B8FF]
+;;  DrawMainItemBox  [8369]
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -2777,7 +2777,7 @@ LoadMainItemBoxDims:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  DrawMainMenuCharBoxBody  [$B9DB :: 0x3B9EB]
+;;  DrawMainMenuCharBoxBody  [8590]
 ;;
 ;;  Draws character stats inside a hero box:
 ;;  Row 0: Name (stat 0)
@@ -2922,7 +2922,7 @@ DrawMainMenuCharBoxBody:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  DrawMenuString  [$B938 :: 0x3B948]
+;;  DrawMenuString  [8485]
 ;;
 ;;  IN: A = ID of menu string to draw ($00-$3F)
 ;;

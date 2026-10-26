@@ -8012,7 +8012,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Mini Map Decompress  [$BF40 :: 0x07F50]
+;;  Mini Map Decompress  [8013]
 ;;
 ;;    This is the stupidest, biggest waste of code and space I can think of.
 ;;  This is basically another version of DecompressMap... only instead of 
