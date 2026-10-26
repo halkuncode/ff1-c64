@@ -11,9 +11,16 @@
 .export PrintNumber_1Digit, PrintNumber_2Digit, PrintNumber_3Digit, PrintNumber_4Digit, PrintNumber_5Digit, PrintNumber_6Digit
 .export FormatNumber_2Digits, FormatNumber_3Digits, FormatNumber_4Digits, FormatNumber_5Digits, FormatNumber_6Digits
 .export TrimZeros_2Digits, TrimZeros_3Digits, TrimZeros_4Digits, TrimZeros_5Digits, TrimZeros_6Digits
+.export DrawMainMenu, DrawOrbBox, DrawMainMenuGoldBox, DrawMainMenuOptionBox
+.export DrawMainItemBox, LoadMainItemBoxDims, DrawMainMenuCharBoxBody
+.export DrawMenuString, DrawMenuComplexString, lut_MainItemBoxes, lut_MenuText
+.export EnterMainMenu, ResumeMainMenu, MainMenuLoop, MainMenuSubTarget
+.export MoveMainMenuSubCursor, MoveCursorUpDown, MenuFrame
+.export PlaySFX_MenuMove, PlaySFX_MenuSel, PlaySFX_Error
+.export EnterItemMenu, EnterMagicMenu, EnterEquipMenu, EnterStatusMenu, ClearMenuScreen
 .import LoadMenuCHRPal, LoadNewGameCHRPal, DrawComplexString, WaitForVBlank_L, UpdateJoy_L, DrawBox
 .import GameStart_L, CallMusicPlay_L, ClearOAM, DrawPalette_L, DrawCursor
-.import lut_ScreenRowLo, lut_ScreenRowHi
+.import lut_ScreenRowLo, lut_ScreenRowHi, CoordToNTAddr
 .import lut_IntroStoryText
 .import LoadPrice
 
@@ -2152,3 +2159,833 @@ lut_DecD4_lo:  .BYTE <1000,<2000,<3000,<4000,<5000,<6000,<7000,<8000,<9000
 
 lut_DecD3_md:  .BYTE >100,>200,>300,>400,>500,>600,>700,>800,>900
 lut_DecD3_lo:  .BYTE <100,<200,<300,<400,<500,<600,<700,<800,<900
+
+
+; ==============================================================================
+; Main Menu Logic & Navigation (Phase 4)
+; ==============================================================================
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Enter Main Menu  [$ADB3 :: 0x3ADC3]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+EnterMainMenu:
+    LDA #$51
+    STA music_track                 ; Menu BGM track ($51)
+    JSR LoadMenuCHRPal              ; Load menu CHR, sprites, and palettes
+
+;; ResumeMainMenu redraws the main menu and activates the sprite multiplexer.
+ResumeMainMenu:
+    LDA #0
+    STA menustall
+    JSR DrawMainMenu                ; Draw all boxes and character stat bodies
+
+    LDA #0
+    STA cursor
+    STA menu_cursor_index
+    STA menu_cursor_mode            ; 0 = Option Box cursor
+    STA joy
+    STA joy_prevdir
+    STA spr_irq_zone
+
+    LDA #5                          ; 5 options (Item, Magic, Weapon, Armor, Status)
+    STA cursor_max
+
+    LDA #2                          ; Activate Main Menu 2-Zone Multiplexer
+    STA spr_multiplex_mode
+
+MainMenuLoop:
+    JSR MenuFrame                   ; VBlank sync, audio update, joypad read
+
+    LDA cursor
+    STA menu_cursor_index           ; Keep multiplexer cursor in sync
+
+    LDA joy_b
+    BNE @B_Pressed
+    LDA joy_a
+    BNE @A_Pressed
+
+    JSR MoveCursorUpDown            ; Navigate options with Up/Down
+    JMP MainMenuLoop
+
+@B_Pressed:
+    LDA #0
+    STA spr_multiplex_mode          ; Restore standard IRQ
+    STA SPENA                       ; Turn off sprites
+    STA joy_a
+    STA joy_b
+    STA joy_start
+    JSR ClearOAM
+    RTS                             ; Exit Main Menu
+
+@A_Pressed:
+    JSR PlaySFX_MenuSel             ; Confirm chirp
+    LDA cursor
+    BNE @NotItem
+
+@Item:
+    JSR EnterItemMenu
+    JMP ResumeMainMenu
+
+@NotItem:
+    CMP #$01
+    BNE @NotMagic
+
+@MagicLoop:
+    JSR MainMenuSubTarget           ; Select character 0..3
+    BCS @EscapeSubTarget            ; Cancelled via B
+
+    LDA submenu_targ                ; 0..3
+    ASL A
+    ASL A
+    ASL A
+    ASL A
+    ASL A
+    ASL A                           ; Shift to $00, $40, $80, $C0
+    TAX
+    LDA ch_ailments, X
+    CMP #$01                        ; Dead?
+    BEQ @CantUseMagic
+    CMP #$02                        ; Stone?
+    BNE @CanUseMagic
+@CantUseMagic:
+    JSR PlaySFX_Error               ; Buzz SFX
+    JMP @MagicLoop
+@CanUseMagic:
+    JSR EnterMagicMenu
+    JMP ResumeMainMenu
+
+@NotMagic:
+    CMP #$02
+    BNE @NotWeapon
+@Weapon:
+    LDA #ch_weapons-ch_stats        ; Offset for Weapon data
+    STA equipoffset
+    JSR EnterEquipMenu
+    JMP ResumeMainMenu
+
+@NotWeapon:
+    CMP #$03
+    BNE @Status
+@Armor:
+    LDA #ch_armor-ch_stats          ; Offset for Armor data
+    STA equipoffset
+    JSR EnterEquipMenu
+    JMP ResumeMainMenu
+
+@Status:
+    JSR MainMenuSubTarget           ; Select character for Status
+    BCS @EscapeSubTarget
+    JSR EnterStatusMenu
+    JMP ResumeMainMenu
+
+@EscapeSubTarget:
+    LDA #0
+    STA cursor
+    STA menu_cursor_index
+    STA menu_cursor_mode
+    LDA #5
+    STA cursor_max
+    JMP MainMenuLoop
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Main Menu Sub Target  [$AE71 :: 0x3AE81]
+;;
+;;  Selects one of the 4 party members (0..3) using 2x2 D-pad navigation.
+;;  OUT:  C = set if B pressed (cancelled)
+;;            clear if A pressed (confirmed)
+;;        submenu_targ = selected character (0..3)
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+MainMenuSubTarget:
+    LDA #0
+    STA cursor
+    STA menu_cursor_index
+    LDA #1                          ; SubTarget cursor mode
+    STA menu_cursor_mode
+    STA joy
+    STA joy_prevdir
+
+@Loop:
+    JSR MenuFrame
+    LDA cursor
+    STA menu_cursor_index
+
+    LDA joy_b
+    BNE @B_Pressed
+    LDA joy_a
+    BNE @A_Pressed
+
+    JSR MoveMainMenuSubCursor
+    JMP @Loop
+
+@B_Pressed:
+    LDA #0
+    STA menu_cursor_mode
+    SEC
+    RTS
+
+@A_Pressed:
+    LDA cursor
+    STA submenu_targ
+    LDA #0
+    STA menu_cursor_mode
+    CLC
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Move Main Menu Sub Cursor  [$B68C :: 0x3B69C]
+;;
+;;  Navigates a 2x2 grid:
+;;    0: Top-Left  (Hero 0)    1: Top-Right (Hero 1)
+;;    2: Bot-Left  (Hero 2)    3: Bot-Right (Hero 3)
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+MoveMainMenuSubCursor:
+    LDA joy
+    AND #$0F
+    CMP joy_prevdir
+    BEQ @Exit
+    STA joy_prevdir
+    CMP #0
+    BEQ @Exit
+
+    LDX #$01                        ; Left/Right toggles bit 0 (Hero 0 <-> Hero 1)
+    CMP #$04                        ; Up/Down is >= 4
+    BCC :+
+    LDX #$02                        ; Up/Down toggles bit 1 (Top <-> Bottom)
+:   TXA
+    EOR cursor
+    STA cursor
+    STA menu_cursor_index
+    JMP PlaySFX_MenuMove
+
+@Exit:
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Move Cursor Up / Down  [$B6AB :: 0x3B6CB]
+;;
+;;  Navigates vertical list (cursor 0..cursor_max-1) with wrapping.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+MoveCursorUpDown:
+    LDA joy
+    AND #$0C                        ; Up ($08) and Down ($04)
+    CMP joy_prevdir
+    BEQ @Exit
+    STA joy_prevdir
+    CMP #0
+    BEQ @Exit
+
+    CMP #$04                        ; Down pressed?
+    BNE @Up
+
+@Down:
+    LDA cursor
+    CLC
+    ADC #1
+    CMP cursor_max
+    BCC @Move
+    LDA #0
+    BEQ @Move
+
+@Up:
+    LDA cursor
+    SEC
+    SBC #1
+    BPL @Move
+    LDA cursor_max
+    SEC
+    SBC #1
+
+@Move:
+    STA cursor
+    STA menu_cursor_index
+    JMP PlaySFX_MenuMove
+
+@Exit:
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Menu Frame  [$B65D :: 0x3B66D]
+;;
+;;  Synchronizes to VBlank, updates audio, and refreshes joypad inputs.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+MenuFrame:
+    JSR WaitForVBlank_L
+    LDA #BANK_THIS
+    STA cur_bank
+    JSR CallMusicPlay_L
+    LDA #0
+    STA joy_a
+    STA joy_b
+    JMP UpdateJoy_L
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  PlaySFX_Error
+;;
+;;  Low buzz sound effect for invalid menu actions.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+PlaySFX_Error:
+    lda #8                          ; 8 frames duration
+    sta sq2_sfx
+    lda #<$1500                     ; Low buzz frequency (~330 Hz)
+    sta V2FREQ_L
+    lda #>$1500
+    sta V2FREQ_H
+    lda #$04                        ; Attack=0, Decay=4
+    sta V2AD
+    lda #$00                        ; Sustain=0, Release=0
+    sta V2SR
+    lda #SID_SAW
+    sta V2CR
+    lda #(SID_SAW | SID_GATE)
+    sta V2CR
+    rts
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Submenu Stubs (Phase 5 placeholders)
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+EnterItemMenu:
+    RTS
+
+EnterMagicMenu:
+    RTS
+
+EnterEquipMenu:
+    RTS
+
+EnterStatusMenu:
+    RTS
+
+
+; ==============================================================================
+; Main Menu Drawing & Coordinates (C64 40x25 Layout)
+; ==============================================================================
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Draw Main Menu  [$B84A :: 0x3B85A]
+;;
+;;  Clears the screen, draws all 7 boxes (Orb, GP, Option, 4 Hero Boxes),
+;;  and populates their contents.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  ClearMenuScreen
+;;
+;;  Prepares VIC-II and clears screen for menus:
+;;    - Screen border = Black ($00)
+;;    - Background 0  = Blue ($06)
+;;    - Multicolor 1  = White ($01)
+;;    - Multicolor 2  = Dark Grey ($0B)
+;;    - Screen RAM    = Character $00 (solid black tile)
+;;    - Color RAM     = Black ($00)
+;;
+;;  When windows are drawn over this, character $FF (blank space)
+;;  allows Background 0 (Blue) to shine through inside the boxes,
+;;  while the outside empty spaces remain solid black.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ClearMenuScreen:
+    LDA #COLOR_BLACK
+    STA EXTCOL
+    LDA #COLOR_BLUE
+    STA BGCOL0
+    LDA #COLOR_WHITE
+    STA BGCOL1
+    LDA #COLOR_DARKGREY
+    STA BGCOL2
+
+    ; Fill Screen RAM with character $00 (solid black block)
+    LDX #$00
+    LDA #$00
+@LoopScreen:
+    STA $4000, X
+    STA $4100, X
+    STA $4200, X
+    STA $4300, X
+    INX
+    BNE @LoopScreen
+
+    ; Fill Color RAM with color 0 (black)
+    LDX #$00
+    LDA #COLOR_BLACK
+@LoopColor:
+    STA COLOR_RAM, X
+    STA COLOR_RAM + $0100, X
+    STA COLOR_RAM + $0200, X
+    STA COLOR_RAM + $0300, X
+    INX
+    BNE @LoopColor
+
+    ; Ensure VIC-II Bank 1 ($4000-$7FFF) is selected
+    LDA CI2DRA
+    ORA #$03
+    STA CI2DRA
+    LDA CI2PRA
+    AND #$FC
+    ORA #VIC_BANK1
+    STA CI2PRA
+
+    LDA #$1B
+    STA SCROLY
+    LDA #$18                   ; 40 cols, MultiColor text mode ON (bit 4 = 1)
+    STA SCROLX
+    LDA #$02                   ; Screen: $4000, Charset: $4800
+    STA VMCSB
+    RTS
+
+
+DrawMainMenu:
+    JSR ClearMenuScreen            ; Clear screen with character $00 and COLOR_BLACK
+    JSR DrawOrbBox                 ; draw the orb box (Box 0) and orbs
+    JSR DrawMainMenuGoldBox        ; gold box (Box 5)
+    JSR DrawMainMenuOptionBox      ; option box (Box 6)
+
+    LDA #1                         ; Box 1: Character 0
+    JSR DrawMainItemBox
+    LDA #$00
+    JSR DrawMainMenuCharBoxBody
+
+    LDA #2                         ; Box 2: Character 1
+    JSR DrawMainItemBox
+    LDA #$40
+    JSR DrawMainMenuCharBoxBody
+
+    LDA #3                         ; Box 3: Character 2
+    JSR DrawMainItemBox
+    LDA #$80
+    JSR DrawMainMenuCharBoxBody
+
+    LDA #4                         ; Box 4: Character 3
+    JSR DrawMainItemBox
+    LDA #$C0
+    JMP DrawMainMenuCharBoxBody    ; and then exit
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Draw Main Menu Gold Box  [$B86E :: 0x3B87E]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawMainMenuGoldBox:
+    LDA #5                         ; Draw MainItem Box 5 (GP Box)
+    JSR DrawMainItemBox
+    LDA #$01                       ; Menu string 1 = "[Gold] G"
+    JMP DrawMenuString
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Draw Orb Box  [$B878 :: 0x3B888]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawOrbBox:
+    LDA #0                         ; Draw MainItem Box 0
+    JSR DrawMainItemBox
+
+    ; Fire Orb (top-left inside box: dest_x = 3, dest_y = 2)
+    LDA #3
+    STA dest_x
+    LDA #2
+    STA dest_y
+    LDA orb_fire
+    LDX #$64
+    LDY #COLOR_LIGHTRED
+    JSR DrawOneOrb
+
+    ; Water Orb (top-right inside box: dest_x = 6, dest_y = 2)
+    LDA #6
+    STA dest_x
+    LDA #2
+    STA dest_y
+    LDA orb_water
+    LDX #$68
+    LDY #COLOR_LIGHTBLUE
+    JSR DrawOneOrb
+
+    ; Air Orb (bottom-left inside box: dest_x = 3, dest_y = 4)
+    LDA #3
+    STA dest_x
+    LDA #4
+    STA dest_y
+    LDA orb_air
+    LDX #$6C
+    LDY #COLOR_LIGHTGREEN
+    JSR DrawOneOrb
+
+    ; Earth Orb (bottom-right inside box: dest_x = 6, dest_y = 4)
+    LDA #6
+    STA dest_x
+    LDA #4
+    STA dest_y
+    LDA orb_earth
+    LDX #$70
+    LDY #COLOR_BROWN
+    JMP DrawOneOrb
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawOneOrb
+;;
+;;  Draws a 2x2 tile orb at (dest_x, dest_y).
+;;  IN:  A = orb status (0 = unlit, nonzero = lit)
+;;       X = base tile ID when lit
+;;       Y = color when lit
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawOneOrb:
+    CMP #0
+    BNE @IsLit
+    LDX #$76                       ; Unlit orb base tile ($76)
+    LDY #COLOR_DARKGREY            ; Unlit color ($0B)
+@IsLit:
+    STY tmp                        ; save color in tmp ($10)
+    STX tmp+1                      ; save tile in tmp+1 ($11)
+
+    JSR CoordToNTAddr
+
+    ; Compute color_dest = ppu_dest + ($D800 - $4000)
+    LDA ppu_dest
+    STA color_dest
+    LDA ppu_dest+1
+    CLC
+    ADC #>($D800 - $4000)
+    STA color_dest+1
+
+    ; Top row:
+    LDY #0
+    LDA tmp+1                      ; tile
+    STA (ppu_dest), Y
+    LDA tmp
+    STA (color_dest), Y
+
+    INY                            ; next column
+    INC tmp+1
+    LDA tmp+1                      ; tile + 1
+    STA (ppu_dest), Y
+    LDA tmp
+    STA (color_dest), Y
+
+    ; Bottom row (+40 bytes):
+    LDA ppu_dest
+    CLC
+    ADC #40
+    STA ppu_dest
+    BCC :+
+    INC ppu_dest+1
+:
+    LDA color_dest
+    CLC
+    ADC #40
+    STA color_dest
+    BCC :+
+    INC color_dest+1
+:
+    LDY #0
+    INC tmp+1
+    LDA tmp+1                      ; tile + 2
+    STA (ppu_dest), Y
+    LDA tmp
+    STA (color_dest), Y
+
+    INY
+    INC tmp+1
+    LDA tmp+1                      ; tile + 3
+    STA (ppu_dest), Y
+    LDA tmp
+    STA (color_dest), Y
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawMainMenuOptionBox  [$B911 :: 0x3B921]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawMainMenuOptionBox:
+    LDA #6                         ; Draw MainItem Box 6 (Option Box)
+    JSR DrawMainItemBox
+    LDA #$02                       ; Menu string 2 = Options list
+    JMP DrawMenuString
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawMainItemBox  [$B8EF :: 0x3B8FF]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawMainItemBox:
+    JSR LoadMainItemBoxDims
+    JMP DrawBox
+
+LoadMainItemBoxDims:
+    ASL A                          ; multiply ID by 4 (4 bytes per box)
+    ASL A
+    TAX
+
+    LDA lut_MainItemBoxes, X
+    STA box_x
+    LDA lut_MainItemBoxes+1, X
+    STA box_y
+    LDA lut_MainItemBoxes+2, X
+    STA box_wd
+    LDA lut_MainItemBoxes+3, X
+    STA box_ht
+
+    LDA #BANK_THIS
+    STA cur_bank
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawMainMenuCharBoxBody  [$B9DB :: 0x3B9EB]
+;;
+;;  Draws character stats inside a hero box:
+;;  Row 0: Name (stat 0)
+;;  Row 1: Level (stat 3)
+;;  Row 2: Ailment (stat 2) + CurHP / MaxHP (stats 5 & 6)
+;;  Row 3: "MAGIC" (if character has MP)
+;;  Row 4: MP 1-4 (if character has MP)
+;;  Row 5: MP 5-8 (if character has MP)
+;;
+;;  IN: A = character index ($00, $40, $80, $C0)
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawMainMenuCharBoxBody:
+    PHA                            ; Save char index ($00, $40, $80, $C0)
+    TAX
+
+    LDA #>str_buf
+    STA text_ptr+1
+
+    ; Check if this character has any Max MP
+    LDA ch_maxmp, X
+    ORA ch_maxmp+1, X
+    ORA ch_maxmp+2, X
+    ORA ch_maxmp+3, X
+    ORA ch_maxmp+4, X
+    ORA ch_maxmp+5, X
+    ORA ch_maxmp+6, X
+    ORA ch_maxmp+7, X
+    BNE @DrawMP
+    JMP @NoMP
+
+@DrawMP:
+    LDY #0
+@MPLoop:
+    LDA ch_curmp, X                ; current MP for this level
+    ORA #$80                       ; convert to digit tile
+    STA str_buf, Y
+    INY
+    LDA #$7A                       ; '/' separator
+    STA str_buf, Y
+    INX
+    INY
+    CPY #8*2
+    BCC @MPLoop
+
+    ; Terminate row 2 (levels 4-7)
+    LDA #0
+    STA str_buf + 15
+
+    ; Draw row 2 (levels 4-7) at dest_y + 5
+    LDA dest_y
+    CLC
+    ADC #5
+    STA dest_y
+    LDA #<(str_buf + 8)
+    STA text_ptr
+    JSR DrawMenuComplexString
+
+    ; Terminate row 1 (levels 0-3) and draw at dest_y + 4
+    LDA #0
+    STA str_buf + 7
+    DEC dest_y
+    LDA #<str_buf
+    STA text_ptr
+    JSR DrawMenuComplexString
+
+    ; Draw "MAGIC" header at dest_y + 3
+    LDA #$52                       ; "MA" DTE tile
+    STA str_buf
+    LDA #$4A                       ; "GI" DTE tile
+    STA str_buf+1
+    LDA #$8C                       ; "C" tile
+    STA str_buf+2
+    LDA #0
+    STA str_buf+3
+    DEC dest_y
+    LDA #<str_buf
+    STA text_ptr
+    JSR DrawComplexString
+
+    ; Restore dest_y back to dest_y + 0
+    LDA dest_y
+    SEC
+    SBC #3
+    STA dest_y
+
+@NoMP:
+    PLA                            ; Restore char index ($00, $40, $80, $C0)
+    ; Convert $00,$40,$80,$C0 to control code $10,$11,$12,$13
+    ASL A
+    ROL A
+    ROL A
+    AND #$03
+    ORA #$10
+    STA tmp+9                      ; tmp+9 = stat control code ($10-$13)
+
+    ; Build single-spaced string for Name, Level, and Ailment/HP:
+    ; Row 0: Name
+    ; Row 1: Level
+    ; Row 2: Ailment + HP
+    LDA tmp+9
+    STA str_buf + 0                ; Control code ($10-$13)
+    LDA #$00                       ; Stat 0 = Name (4 chars)
+    STA str_buf + 1
+    LDA #$05                       ; Single line break ($05) -> Row 1
+    STA str_buf + 2
+    LDA #$C6                       ; 'L' tile
+    STA str_buf + 3
+    LDA tmp+9
+    STA str_buf + 4                ; Control code ($10-$13)
+    LDA #$03                       ; Stat 3 = Level (2 digits)
+    STA str_buf + 5
+    LDA #$05                       ; Single line break ($05) -> Row 2
+    STA str_buf + 6
+    LDA tmp+9
+    STA str_buf + 7                ; Control code ($10-$13)
+    LDA #$02                       ; Stat 2 = Ailment ("HP", "ST", "PO")
+    STA str_buf + 8
+    LDA #$FF                       ; Space
+    STA str_buf + 9
+    LDA tmp+9
+    STA str_buf + 10               ; Control code ($10-$13)
+    LDA #$05                       ; Stat 5 = Cur HP (3 digits)
+    STA str_buf + 11
+    LDA #$7A                       ; '/' tile
+    STA str_buf + 12
+    LDA tmp+9
+    STA str_buf + 13               ; Control code ($10-$13)
+    LDA #$06                       ; Stat 6 = Max HP (3 digits)
+    STA str_buf + 14
+    LDA #0                         ; Null terminator
+    STA str_buf + 15
+
+    LDA #<str_buf
+    STA text_ptr
+    LDA #>str_buf
+    STA text_ptr+1
+    JMP DrawComplexString          ; Draw string and exit!
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawMenuString  [$B938 :: 0x3B948]
+;;
+;;  IN: A = ID of menu string to draw ($00-$3F)
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawMenuString:
+    ASL A                          ; 2 bytes per pointer
+    TAX
+    LDA lut_MenuText, X
+    STA text_ptr
+    LDA lut_MenuText+1, X
+    STA text_ptr+1
+
+DrawMenuComplexString:
+    LDA #BANK_THIS
+    STA cur_bank
+    STA ret_bank
+    JMP DrawComplexString
+
+
+; ==============================================================================
+; lut_MainItemBoxes - Box Coordinates and Dimensions (C64 40x25 Layout)
+; Format per box: [X, Y, Width, Height]
+; ==============================================================================
+
+lut_MainItemBoxes:
+    .BYTE   1,  1, 10,  6      ; Box 0: Orb Box (X=1, Y=1, W=10, H=6)
+    .BYTE  12,  1, 13, 10      ; Box 1: Character 0 stat box (X=12, Y=1, W=13, H=10)
+    .BYTE  26,  1, 13, 10      ; Box 2: Character 1 stat box (X=26, Y=1, W=13, H=10)
+    .BYTE  12, 12, 13, 10      ; Box 3: Character 2 stat box (X=12, Y=12, W=13, H=10)
+    .BYTE  26, 12, 13, 10      ; Box 4: Character 3 stat box (X=26, Y=12, W=13, H=10)
+    .BYTE   1,  7, 10,  4      ; Box 5: GP box (X=1, Y=7, W=10, H=4)
+    .BYTE   1, 12, 10, 10      ; Box 6: Option box (X=1, Y=12, W=10, H=10)
+    .BYTE   1,  1,  8,  4      ; Box 7: Item title box (X=1, Y=1, W=8, H=4)
+    .BYTE   1, 18, 38,  6      ; Box 8: Item description box (X=1, Y=18, W=38, H=6)
+    .BYTE   1,  5, 38, 13      ; Box 9: Item list box (X=1, Y=5, W=38, H=13)
+
+
+; ==============================================================================
+; Menu Text Pointer Table & String Data
+; ==============================================================================
+
+str_MainMenuOptions:
+    ; " ITEM" [Single Break: $05] " MAGIC" [Single Break: $05] ...
+    .BYTE $FF, $92, $9D, $8E, $96, $05
+    .BYTE $FF, $96, $8A, $90, $92, $8C, $05
+    .BYTE $FF, $CF, $D0, $D1, $D2, $D3, $05
+    .BYTE $FF, $8A, $9B, $96, $98, $9B, $05
+    .BYTE $FF, $CA, $CB, $CC, $CD, $CE, $00
+
+lut_MenuText:
+    .WORD lut_MenuStrings + $0000, lut_MenuStrings + $0001, str_MainMenuOptions, lut_MenuStrings + $0027
+    .WORD lut_MenuStrings + $002D, lut_MenuStrings + $003A, lut_MenuStrings + $0059, lut_MenuStrings + $0073
+    .WORD lut_MenuStrings + $0081, lut_MenuStrings + $0095, lut_MenuStrings + $00B0, lut_MenuStrings + $00BE
+    .WORD lut_MenuStrings + $00C8, lut_MenuStrings + $00D6, lut_MenuStrings + $00F1, lut_MenuStrings + $00FE
+    .WORD lut_MenuStrings + $011E, lut_MenuStrings + $013D, lut_MenuStrings + $015F, lut_MenuStrings + $016D
+    .WORD lut_MenuStrings + $018E, lut_MenuStrings + $01B8, lut_MenuStrings + $01D3, lut_MenuStrings + $01F0
+    .WORD lut_MenuStrings + $01FB, lut_MenuStrings + $0214, lut_MenuStrings + $0226, lut_MenuStrings + $024C
+    .WORD lut_MenuStrings + $025D, lut_MenuStrings + $0283, lut_MenuStrings + $0294, lut_MenuStrings + $02C9
+    .WORD lut_MenuStrings + $02E6, lut_MenuStrings + $02F8, lut_MenuStrings + $030B, lut_MenuStrings + $0327
+    .WORD lut_MenuStrings + $032B, lut_MenuStrings + $0332, lut_MenuStrings + $0339, lut_MenuStrings + $035C
+    .WORD lut_MenuStrings + $0398, lut_MenuStrings + $03CB, lut_MenuStrings + $03CF, lut_MenuStrings + $0487
+    .WORD lut_MenuStrings + $0499, lut_MenuStrings + $04CD, lut_MenuStrings + $04E5, lut_MenuStrings + $04F7
+    .WORD lut_MenuStrings + $0517, lut_MenuStrings + $0533, lut_MenuStrings + $055E, lut_MenuStrings + $057B
+    .WORD lut_MenuStrings + $0598, lut_MenuStrings + $059E, lut_MenuStrings + $05B3, lut_MenuStrings + $05B7
+    .WORD lut_MenuStrings + $05B8, lut_MenuStrings + $05BC, lut_MenuStrings + $05BD, lut_MenuStrings + $05C1
+    .WORD lut_MenuStrings + $05C2, lut_MenuStrings + $05C6, lut_MenuStrings + $05C7, lut_MenuStrings + $05CD
+
+lut_MenuStrings:
+    .INCBIN "../res/menu/menustrings.bin"

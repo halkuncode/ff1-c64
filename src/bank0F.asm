@@ -18,7 +18,7 @@
 .export lut_NES_to_C64, lut_OWTileColors, lut_OWMetatileColors
 .export LoadPrice
 
-.import EnterIntroStory, EnterTitleScreen, NewGamePartyGeneration
+.import EnterIntroStory, EnterTitleScreen, NewGamePartyGeneration, EnterMainMenu
 .import lut_MenuCHR
 .import lut_FingerSprite, lut_HeroSprites
 .import lut_BattleFormations
@@ -265,6 +265,16 @@ EnterOverworldLoop:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ProcessOWInput:
+    LDA joy_start
+    BEQ @NoStart
+    LDA #0
+    STA joy_start
+    LDA #BANK_MENUS             ; Swap to Bank $0E (BANK_MENUS)
+    JSR SwapPRG_L
+    JSR EnterMainMenu           ; Enter main menu!
+    JMP DoOverworld             ; Redraw overworld when main menu exits
+
+@NoStart:
     LDA joy
     AND #(RIGHT | LEFT | DOWN | UP)
     BEQ @Exit           ; if no direction pressed, exit
@@ -2752,9 +2762,17 @@ WaitForVBlank:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 OnIRQ:
-    ; Check if Party Generation 2-zone multiplexer is active
+    ; Check multiplexer mode:
+    ;   0 = Normal single-zone VBlank IRQ
+    ;   1 = Party Generation 2-zone multiplexer
+    ;   2 = Main Menu 2-zone multiplexer
     lda spr_multiplex_mode
     beq @NormalIRQ
+    cmp #1
+    beq @PartyGen
+    jmp MainMenu_IRQ
+
+@PartyGen:
     jmp PartyGen_IRQ
 
 @NormalIRQ:
@@ -3209,6 +3227,617 @@ lut_Class_dY:
     .byte 0, 21, 0, 0   ; Class 3 (Red Mage)
     .byte 0, 21, 3, 0   ; Class 4 (White Mage) - dY=+3 on Layer 2!
     .byte 0, 21, 0, 0   ; Class 5 (Black Mage)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  MainMenu_IRQ - Multi-Zone Raster Multiplexer for Main Menu
+;;
+;;  Zone 0 (Scanline 250 / VBlank -> Scanline 135):
+;;    Physical Sprites 0-3: Hero 0 (Box 1, Top-Left: X = 168, Upper Y = 66, Feet Y = 87)
+;;    Physical Sprites 4-7: Hero 1 (Box 2, Top-Right: X = 280, Upper Y = 66, Feet Y = 87)
+;;    If SubTarget cursor on Hero 0 or 1:
+;;      Physical Sprites 1 & 5: Finger Cursor at X = 104 or 216, Y = 74
+;;      Split at Scanline 86 switches Sprites 0 & 4 to Hero 0 & 1 Feet at Y = 87!
+;;
+;;  Zone 1 (Scanline 135 -> Scanline 174):
+;;    Physical Sprites 0, 2, 3: Hero 2 Upper Body at X = 168, Y = 154
+;;    Physical Sprites 4, 6, 7: Hero 3 Upper Body at X = 280, Y = 154
+;;    Physical Sprites 1 & 5: Finger Cursor
+;;      If Option Box (menu_cursor_mode == 0): X = 32, Y from lut_MMOptionCursor_Y
+;;      If SubTarget on Hero 2 or 3: X = 104 or 216, Y = 162
+;;
+;;  Zone 2 (Scanline 174 -> Scanline 250):
+;;    Upper bodies for Hero 2 & 3 completed at line 174.
+;;    Physical Sprite 0: Hero 2 Feet at X = 168, Y = 175
+;;    Physical Sprite 4: Hero 3 Feet at X = 280, Y = 175
+;;    Physical Sprites 1 & 5 continue displaying the Finger Cursor!
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_MMOptionCursor_Y:
+    .byte 162, 170, 178, 186, 194
+
+mm_h0_feet_ptr: .byte 0
+mm_h0_feet_col: .byte 0
+mm_h1_feet_ptr: .byte 0
+mm_h1_feet_col: .byte 0
+mm_h2_feet_ptr: .byte 0
+mm_h2_feet_col: .byte 0
+mm_h3_feet_ptr: .byte 0
+mm_h3_feet_col: .byte 0
+
+MainMenu_IRQ:
+    lda #$01
+    sta VICIRQ                 ; Acknowledge VIC-II Raster IRQ
+
+    lda spr_irq_zone
+    beq @Zone0
+    cmp #1
+    bne :+
+    jmp @Zone1
+:   cmp #2
+    bne :+
+    jmp @Zone2
+:   jmp @Zone3
+
+@Zone0:
+    inc vblank_count
+
+    lda #$00
+    sta XEXP
+    sta YEXP
+    sta SPBGPR
+    sta SPMC
+
+    jsr SetupMMHero0
+    jsr SetupMMHero1
+
+    ; Check if SubTarget cursor is on Hero 0 or 1
+    lda menu_cursor_mode
+    cmp #1
+    bne @ToArmZone1
+    lda menu_cursor_index
+    cmp #2
+    bcc @HasSubTargetTop
+@ToArmZone1:
+    jmp @ArmZone1
+
+@HasSubTargetTop:
+    ; SubTarget cursor in Zone 0
+    ldx #104
+    lda menu_cursor_index
+    beq :+
+    ldx #216
+:   stx SP1X
+    stx SP5X
+    lda #74
+    sta SP1Y
+    sta SP5Y
+
+    lda MSIGX
+    and #%11011101
+    sta MSIGX
+
+    lda #BLOCK_FINGER_OVERLAY
+    sta $43F9
+    lda #COLOR_WHITE
+    sta SP1COL
+
+    lda #BLOCK_FINGER_BASE
+    sta $43FD
+    lda #COLOR_WHITE
+    sta SP5COL
+
+    lda SPMC
+    ora #%00100000
+    sta SPMC
+
+    lda SPENA
+    ora #%00100010
+    sta SPENA
+
+    ; Arm split at line 86 to display feet on Sprites 0 & 4
+    lda #86
+    sta RASTER
+    lda SCROLY
+    and #$7F
+    sta SCROLY
+    lda #3                     ; Zone 3: Upper heroes feet split
+    sta spr_irq_zone
+    jmp $FEBC
+
+@ArmZone1:
+    lda #135
+    sta RASTER
+    lda SCROLY
+    and #$7F
+    sta SCROLY
+    lda #1
+    sta spr_irq_zone
+    jmp $FEBC
+
+@Zone3:
+    ; Scanline 86: Switch Sprite 0 & 4 to Hero 0 & 1 Feet at line 87
+    lda ch_ailments + 0
+    cmp #$01
+    beq :+
+    lda #87
+    sta SP0Y
+    lda mm_h0_feet_ptr
+    sta $43F8
+    lda mm_h0_feet_col
+    sta SP0COL
+:
+    lda ch_ailments + $40
+    cmp #$01
+    beq :+
+    lda #87
+    sta SP4Y
+    lda mm_h1_feet_ptr
+    sta $43FC
+    lda mm_h1_feet_col
+    sta SP4COL
+:
+    lda #135
+    sta RASTER
+    lda SCROLY
+    and #$7F
+    sta SCROLY
+    lda #1
+    sta spr_irq_zone
+    jmp $FEBC
+
+@Zone1:
+    lda #$00
+    sta XEXP
+    sta YEXP
+    sta SPBGPR
+    sta SPMC
+
+    jsr SetupMMHero2
+    jsr SetupMMHero3
+
+    lda menu_cursor_mode
+    beq @OptionBoxCursor
+    cmp #1
+    beq @SubTargetLower
+    ; If no cursor, feet are already on Sprites 1 & 5
+    jmp @ArmZone0Direct
+
+@OptionBoxCursor:
+    lda #32
+    sta SP1X
+    sta SP5X
+
+    ldx menu_cursor_index
+    cpx #5
+    bcc :+
+    ldx #0
+:   lda lut_MMOptionCursor_Y, x
+    sta SP1Y
+    sta SP5Y
+
+    lda MSIGX
+    and #%11011101
+    sta MSIGX
+
+    lda #BLOCK_FINGER_OVERLAY
+    sta $43F9
+    lda #COLOR_WHITE
+    sta SP1COL
+
+    lda #BLOCK_FINGER_BASE
+    sta $43FD
+    lda #COLOR_WHITE
+    sta SP5COL
+
+    lda SPMC
+    ora #%00100000
+    sta SPMC
+
+    lda SPENA
+    ora #%00100010
+    sta SPENA
+
+    ; Arm split at line 174 to restore Hero 2 & 3 feet on Sprites 0 & 4
+    lda #174
+    sta RASTER
+    lda SCROLY
+    and #$7F
+    sta SCROLY
+    lda #2
+    sta spr_irq_zone
+    jmp $FEBC
+
+@SubTargetLower:
+    lda menu_cursor_index
+    cmp #2
+    bcs :+
+    jmp @ArmZone0Direct
+:
+    ldx #104
+    cmp #2
+    beq :+
+    ldx #216
+:   stx SP1X
+    stx SP5X
+    lda #162
+    sta SP1Y
+    sta SP5Y
+
+    lda MSIGX
+    and #%11011101
+    sta MSIGX
+
+    lda #BLOCK_FINGER_OVERLAY
+    sta $43F9
+    lda #COLOR_WHITE
+    sta SP1COL
+
+    lda #BLOCK_FINGER_BASE
+    sta $43FD
+    lda #COLOR_WHITE
+    sta SP5COL
+
+    lda SPMC
+    ora #%00100000
+    sta SPMC
+
+    lda SPENA
+    ora #%00100010
+    sta SPENA
+
+    ; Arm split at line 174 to restore Hero 2 & 3 feet on Sprites 0 & 4
+    lda #174
+    sta RASTER
+    lda SCROLY
+    and #$7F
+    sta SCROLY
+    lda #2
+    sta spr_irq_zone
+    jmp $FEBC
+
+@Zone2:
+    ; Scanline 174: Switch Sprite 0 to Hero 2 Feet, Sprite 4 to Hero 3 Feet
+    lda ch_ailments + $80
+    cmp #$01
+    beq :+
+    lda #175
+    sta SP0Y
+    lda mm_h2_feet_ptr
+    sta $43F8
+    lda mm_h2_feet_col
+    sta SP0COL
+:
+    lda ch_ailments + $C0
+    cmp #$01
+    beq :+
+    lda #175
+    sta SP4Y
+    lda mm_h3_feet_ptr
+    sta $43FC
+    lda mm_h3_feet_col
+    sta SP4COL
+:
+    ; Arm scanline 250 for VBlank
+@ArmZone0Direct:
+    lda #250
+    sta RASTER
+    lda SCROLY
+    and #$7F
+    sta SCROLY
+    lda #0
+    sta spr_irq_zone
+    jmp $FEBC
+
+SetupMMHero0:
+    lda ch_ailments + 0
+    cmp #$01
+    bne @Alive
+    lda SPENA
+    and #%11110000
+    sta SPENA
+    rts
+@Alive:
+    lda SPENA
+    ora #%00001111
+    sta SPENA
+
+    lda MSIGX
+    and #%11110000
+    sta MSIGX
+
+    lda #168
+    sta SP0X
+    sta SP1X
+    sta SP2X
+    sta SP3X
+
+    lda #66
+    sta SP0Y
+    sta SP3Y
+    lda #87
+    sta SP1Y
+
+    lda ch_class + 0
+    cmp #6
+    bcc :+
+    sbc #6
+:   asl a
+    asl a
+    tay
+
+    lda #66
+    clc
+    adc lut_Class_dY + 2, y
+    sta SP2Y
+
+    tya
+    clc
+    adc #BLOCK_HERO_BASE
+    sta $43F8
+    tax
+    inx
+    stx $43F9
+    stx mm_h0_feet_ptr
+    inx
+    stx $43FA
+    inx
+    stx $43FB
+
+    lda ch_ailments + 0
+    cmp #$02
+    beq @Stone
+    lda lut_ClassColors, y
+    sta SP0COL
+    lda lut_ClassColors + 1, y
+    sta SP1COL
+    sta mm_h0_feet_col
+    lda lut_ClassColors + 2, y
+    sta SP2COL
+    lda lut_ClassColors + 3, y
+    sta SP3COL
+    rts
+@Stone:
+    lda #COLOR_DARKGREY
+    sta SP0COL
+    sta SP1COL
+    sta mm_h0_feet_col
+    sta SP2COL
+    sta SP3COL
+    rts
+
+SetupMMHero1:
+    lda ch_ailments + $40
+    cmp #$01
+    bne @Alive
+    lda SPENA
+    and #%00001111
+    sta SPENA
+    rts
+@Alive:
+    lda SPENA
+    ora #%11110000
+    sta SPENA
+
+    lda MSIGX
+    ora #%11110000
+    sta MSIGX
+
+    lda #24
+    sta SP4X
+    sta SP5X
+    sta SP6X
+    sta SP7X
+
+    lda #66
+    sta SP4Y
+    sta SP7Y
+    lda #87
+    sta SP5Y
+
+    lda ch_class + $40
+    cmp #6
+    bcc :+
+    sbc #6
+:   asl a
+    asl a
+    tay
+
+    lda #66
+    clc
+    adc lut_Class_dY + 2, y
+    sta SP6Y
+
+    tya
+    clc
+    adc #BLOCK_HERO_BASE
+    sta $43FC
+    tax
+    inx
+    stx $43FD
+    stx mm_h1_feet_ptr
+    inx
+    stx $43FE
+    inx
+    stx $43FF
+
+    lda ch_ailments + $40
+    cmp #$02
+    beq @Stone
+    lda lut_ClassColors, y
+    sta SP4COL
+    lda lut_ClassColors + 1, y
+    sta SP5COL
+    sta mm_h1_feet_col
+    lda lut_ClassColors + 2, y
+    sta SP6COL
+    lda lut_ClassColors + 3, y
+    sta SP7COL
+    rts
+@Stone:
+    lda #COLOR_DARKGREY
+    sta SP4COL
+    sta SP5COL
+    sta mm_h1_feet_col
+    sta SP6COL
+    sta SP7COL
+    rts
+
+SetupMMHero2:
+    lda ch_ailments + $80
+    cmp #$01
+    bne @Alive
+    lda SPENA
+    and #%11110000
+    sta SPENA
+    rts
+@Alive:
+    lda SPENA
+    ora #%00001111
+    sta SPENA
+
+    lda MSIGX
+    and #%11110000
+    sta MSIGX
+
+    lda #168
+    sta SP0X
+    sta SP1X
+    sta SP2X
+    sta SP3X
+
+    lda #154
+    sta SP0Y
+    sta SP3Y
+    lda #175
+    sta SP1Y
+
+    lda ch_class + $80
+    cmp #6
+    bcc :+
+    sbc #6
+:   asl a
+    asl a
+    tay
+
+    lda #154
+    clc
+    adc lut_Class_dY + 2, y
+    sta SP2Y
+
+    tya
+    clc
+    adc #BLOCK_HERO_BASE
+    sta $43F8
+    tax
+    inx
+    stx $43F9
+    stx mm_h2_feet_ptr
+    inx
+    stx $43FA
+    inx
+    stx $43FB
+
+    lda ch_ailments + $80
+    cmp #$02
+    beq @Stone
+    lda lut_ClassColors, y
+    sta SP0COL
+    lda lut_ClassColors + 1, y
+    sta SP1COL
+    sta mm_h2_feet_col
+    lda lut_ClassColors + 2, y
+    sta SP2COL
+    lda lut_ClassColors + 3, y
+    sta SP3COL
+    rts
+@Stone:
+    lda #COLOR_DARKGREY
+    sta SP0COL
+    sta SP1COL
+    sta mm_h2_feet_col
+    sta SP2COL
+    sta SP3COL
+    rts
+
+SetupMMHero3:
+    lda ch_ailments + $C0
+    cmp #$01
+    bne @Alive
+    lda SPENA
+    and #%00001111
+    sta SPENA
+    rts
+@Alive:
+    lda SPENA
+    ora #%11110000
+    sta SPENA
+
+    lda MSIGX
+    ora #%11110000
+    sta MSIGX
+
+    lda #24
+    sta SP4X
+    sta SP5X
+    sta SP6X
+    sta SP7X
+
+    lda #154
+    sta SP4Y
+    sta SP7Y
+    lda #175
+    sta SP5Y
+
+    lda ch_class + $C0
+    cmp #6
+    bcc :+
+    sbc #6
+:   asl a
+    asl a
+    tay
+
+    lda #154
+    clc
+    adc lut_Class_dY + 2, y
+    sta SP6Y
+
+    tya
+    clc
+    adc #BLOCK_HERO_BASE
+    sta $43FC
+    tax
+    inx
+    stx $43FD
+    stx mm_h3_feet_ptr
+    inx
+    stx $43FE
+    inx
+    stx $43FF
+
+    lda ch_ailments + $C0
+    cmp #$02
+    beq @Stone
+    lda lut_ClassColors, y
+    sta SP4COL
+    lda lut_ClassColors + 1, y
+    sta SP5COL
+    sta mm_h3_feet_col
+    lda lut_ClassColors + 2, y
+    sta SP6COL
+    lda lut_ClassColors + 3, y
+    sta SP7COL
+    rts
+@Stone:
+    lda #COLOR_DARKGREY
+    sta SP4COL
+    sta SP5COL
+    sta mm_h3_feet_col
+    sta SP6COL
+    sta SP7COL
+    rts
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
