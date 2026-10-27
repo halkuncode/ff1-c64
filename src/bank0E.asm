@@ -18,7 +18,8 @@
 .export MoveMainMenuSubCursor, MoveCursorUpDown, MenuFrame
 .export PlaySFX_MenuMove, PlaySFX_MenuSel, PlaySFX_Error
 .export EnterItemMenu, EnterMagicMenu, EnterEquipMenu, EnterStatusMenu, ClearMenuScreen
-.import LoadMenuCHRPal, LoadNewGameCHRPal, DrawComplexString, WaitForVBlank_L, UpdateJoy_L, DrawBox
+.export DrawCharMenuString, DrawCharMenuString_Len, MenuWaitForBtn_SFX, MenuWaitForBtn, lut_StatusBoxes
+.import LoadMenuCHRPal, LoadNewGameCHRPal, DrawComplexString, WaitForVBlank_L, UpdateJoy_L, DrawBox, DrawOBSprite
 .import GameStart_L, CallMusicPlay_L, ClearOAM, DrawPalette_L, DrawCursor
 .import lut_ScreenRowLo, lut_ScreenRowHi, CoordToNTAddr
 .import lut_IntroStoryText
@@ -2480,7 +2481,163 @@ EnterEquipMenu:
     RTS
 
 EnterStatusMenu:
+    LDA #0
+    STA spr_multiplex_mode          ; Disable raster multiplexer
+    STA spr_irq_zone
+    LDA #250
+    STA RASTER
+    LDA SCROLY
+    AND #$7F
+    STA SCROLY
+
+    LDA #0
+    STA menustall                   ; Disable menu stalling
+    JSR ClearMenuScreen             ; Clear screen with black bg, prepare VIC-II
+
+    LDX #0*4                        ; Draw Box 0 (Character name)
+    JSR @DrawStatusBox
+    LDA #$23                        ; Menu string $23 = character name
+    JSR DrawCharMenuString
+
+    LDX #1*4                        ; Draw Box 1 (Class name & battle sprite)
+    JSR @DrawStatusBox
+    LDA #$24                        ; Menu string $24 = class name
+    JSR DrawCharMenuString
+
+    LDX #2*4                        ; Draw Box 2 (Level)
+    JSR @DrawStatusBox
+    LDA #$25                        ; Menu string $25 = level
+    JSR DrawCharMenuString
+
+    LDX #3*4                        ; Draw Box 3 (EXP)
+    JSR @DrawStatusBox
+    LDA #$26                        ; Menu string $26 = EXP / For Lev Up
+    JSR DrawCharMenuString
+
+    LDX #4*4                        ; Draw Box 4 (Base stats)
+    JSR @DrawStatusBox
+    LDA #$27                        ; Menu string $27 = STR, AGL, INT, VIT, LUCK
+    JSR DrawCharMenuString
+
+    LDX #5*4                        ; Draw Box 5 (Sub stats)
+    JSR @DrawStatusBox
+    LDA #$28                        ; Menu string $28 = DAMAGE, HIT, ABSORB, EVADE
+    JSR DrawCharMenuString
+
+    JSR ClearOAM                    ; Clear shadow OAM
+
+    LDA submenu_targ                ; 0..3
+    ASL A
+    ASL A
+    ASL A
+    ASL A
+    ASL A
+    ASL A                           ; Shift to $00, $40, $80, $C0
+    JSR DrawOBSprite                ; Draw hero battle sprite inside Box 1
+
+    JMP MenuWaitForBtn_SFX          ; Wait for A or B before exiting
+
+@DrawStatusBox:
+    LDA lut_StatusBoxes, X
+    STA box_x
+    LDA lut_StatusBoxes+1, X
+    STA box_y
+    LDA lut_StatusBoxes+2, X
+    STA box_wd
+    LDA lut_StatusBoxes+3, X
+    STA box_ht
+    JSR DrawBox
+    INC dest_y                      ; Text starts on box_y + 2
     RTS
+
+lut_StatusBoxes:
+    .BYTE  4,  0,  8,  5            ; Box 0: Character name (top left)
+    .BYTE 13,  0, 14,  5            ; Box 1: Battle sprite & class name (top center)
+    .BYTE 28,  0,  8,  5            ; Box 2: Level (top right)
+    .BYTE  8,  5, 23,  7            ; Box 3: EXP (center)
+    .BYTE  4, 12, 14, 13            ; Box 4: Base stats (STR, AGL, INT, VIT, LUCK)
+    .BYTE 19, 12, 16, 13            ; Box 5: Sub stats (DAMAGE, HIT, ABSORB, EVADE)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Draw Character Menu String  [8541]
+;;
+;;     Draws a desired menu string (see DrawMenuString), but replaces character stat
+;;  codes in the string to reflect the stats of the given character.
+;;
+;;  IN:              A = menu string ID to draw
+;;        submenu_targ = character ID whose stats to draw (0..3)
+;;                   Y = length of string (DrawCharMenuString_Len only!)
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawCharMenuString:
+    LDY #$7F                        ; set length to default 7F
+
+DrawCharMenuString_Len:
+    ASL A                           ; double menu string ID
+    TAX                             ; put in X
+    LDA lut_MenuText, X             ; and load up the pointer into (tmp)
+    STA tmp
+    LDA lut_MenuText+1, X
+    STA tmp+1
+
+    LDA #<bigstr_buf                ; set the text pointer to our bigstring buffer
+    STA text_ptr
+    LDA #>bigstr_buf
+    STA text_ptr+1
+
+@Loop:                              ; now step through each byte of the string....
+    LDA (tmp), Y                    ; get the byte
+    CMP #$10                        ; compare it to $10 (character stat control code)
+    BNE :+                          ;   if it equals...
+      ORA submenu_targ              ;   OR with desired character ID (0..3 -> $10..$13)
+:   STA bigstr_buf, Y               ; copy the byte to the big string buffer
+    DEY                             ; then decrement Y
+    CPY #$FF                        ; check to see if it wrapped
+    BNE @Loop                       ; and keep looping until it has
+
+    JMP DrawMenuComplexString       ; draw the complex string and exit.
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  MenuWaitForBtn_SFX  [7745]
+;;
+;;    Waits until the user presses A or B, plays MenuSel SFX, and returns.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+MenuWaitForBtn_SFX:
+    JSR MenuFrame
+    LDA joy_a
+    ORA joy_b
+    BEQ MenuWaitForBtn_SFX
+    LDA #0
+    STA joy_a
+    STA joy_b
+    JMP PlaySFX_MenuSel
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  MenuWaitForBtn  [7756]
+;;
+;;    Waits until the user presses A or B without SFX, and returns.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+MenuWaitForBtn:
+    JSR MenuFrame
+    LDA joy_a
+    ORA joy_b
+    BEQ MenuWaitForBtn
+    LDA #0
+    STA joy_a
+    STA joy_b
+    RTS
+
 
 
 ; ==============================================================================

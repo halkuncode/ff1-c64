@@ -14,7 +14,7 @@
 .export WaitForVBlank_L, WaitForVBlank
 .export SwapPRG_L, SwapPRG
 .export CoordToNTAddr, lut_ScreenRowLo, lut_ScreenRowHi
-.export DrawCursor, UpdateSprites, VerifyChecksum
+.export DrawCursor, UpdateSprites, VerifyChecksum, DrawOBSprite
 .export lut_NES_to_C64, lut_OWMetatileColors
 .export LoadPrice
 
@@ -3625,6 +3625,113 @@ DrawCursor:
 @Exit:
     rts
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawOBSprite  [10405]
+;;
+;;  Draws an out-of-battle hero sprite on C64.
+;;  Used by Status Menu to display the hero inside Box 1.
+;;
+;;  IN:  A = char_index ($00, $40, $80, $C0)
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawOBSprite:
+    sta char_index
+    tax
+    lda ch_ailments, x
+    cmp #$01                      ; dead?
+    bne @Alive
+    lda #0
+    sta shadow_spr_en
+    sta SPENA
+    rts
+
+@Alive:
+    lda ch_class, x
+    cmp #6
+    bcc :+
+    sbc #6
+:   tax                           ; Class 0..5 in X
+
+    lda lut_ClassSpriteBase, x
+    sta shadow_spr_ptr + 0
+    sta $43F8
+    clc
+    adc #1
+    sta shadow_spr_ptr + 1
+    sta $43F9
+    adc #1
+    sta shadow_spr_ptr + 2
+    sta $43FA
+
+    txa
+    asl a
+    stx tmp
+    clc
+    adc tmp                       ; A = Class * 3
+    tay
+
+    ldx char_index
+    lda ch_ailments, x
+    cmp #$02                      ; stone?
+    bne @NotStone
+    lda #COLOR_DARKGREY
+    sta shadow_spr_col + 0
+    sta shadow_spr_col + 1
+    sta shadow_spr_col + 2
+    sta SP0COL
+    sta SP1COL
+    sta SP2COL
+    jmp @Position
+
+@NotStone:
+    lda lut_ClassColors + 0, y
+    sta shadow_spr_col + 0
+    sta SP0COL
+    lda lut_ClassColors + 1, y
+    sta shadow_spr_col + 1
+    sta SP1COL
+    lda lut_ClassColors + 2, y
+    sta shadow_spr_col + 2
+    sta SP2COL
+
+@Position:
+    lda #144                      ; Col 15 (X = 24 + 15*8 = 144)
+    sta shadow_spr_x + 0
+    sta shadow_spr_x + 1
+    sta shadow_spr_x + 2
+    sta SP0X
+    sta SP1X
+    sta SP2X
+
+    lda #59                       ; Row 1 (Y = 50 + 1*8 + 1 = 59)
+    sta shadow_spr_y + 0
+    sta shadow_spr_y + 1
+    sta shadow_spr_y + 2
+    sta SP0Y
+    sta SP1Y
+    sta SP2Y
+
+    lda shadow_spr_msb
+    and #%11111000
+    sta shadow_spr_msb
+    lda MSIGX
+    and #%11111000
+    sta MSIGX
+
+    lda shadow_spr_mcm
+    and #%11111000
+    sta shadow_spr_mcm
+    lda SPMC
+    and #%11111000
+    sta SPMC
+
+    lda #%00000111
+    sta shadow_spr_en
+    sta SPENA
+    rts
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
