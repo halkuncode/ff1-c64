@@ -5,7 +5,7 @@
 ; SKIP_TO_MAP = 1: Quick-boot directly to Party Generation, where F1 immediately
 ;                  confirms default party and enters the overworld map.
 ; SKIP_TO_MAP = 0: Normal game flow (Intro -> Title -> Normal Party Generation).
-SKIP_TO_MAP = 1
+SKIP_TO_MAP = 0
 ; ==============================================================================
 
 ;;;;;;;;;;;;;;;;;;
@@ -472,7 +472,8 @@ lut_OrbCHR         = $B600   ; BANK_ORBCHR
 lut_BatSprCHR      = $9000   ; BANK_BTLCHR -- page
 lut_BatObjCHR      = $A800   ; BANK_BTLCHR -- page
 
-lut_BackdropPal    = $B200   ; BANK_BACKDROPPAL
+lut_BtlBackdropPalettes = $B200   ; BANK_BACKDROPPAL
+lut_BackdropPal         = lut_BtlBackdropPalettes   ; Alias for NES parity
 
 lut_ItemPrices     = $BC00   ; BANK_ITEMPRICES - page
 

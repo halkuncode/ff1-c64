@@ -65,12 +65,7 @@ $(OBJDIR):
 $(OBJDIR)/%.o: $(SRCDIR)/%.asm $(INCS) | $(OBJDIR)
 	$(AS) $(ASFLAGS) $< -o $@
 
-res/heros/heroes.bin: scripts/build_heroes.py res/heros/fighter.asm res/heros/thief.asm res/heros/blackbelt.asm res/heros/redmage.asm res/heros/whitemage.asm res/heros/blackmage.asm
-	python scripts/build_heroes.py
-
-$(OBJDIR)/bank01.o: res/data/bank_01_data.bin
-$(OBJDIR)/bank02.o: res/maps/Overworld/overworld.chr
-$(OBJDIR)/bank09.o: res/menu/menufont.chr res/heros/heroes.bin
+$(OBJDIR)/bank09.o: res/menu/menufont.chr res/heroes/class1.spr
 $(OBJDIR)/bank0A.o: res/data/bank0A.dat
 $(OBJDIR)/bank0B.o: res/data/battleformations.bin
 $(OBJDIR)/bank0D.o: res/menu/orbs.chr res/audio/scoredata.bin

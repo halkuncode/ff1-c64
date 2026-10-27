@@ -38,8 +38,8 @@ lut_FingerSprite:
     .byte $00,$00,$00,$00,$00,$00,$00,$00
     .byte $00,$00,$00,$00,$00,$00,$00,$01
 
-; $9080 - $967F: Hero Sprites (6 classes x 256 bytes = 1536 bytes)
+; $9080 - $AB7F: Hero Sprites (6 classes x 18 sprites = 108 sprites x 64 bytes = 6912 bytes)
 .export lut_HeroSprites
 lut_HeroSprites:
-    .incbin "../res/heros/heroes.bin"
+    .incbin "../res/heroes/class1.spr"
 

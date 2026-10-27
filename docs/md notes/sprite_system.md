@@ -115,23 +115,17 @@ The sprite subsystem represents the largest architectural divide between the two
    └────────┴────────┘                   └──────────────────────────────┘
 ```
 
-### The Hero Sprite Stack (4 Sprites per Hero)
-Because NES heroes have distinct heads, bodies, and feet, they exceed the 21-pixel vertical height of a single C64 sprite. The redrawn C64 heroes (defined in `res/heros/*.asm`) use a **4-sprite multi-layer composite** ($24 \times 42$ pixels total):
-1. **Upper Body / Head / Accents ($Y+0$ to $Y+20$):**
-   * **Sprite 0 (Body):** Clothes, Armor, Tunic (e.g., Red for Fighter/Red Mage, Brown for Thief, Cyan for Black Belt/Black Mage, White for White Mage).
-   * **Sprite 1 (Feet/Boots):** Lower body extension, placed at relative $(X, Y+21)$.
-   * **Sprite 2 (Skin / Accents):** Face, arms, exposed skin (Peach = Color 10), or custom accents.
-   * **Sprite 3 (Highlight / Hair / Secondary):** Helmet gleam, hair, feather, hat shade.
-   * *Layers are drawn in Hi-Res mode ($1 \times 1$ crisp pixels) layered on top of each other.*
+### The Hero Sprite Stack (3 Sprites per Hero)
+All Class 1 heroes are redrawn to fit cleanly into the native C64 $24 \times 21$ sprite box (stored as binary in `res/heroes/class1.spr`). Each hero is a **3-sprite hi-res overlay composite** without any spillover feet sprite:
+1. **Layer 0 (Base / Body):** Clothes, tunic, robe, base armor.
+2. **Layer 1 (Skin / Accent):** Face, arms, exposed skin, secondary accents.
+3. **Layer 2 (Highlight / Trim):** Weapons, highlights, hair, robe trim.
+*Layers are drawn in Hi-Res mode ($1 \times 1$ crisp pixels) aligned at $(dX=0, dY=0)$.*
 
-### Handling Atypical Layer Offsets (The White Mage Snag)
-While standard heroes share $(dX=0, dY=0)$ for upper layers and $(dX=0, dY=21)$ for feet, some heroes introduce unique layer offsets:
-* **White Mage (`res/heros/whitemage.asm`):**
-  * Sprite 0: Body (White) at $(0, 0)$
-  * Sprite 1: Feet (White) at $(0, 21)$
-  * **Sprite 2: Accents (Red robe triangles) at $(0, 3)$** $\leftarrow$ *Atypical $+3$ pixel vertical offset!*
-  * Sprite 3: Skin (Peach) at $(0, 0)$
-* **Solution:** To handle any hero class with irregular offsets, the sprite engine defines explicit relative offsets $(dX, dY)$ per layer inside the hero template table rather than hardcoding $Y+0$ and $Y+21$.
+### Native 21-Line Alignment (Zero Feet Spillover & Zero Layer Offsets)
+* By fitting the art within 21 lines, there is no need for a 4th "feet" sprite at $Y+21$.
+* All 3 layers share identical origin coordinates $(dX=0, dY=0)$, completely eliminating the previous White Mage $+3$ vertical offset snag.
+* In the **Party Generation Screen**, Hero 0 (3 sprites) + Hero 1 (3 sprites) + Finger Cursor (2 sprites) = **8 sprites total**, displaying simultaneously without mid-character raster collisions.
 
 ---
 

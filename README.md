@@ -54,7 +54,7 @@ ff1-c64/
 ├── res/                 # Binary graphics, audio tables, and character data
 │   ├── audio/           # SID score and song data
 │   ├── data/            # Battle formations and game data tables
-│   ├── heros/           # Hero sprite graphics and assembly definitions
+│   ├── heroes/          # Hero sprite graphics and class1.spr definition
 │   ├── menu/            # Menu font and orb CHR assets
 │   └── monsters/        # Monster graphic CHR files
 ├── scripts/             # Python asset pipeline and graphic conversion tools

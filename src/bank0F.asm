@@ -15,7 +15,7 @@
 .export SwapPRG_L, SwapPRG
 .export CoordToNTAddr, lut_ScreenRowLo, lut_ScreenRowHi
 .export DrawCursor, UpdateSprites, VerifyChecksum
-.export lut_NES_to_C64, lut_OWTileColors, lut_OWMetatileColors
+.export lut_NES_to_C64, lut_OWMetatileColors
 .export LoadPrice
 
 .import EnterIntroStory, EnterTitleScreen, NewGamePartyGeneration, EnterMainMenu
@@ -969,47 +969,6 @@ lut_OWMetatileColors:
     .byte $0E, $0E, $0F, $0F, $0A, $0B, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $50-$5F
     .byte $0A, $0A, $0B, $0B, $0F, $0F, $0D, $0D, $0D, $0D, $0D, $09, $0D, $09, $0D, $09  ; $60-$6F
     .byte $0A, $0A, $0B, $0B, $0F, $0F, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $70-$7F
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;;  lut_OWTileColors
-;;
-;;  Lookup table mapping each of the 256 Overworld 8x8 character tiles ($00-$FF)
-;;  to its corresponding MultiColor Color RAM nybble ($08-$0F with bit 3 set).
-;;
-;;  Tile Ranges:
-;;    $00-$1F (  0- 31): $09 (White)       - Mountains
-;;    $20-$3A ( 32- 58): $0D (Green)       - Terrain / grass / paths
-;;    $3B-$61 ( 59- 97): $0E (Blue)        - Water / rivers / sea
-;;    $62-$68 ( 98-104): $0A (Red / Brown) - Bridges / dirt
-;;    $69-$6A (105-106): $0E (Blue)        - Waterfall
-;;    $6B-$72 (107-114): $0B (Cyan)        - Marsh / swamp
-;;    $73-$7B (115-123): $0F (Yellow)      - Desert tower
-;;    $7C-$EA (124-234): $09 (White)       - Buildings / castles / towns
-;;    $EB-$F3 (235-243): $0F (Yellow)      - Desert sands
-;;    $F4-$FF (244-255): $09 (White)       - Docks / structures
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-lut_OWTileColors:
-    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $00-$0F
-    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $10-$1F
-    .byte $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D  ; $20-$2F
-    .byte $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0E, $0E, $0E, $0E, $0E  ; $30-$3F
-    .byte $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E  ; $40-$4F
-    .byte $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E, $0E  ; $50-$5F
-    .byte $0E, $0E, $0A, $0A, $0A, $0A, $0A, $0A, $0A, $0E, $0E, $0B, $0B, $0B, $0B, $0B  ; $60-$6F
-    .byte $0B, $0B, $0B, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $09, $09, $09, $09  ; $70-$7F
-    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $80-$8F
-    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $90-$9F
-    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $A0-$AF
-    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $B0-$BF
-    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $C0-$CF
-    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $D0-$DF
-    .byte $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $0F, $0F, $0F, $0F, $0F  ; $E0-$EF
-    .byte $0F, $0F, $0F, $0F, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $F0-$FF
 
 
 
@@ -2319,18 +2278,18 @@ LoadBattleBGCHRAndPalettes:
     LDA #BANK_OWINFO              ; Swap back to Bank 0 to read palette
     JSR SwapPRG_L
 
-    LDA lut_BackdropPal+0, X
+    LDA lut_BtlBackdropPalettes+0, X
     STA cur_pal+0
     STA BGCOL0                    ; $D021 = Background Color 0 (%00)
-    LDA lut_BackdropPal+1, X
+    LDA lut_BtlBackdropPalettes+1, X
     STA cur_pal+1
     STA BGCOL1                    ; $D022 = Background Color 1 (%01)
-    LDA lut_BackdropPal+2, X
+    LDA lut_BtlBackdropPalettes+2, X
     STA cur_pal+2
     STA BGCOL2                    ; $D023 = Background Color 2 (%10)
 
     ; Color 3 goes to Color RAM ($D800) and cur_pal+3
-    LDA lut_BackdropPal+3, X
+    LDA lut_BtlBackdropPalettes+3, X
     STA cur_pal+3
     ORA #$08                      ; Bit 3 = 1 enables MultiColor mode for character cell
     STA tmp+2
@@ -2530,7 +2489,8 @@ LoadBatSprCHRPalettes:
     CPY #128
     BNE @CopySprite
 
-    ; Copy 1536 bytes (6 pages = 24 blocks) of Hero Sprites from lut_HeroSprites to $5880
+    ; Copy Pose 0 (192 bytes = 3 sprites) for each of the 6 classes from lut_HeroSprites
+    ; In lut_HeroSprites, each class has 18 sprites = 1152 ($0480) bytes.
     LDA #<lut_HeroSprites
     STA tmp
     LDA #>lut_HeroSprites
@@ -2541,24 +2501,36 @@ LoadBatSprCHRPalettes:
     LDA #>$5880
     STA chr_dest+1
 
-    LDX #6                     ; 6 pages = 1536 bytes ($0600)
+    LDX #0                     ; 6 classes
+@CopyHeroClass:
     LDY #0
-@CopyHeroes:
+@CopyPose0:
     LDA (tmp), Y
     STA (chr_dest), Y
     INY
-    BNE @CopyHeroes
-    INC tmp+1
-    INC chr_dest+1
-    DEX
-    BNE @CopyHeroes
+    CPY #192                   ; 3 sprites * 64 bytes = 192 bytes
+    BNE @CopyPose0
 
-    ; Load 16-byte battle/menu sprite palette into cur_pal + $10..$1F
-    LDX #$0F
-:   LDA lut_BattleSpritePalettes, X
-    STA cur_pal + $10, X
-    DEX
-    BPL :-
+    ; Advance chr_dest by 192 bytes ($00C0)
+    LDA chr_dest
+    CLC
+    ADC #192
+    STA chr_dest
+    BCC :+
+    INC chr_dest+1
+:
+    ; Advance tmp by 1152 bytes ($0480) to next class in lut_HeroSprites
+    LDA tmp
+    CLC
+    ADC #<$0480
+    STA tmp
+    LDA tmp+1
+    ADC #>$0480
+    STA tmp+1
+
+    INX
+    CPX #6
+    BNE @CopyHeroClass
 
     ; Set global Sprite Multicolor registers according to user specs:
     ; Background is 00 (transparent / black $D021)
@@ -2573,9 +2545,6 @@ LoadBatSprCHRPalettes:
     LDA #BANK_INTRO
     JSR SwapPRG_L
     RTS
-
-lut_BattleSpritePalettes:
-    .byte $0F,$28,$18,$21,  $0F,$16,$30,$36,   $0F,$30,$22,$12,  $0F,$30,$10,$00
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -2814,17 +2783,13 @@ PartyGen_IRQ:
 
     lda spr_irq_zone
     beq @Zone0
-    cmp #1
-    beq @Zone1
-    cmp #2
-    beq @Zone2
-    jmp @Zone3
+    jmp @Zone1
 
 @Zone0:
     inc vblank_count           ; Increment frame counter once per frame on VBlank
 
-    jsr SetupHero0_Upper
-    jsr SetupHero1_Upper
+    jsr SetupHero0
+    jsr SetupHero1
 
     ; Common VIC-II configuration for sprites
     lda #$00
@@ -2832,8 +2797,6 @@ PartyGen_IRQ:
     sta XEXP                   ; No X expansion
     sta YEXP                   ; No Y expansion
     sta SPBGPR                 ; In front of BG
-    lda #$FF
-    sta SPENA                  ; Enable all 8 sprites
 
     lda char_index
     cmp #$20
@@ -2841,9 +2804,19 @@ PartyGen_IRQ:
 
     ; Cursor is in Top Half (Hero 0 or Hero 1)
     jsr SetupCursor
+    lda #$FF                   ; Enable all 8 sprites (Heroes 0-5 + Cursor 6-7)
+    sta SPENA
+    jmp @ArmZone1
 
-    ; Arm next split at Scanline 100 for Feet
-    lda #100
+@TopNoCursor:
+    lda #%00111111             ; Enable Sprites 0-5 (heroes only)
+    sta SPENA
+    lda #$00
+    sta SPMC
+
+@ArmZone1:
+    ; Arm next split at Scanline 145 for Bottom Half
+    lda #145
     sta RASTER
     lda SCROLY
     and #$7F                   ; Raster bit 8 = 0
@@ -2852,37 +2825,10 @@ PartyGen_IRQ:
     sta spr_irq_zone
     jmp $FEBC
 
-@TopNoCursor:
-    jsr SetupHero01_Feet
-
-    ; Arm next split at Scanline 145 for Bottom Half
-    lda #145
-    sta RASTER
-    lda SCROLY
-    and #$7F                   ; Raster bit 8 = 0
-    sta SCROLY
-    lda #2
-    sta spr_irq_zone
-    jmp $FEBC
-
 @Zone1:
-    ; Scanline 100: Cursor top finished, set up Feet for Hero 0 & 1
-    jsr SetupHero01_Feet
-
-    ; Arm next split at Scanline 145 for Bottom Half
-    lda #145
-    sta RASTER
-    lda SCROLY
-    and #$7F                   ; Raster bit 8 = 0
-    sta SCROLY
-    lda #2
-    sta spr_irq_zone
-    jmp $FEBC
-
-@Zone2:
     ; Scanline 145: Bottom Half (Hero 2 & 3)
-    jsr SetupHero2_Upper
-    jsr SetupHero3_Upper
+    jsr SetupHero2
+    jsr SetupHero3
 
     lda char_index
     cmp #$20
@@ -2890,34 +2836,17 @@ PartyGen_IRQ:
 
     ; Cursor is in Bottom Half (Hero 2 or Hero 3)
     jsr SetupCursor
-
-    ; Arm next split at Scanline 204 for Feet
-    lda #204
-    sta RASTER
-    lda SCROLY
-    and #$7F                   ; Raster bit 8 = 0
-    sta SCROLY
-    lda #3
-    sta spr_irq_zone
-    jmp $FEBC
+    lda #$FF                   ; Enable all 8 sprites
+    sta SPENA
+    jmp @ArmZone0
 
 @BottomNoCursor:
-    jsr SetupHero23_Feet
+    lda #%00111111             ; Enable Sprites 0-5 (heroes only)
+    sta SPENA
+    lda #$00
+    sta SPMC
 
-    ; Arm next split at Scanline 250 for VBlank
-    lda #250
-    sta RASTER
-    lda SCROLY
-    and #$7F                   ; Raster bit 8 = 0
-    sta SCROLY
-    lda #0
-    sta spr_irq_zone
-    jmp $FEBC
-
-@Zone3:
-    ; Scanline 204: Cursor bottom finished, set up Feet for Hero 2 & 3
-    jsr SetupHero23_Feet
-
+@ArmZone0:
     ; Arm next split at Scanline 250 for VBlank
     lda #250
     sta RASTER
@@ -2931,341 +2860,225 @@ PartyGen_IRQ:
 SetupCursor:
     ldx char_index
     lda ptygen_curs_x, x
-    sta SP1X
-    sta SP5X
+    sta SP6X
+    sta SP7X
     lda ptygen_curs_y, x
-    sta SP1Y
-    sta SP5Y
+    sta SP6Y
+    sta SP7Y
     lda #BLOCK_FINGER_OVERLAY   ; Block 97 (Hi-Res Overlay, White)
-    sta $43F9                  ; Sprite 1 pointer
+    sta $43FE                  ; Sprite 6 pointer
     lda #COLOR_WHITE
-    sta SP1COL
+    sta SP6COL
     lda #BLOCK_FINGER_BASE      ; Block 96 (Multicolor Base, White + Greys)
-    sta $43FD                  ; Sprite 5 pointer
+    sta $43FF                  ; Sprite 7 pointer
     lda #COLOR_WHITE
-    sta SP5COL
-    lda #%00100000             ; Sprite 5 Multicolor, Sprite 1 Hi-Res
+    sta SP7COL
+    lda #%10000000             ; Sprite 7 Multicolor, Sprite 6 Hi-Res
     sta SPMC
     rts
 
-SetupHero0_Upper:
+SetupHero0:
     ldx ptygen+0
+    cpx #6
+    bcc :+
+    ldx #0
+:   lda lut_ClassSpriteBase, x
+    sta $43F8                  ; Sprite 0 pointer (Layer 0)
+    clc
+    adc #1
+    sta $43F9                  ; Sprite 1 pointer (Layer 1)
+    adc #1
+    sta $43FA                  ; Sprite 2 pointer (Layer 2)
+
     txa
     asl a
-    asl a                      ; A = class * 4
+    stx tmp
+    clc
+    adc tmp                    ; A = X * 3
     tay
 
-    ; Layer 0: Body (Y = 90, X = 120)
-    lda #120
-    sta SP0X
-    lda #90
-    sta SP0Y
-    tya
-    clc
-    adc #BLOCK_HERO_BASE
-    sta $43F8
-    lda lut_ClassColors, y
+    lda lut_ClassColors + 0, y
     sta SP0COL
-
-    ; Layer 2: Skin/Accents (Y = 90 + dY, X = 120)
-    lda #120
-    sta SP2X
-    lda #90
-    clc
-    adc lut_Class_dY + 2, y
-    sta SP2Y
-    tya
-    clc
-    adc #(BLOCK_HERO_BASE + 2)
-    sta $43FA
+    lda lut_ClassColors + 1, y
+    sta SP1COL
     lda lut_ClassColors + 2, y
     sta SP2COL
 
-    ; Layer 3: Hilight/Secondary (Y = 90, X = 120)
-    lda #120
-    sta SP3X
-    lda #90
-    sta SP3Y
-    tya
-    clc
-    adc #(BLOCK_HERO_BASE + 3)
-    sta $43FB
-    lda lut_ClassColors + 3, y
-    sta SP3COL
-    rts
-
-SetupHero1_Upper:
-    ldx ptygen+$10
-    txa
-    asl a
-    asl a
-    tay
-
-    ; Layer 0: Body (Y = 90, X = 232)
-    lda #232
-    sta SP4X
-    lda #90
-    sta SP4Y
-    tya
-    clc
-    adc #BLOCK_HERO_BASE
-    sta $43FC
-    lda lut_ClassColors, y
-    sta SP4COL
-
-    ; Layer 2: Skin/Accents (Y = 90 + dY, X = 232)
-    lda #232
-    sta SP6X
-    lda #90
-    clc
-    adc lut_Class_dY + 2, y
-    sta SP6Y
-    tya
-    clc
-    adc #(BLOCK_HERO_BASE + 2)
-    sta $43FE
-    lda lut_ClassColors + 2, y
-    sta SP6COL
-
-    ; Layer 3: Hilight/Secondary (Y = 90, X = 232)
-    lda #232
-    sta SP7X
-    lda #90
-    sta SP7Y
-    tya
-    clc
-    adc #(BLOCK_HERO_BASE + 3)
-    sta $43FF
-    lda lut_ClassColors + 3, y
-    sta SP7COL
-    rts
-
-SetupHero01_Feet:
-    ; Sprite 1: Hero 0 Feet (Y = 111, X = 120)
-    lda #120
-    sta SP1X
-    lda #111
-    sta SP1Y
-    ldx ptygen+0
-    txa
-    asl a
-    asl a
-    tay
-    clc
-    adc #(BLOCK_HERO_BASE + 1)
-    sta $43F9
-    lda lut_ClassColors + 1, y
-    sta SP1COL
-
-    ; Sprite 5: Hero 1 Feet (Y = 111, X = 232)
-    lda #232
-    sta SP5X
-    lda #111
-    sta SP5Y
-    ldx ptygen+$10
-    txa
-    asl a
-    asl a
-    tay
-    clc
-    adc #(BLOCK_HERO_BASE + 1)
-    sta $43FD
-    lda lut_ClassColors + 1, y
-    sta SP5COL
-
-    lda #$00                   ; All Hi-Res
-    sta SPMC
-    rts
-
-SetupHero2_Upper:
-    ldx ptygen+$20
-    txa
-    asl a
-    asl a
-    tay
-
-    ; Layer 0: Body (Y = 194, X = 120)
     lda #120
     sta SP0X
-    lda #194
-    sta SP0Y
-    tya
-    clc
-    adc #BLOCK_HERO_BASE
-    sta $43F8
-    lda lut_ClassColors, y
-    sta SP0COL
-
-    ; Layer 2: Skin/Accents (Y = 194 + dY, X = 120)
-    lda #120
+    sta SP1X
     sta SP2X
-    lda #194
-    clc
-    adc lut_Class_dY + 2, y
+
+    lda #94
+    sta SP0Y
+    sta SP1Y
     sta SP2Y
-    tya
+    rts
+
+SetupHero1:
+    ldx ptygen+$10
+    cpx #6
+    bcc :+
+    ldx #0
+:   lda lut_ClassSpriteBase, x
+    sta $43FB                  ; Sprite 3 pointer (Layer 0)
     clc
-    adc #(BLOCK_HERO_BASE + 2)
-    sta $43FA
+    adc #1
+    sta $43FC                  ; Sprite 4 pointer (Layer 1)
+    adc #1
+    sta $43FD                  ; Sprite 5 pointer (Layer 2)
+
+    txa
+    asl a
+    stx tmp
+    clc
+    adc tmp                    ; A = X * 3
+    tay
+
+    lda lut_ClassColors + 0, y
+    sta SP3COL
+    lda lut_ClassColors + 1, y
+    sta SP4COL
+    lda lut_ClassColors + 2, y
+    sta SP5COL
+
+    lda #232
+    sta SP3X
+    sta SP4X
+    sta SP5X
+
+    lda #94
+    sta SP3Y
+    sta SP4Y
+    sta SP5Y
+    rts
+
+SetupHero2:
+    ldx ptygen+$20
+    cpx #6
+    bcc :+
+    ldx #0
+:   lda lut_ClassSpriteBase, x
+    sta $43F8                  ; Sprite 0 pointer (Layer 0)
+    clc
+    adc #1
+    sta $43F9                  ; Sprite 1 pointer (Layer 1)
+    adc #1
+    sta $43FA                  ; Sprite 2 pointer (Layer 2)
+
+    txa
+    asl a
+    stx tmp
+    clc
+    adc tmp                    ; A = X * 3
+    tay
+
+    lda lut_ClassColors + 0, y
+    sta SP0COL
+    lda lut_ClassColors + 1, y
+    sta SP1COL
     lda lut_ClassColors + 2, y
     sta SP2COL
 
-    ; Layer 3: Hilight/Secondary (Y = 194, X = 120)
     lda #120
-    sta SP3X
-    lda #194
-    sta SP3Y
-    tya
-    clc
-    adc #(BLOCK_HERO_BASE + 3)
-    sta $43FB
-    lda lut_ClassColors + 3, y
-    sta SP3COL
-    rts
-
-SetupHero3_Upper:
-    ldx ptygen+$30
-    txa
-    asl a
-    asl a
-    tay
-
-    ; Layer 0: Body (Y = 194, X = 232)
-    lda #232
-    sta SP4X
-    lda #194
-    sta SP4Y
-    tya
-    clc
-    adc #BLOCK_HERO_BASE
-    sta $43FC
-    lda lut_ClassColors, y
-    sta SP4COL
-
-    ; Layer 2: Skin/Accents (Y = 194 + dY, X = 232)
-    lda #232
-    sta SP6X
-    lda #194
-    clc
-    adc lut_Class_dY + 2, y
-    sta SP6Y
-    tya
-    clc
-    adc #(BLOCK_HERO_BASE + 2)
-    sta $43FE
-    lda lut_ClassColors + 2, y
-    sta SP6COL
-
-    ; Layer 3: Hilight/Secondary (Y = 194, X = 232)
-    lda #232
-    sta SP7X
-    lda #194
-    sta SP7Y
-    tya
-    clc
-    adc #(BLOCK_HERO_BASE + 3)
-    sta $43FF
-    lda lut_ClassColors + 3, y
-    sta SP7COL
-    rts
-
-SetupHero23_Feet:
-    ; Sprite 1: Hero 2 Feet (Y = 215, X = 120)
-    lda #120
+    sta SP0X
     sta SP1X
-    lda #215
-    sta SP1Y
-    ldx ptygen+$20
-    txa
-    asl a
-    asl a
-    tay
-    clc
-    adc #(BLOCK_HERO_BASE + 1)
-    sta $43F9
-    lda lut_ClassColors + 1, y
-    sta SP1COL
+    sta SP2X
 
-    ; Sprite 5: Hero 3 Feet (Y = 215, X = 232)
-    lda #232
-    sta SP5X
-    lda #215
-    sta SP5Y
+    lda #198
+    sta SP0Y
+    sta SP1Y
+    sta SP2Y
+    rts
+
+SetupHero3:
     ldx ptygen+$30
+    cpx #6
+    bcc :+
+    ldx #0
+:   lda lut_ClassSpriteBase, x
+    sta $43FB                  ; Sprite 3 pointer (Layer 0)
+    clc
+    adc #1
+    sta $43FC                  ; Sprite 4 pointer (Layer 1)
+    adc #1
+    sta $43FD                  ; Sprite 5 pointer (Layer 2)
+
     txa
     asl a
-    asl a
-    tay
+    stx tmp
     clc
-    adc #(BLOCK_HERO_BASE + 1)
-    sta $43FD
+    adc tmp                    ; A = X * 3
+    tay
+
+    lda lut_ClassColors + 0, y
+    sta SP3COL
     lda lut_ClassColors + 1, y
+    sta SP4COL
+    lda lut_ClassColors + 2, y
     sta SP5COL
 
-    lda #$00                   ; All Hi-Res
-    sta SPMC
+    lda #232
+    sta SP3X
+    sta SP4X
+    sta SP5X
+
+    lda #198
+    sta SP3Y
+    sta SP4Y
+    sta SP5Y
     rts
+
+.export lut_ClassSpriteBase, lut_ClassColors
+
+lut_ClassSpriteBase:
+    .byte BLOCK_HERO_BASE + (0 * 3)   ; Class 0 (Fighter): Index 0 (Block 98)
+    .byte BLOCK_HERO_BASE + (1 * 3)   ; Class 1 (Thief): Index 1 (Block 101)
+    .byte BLOCK_HERO_BASE + (2 * 3)   ; Class 2 (Black Belt): Index 2 (Block 104)
+    .byte BLOCK_HERO_BASE + (3 * 3)   ; Class 3 (Red Mage): Index 3 (Block 107)
+    .byte BLOCK_HERO_BASE + (5 * 3)   ; Class 4 (White Mage): Index 5 (Block 113)
+    .byte BLOCK_HERO_BASE + (4 * 3)   ; Class 5 (Black Mage): Index 4 (Block 110)
 
 lut_ClassColors:
-    ; Class 0 (Fighter): Red, Red/Brown, Peach, Light Grey
-    .byte COLOR_RED, COLOR_RED, COLOR_PEACH, COLOR_LIGHTGREY
-    ; Class 1 (Thief): Brown, Brown, Peach, Cyan
-    .byte COLOR_ORANGE, COLOR_ORANGE, COLOR_PEACH, COLOR_CYAN
-    ; Class 2 (Black Belt): Cyan, Cyan, Brown, Peach
-    .byte COLOR_CYAN, COLOR_CYAN, COLOR_ORANGE, COLOR_PEACH
-    ; Class 3 (Red Mage): Red, Red, Peach, White
-    .byte COLOR_RED, COLOR_RED, COLOR_PEACH, COLOR_WHITE
-    ; Class 4 (White Mage): White, White, Red, Peach
-    .byte COLOR_WHITE, COLOR_WHITE, COLOR_RED, COLOR_PEACH
-    ; Class 5 (Black Mage): Cyan, Cyan, Yellow, Brown
-    .byte COLOR_CYAN, COLOR_CYAN, COLOR_YELLOW, COLOR_ORANGE
+    ; Class 0 (Fighter): Red, Pink/Peach, White
+    .byte COLOR_RED, COLOR_PEACH, COLOR_WHITE
 
-lut_Class_dY:
-    .byte 0, 21, 0, 0   ; Class 0 (Fighter)
-    .byte 0, 21, 0, 0   ; Class 1 (Thief)
-    .byte 0, 21, 0, 0   ; Class 2 (Black Belt)
-    .byte 0, 21, 0, 0   ; Class 3 (Red Mage)
-    .byte 0, 21, 3, 0   ; Class 4 (White Mage) - dY=+3 on Layer 2!
-    .byte 0, 21, 0, 0   ; Class 5 (Black Mage)
+    ; Class 1 (Thief): Brown, Pink/Peach, Cyan
+    .byte COLOR_BROWN, COLOR_PEACH, COLOR_CYAN
+
+    ; Class 2 (Black Belt): Brown, Pink/Peach, Cyan
+    .byte COLOR_BROWN, COLOR_PEACH, COLOR_CYAN
+
+    ; Class 3 (Red Mage): Red, Pink/Peach, White
+    .byte COLOR_RED, COLOR_PEACH, COLOR_WHITE
+
+    ; Class 4 (White Mage): Red, Pink/Peach, White
+    .byte COLOR_RED, COLOR_PEACH, COLOR_WHITE
+
+    ; Class 5 (Black Mage): Yellow, Brown, Cyan
+    .byte COLOR_YELLOW, COLOR_BROWN, COLOR_CYAN
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  MainMenu_IRQ - Multi-Zone Raster Multiplexer for Main Menu
+;;  MainMenu_IRQ - 2-Zone Raster Multiplexer for Main Menu
 ;;
 ;;  Zone 0 (Scanline 250 / VBlank -> Scanline 135):
-;;    Physical Sprites 0-3: Hero 0 (Box 1, Top-Left: X = 168, Upper Y = 66, Feet Y = 87)
-;;    Physical Sprites 4-7: Hero 1 (Box 2, Top-Right: X = 280, Upper Y = 66, Feet Y = 87)
-;;    If SubTarget cursor on Hero 0 or 1:
-;;      Physical Sprites 1 & 5: Finger Cursor at X = 104 or 216, Y = 74
-;;      Split at Scanline 86 switches Sprites 0 & 4 to Hero 0 & 1 Feet at Y = 87!
+;;    Physical Sprites 0-2: Hero 0 (Box 1, Top-Left: X = 192, Y = 66)
+;;    Physical Sprites 3-5: Hero 1 (Box 2, Top-Right: X = 280, Y = 66)
+;;    Physical Sprites 6-7: Finger Cursor (if SubTarget on Hero 0 or 1)
 ;;
-;;  Zone 1 (Scanline 135 -> Scanline 174):
-;;    Physical Sprites 0, 2, 3: Hero 2 Upper Body at X = 168, Y = 154
-;;    Physical Sprites 4, 6, 7: Hero 3 Upper Body at X = 280, Y = 154
-;;    Physical Sprites 1 & 5: Finger Cursor
-;;      If Option Box (menu_cursor_mode == 0): X = 32, Y from lut_MMOptionCursor_Y
-;;      If SubTarget on Hero 2 or 3: X = 104 or 216, Y = 162
-;;
-;;  Zone 2 (Scanline 174 -> Scanline 250):
-;;    Upper bodies for Hero 2 & 3 completed at line 174.
-;;    Physical Sprite 0: Hero 2 Feet at X = 168, Y = 175
-;;    Physical Sprite 4: Hero 3 Feet at X = 280, Y = 175
-;;    Physical Sprites 1 & 5 continue displaying the Finger Cursor!
+;;  Zone 1 (Scanline 135 -> Scanline 250):
+;;    Physical Sprites 0-2: Hero 2 (Box 3, Bottom-Left: X = 192, Y = 162)
+;;    Physical Sprites 3-5: Hero 3 (Box 4, Bottom-Right: X = 280, Y = 162)
+;;    Physical Sprites 6-7: Finger Cursor
+;;      - Option Box: X = 52, Y from lut_MMOptionCursor_Y
+;;      - SubTarget on Hero 2 or 3: X = 136 or 224, Y = 154
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 lut_MMOptionCursor_Y:
     .byte 194, 202, 210, 218, 226
-
-mm_h0_feet_ptr: .byte 0
-mm_h0_feet_col: .byte 0
-mm_h1_feet_ptr: .byte 0
-mm_h1_feet_col: .byte 0
-mm_h2_feet_ptr: .byte 0
-mm_h2_feet_col: .byte 0
-mm_h3_feet_ptr: .byte 0
-mm_h3_feet_col: .byte 0
 
 MainMenu_IRQ:
     lda #$01
@@ -3273,13 +3086,7 @@ MainMenu_IRQ:
 
     lda spr_irq_zone
     beq @Zone0
-    cmp #1
-    bne :+
     jmp @Zone1
-:   cmp #2
-    bne :+
-    jmp @Zone2
-:   jmp @Zone3
 
 @Zone0:
     inc vblank_count
@@ -3296,97 +3103,51 @@ MainMenu_IRQ:
     ; Check if SubTarget cursor is on Hero 0 or 1
     lda menu_cursor_mode
     cmp #1
-    bne @ArmZone1
+    bne @NoZone0Cursor
     lda menu_cursor_index
     cmp #2
-    bcs @ArmZone1
+    bcs @NoZone0Cursor
 
     ; SubTarget cursor in Zone 0
-    ldx #136                   ; Hero 0 cursor X (col 14)
+    ldx #136                   ; Hero 0 cursor X
     lda menu_cursor_index
     beq :+
-    ldx #224                   ; Hero 1 cursor X (col 25)
-:   stx SP1X
-    stx SP5X
-    lda #58                    ; Points directly to character name (row 1)
-    sta SP1Y
-    sta SP5Y
+    ldx #224                   ; Hero 1 cursor X
+:   stx SP6X
+    stx SP7X
+    lda #58                    ; Points directly to character name
+    sta SP6Y
+    sta SP7Y
 
     lda MSIGX
-    and #%11011101
+    and #%00111111             ; Clear MSB for Sprites 6 & 7 (X < 256)
     sta MSIGX
 
     lda #BLOCK_FINGER_OVERLAY
-    sta $43F9
+    sta $43FE
     lda #COLOR_WHITE
-    sta SP1COL
+    sta SP6COL
 
     lda #BLOCK_FINGER_BASE
-    sta $43FD
+    sta $43FF
     lda #COLOR_WHITE
-    sta SP5COL
+    sta SP7COL
 
     lda SPMC
-    ora #%00100000
+    ora #%10000000             ; Sprite 7 is MultiColor
     sta SPMC
 
     lda SPENA
-    ora #%00100010
+    ora #%11000000             ; Enable Sprites 6 & 7
+    sta SPENA
+    jmp @ArmZone1
+
+@NoZone0Cursor:
+    lda SPENA
+    and #%00111111             ; Disable cursor sprites in Zone 0
     sta SPENA
 
-    ; Arm split at line 80 to switch Sprites 1 & 5 to Hero 0 & 1 Feet at line 87
-    lda #80
-    sta RASTER
-    lda SCROLY
-    and #$7F
-    sta SCROLY
-    lda #3                     ; Zone 3: Upper heroes feet split
-    sta spr_irq_zone
-    jmp $FEBC
-
 @ArmZone1:
-    lda #135
-    sta RASTER
-    lda SCROLY
-    and #$7F
-    sta SCROLY
-    lda #1
-    sta spr_irq_zone
-    jmp $FEBC
-
-@Zone3:
-    ; Scanline 74: Switch Sprite 1 to Hero 0 Feet, Sprite 5 to Hero 1 Feet
-    lda ch_ailments + 0
-    cmp #$01
-    beq :+
-    lda #192                   ; Restore Hero 0 X
-    sta SP1X
-    lda #87
-    sta SP1Y
-    lda mm_h0_feet_ptr
-    sta $43F9
-    lda mm_h0_feet_col
-    sta SP1COL
-:
-    lda ch_ailments + $40
-    cmp #$01
-    beq :+
-    lda #24                    ; Restore Hero 1 X
-    sta SP5X
-    lda MSIGX
-    ora #%00100000             ; Restore MSB for Sprite 5 (X=280)
-    sta MSIGX
-    lda #87
-    sta SP5Y
-    lda mm_h1_feet_ptr
-    sta $43FD
-    lda mm_h1_feet_col
-    sta SP5COL
-:
-    lda SPMC
-    and #%11011101
-    sta SPMC
-
     lda #135
     sta RASTER
     lda SCROLY
@@ -3407,152 +3168,90 @@ MainMenu_IRQ:
     jsr SetupMMHero3
 
     lda menu_cursor_mode
-    beq @OptionBoxZone1
     cmp #1
-    beq @SubTargetLowerZone1
-    jmp @ArmZone0Direct
+    beq @Zone1_SubTarget
 
-@OptionBoxZone1:
-    ; Normal Option Mode:
-    ; Hero 2 & 3 upper bodies run scanlines 162..182 on Sprites 0,2,3,4,6,7.
-    ; Hero 2 & 3 feet run scanlines 183..203 on Sprites 1,5.
-    ; Upper bodies finish at 182!
-    ; Arm Zone 2 at scanline 185 to configure Sprite 0 & 4 as Option Cursor!
-    lda #185
-    sta RASTER
-    lda SCROLY
-    and #$7F
-    sta SCROLY
-    lda #2
-    sta spr_irq_zone
-    jmp $FEBC
-
-@SubTargetLowerZone1:
-    lda menu_cursor_index
-    cmp #2
-    bcs :+
-    jmp @ArmZone0Direct
-:
-    ldx #136                   ; Hero 2 cursor X (col 14)
-    cmp #2
-    beq :+
-    ldx #224                   ; Hero 3 cursor X (col 25)
-:   stx SP1X
-    stx SP5X
-    lda #154                   ; Points directly to character name (row 13)
-    sta SP1Y
-    sta SP5Y
-
-    lda MSIGX
-    and #%11011101
-    sta MSIGX
-
-    lda #BLOCK_FINGER_OVERLAY
-    sta $43F9
-    lda #COLOR_WHITE
-    sta SP1COL
-
-    lda #BLOCK_FINGER_BASE
-    sta $43FD
-    lda #COLOR_WHITE
-    sta SP5COL
-
-    lda SPMC
-    ora #%00100000
-    sta SPMC
-
-    lda SPENA
-    ora #%00100010
-    sta SPENA
-
-    ; Arm split at line 176 to switch Sprites 1 & 5 to Hero 2 & 3 feet at line 183
-    lda #176
-    sta RASTER
-    lda SCROLY
-    and #$7F
-    sta SCROLY
-    lda #2
-    sta spr_irq_zone
-    jmp $FEBC
-
-@Zone2:
-    lda menu_cursor_mode
-    cmp #1
-    beq @Zone2_SubTarget
-
-    ; Option Box Cursor in Zone 2!
-    ; Sprites 0 and 4 are free (Hero 2 & 3 upper bodies finished at 182).
-    ; Sprites 1 and 5 (Hero 2 & 3 feet) continue rendering scanlines 183..203.
+    ; Option Box Cursor in Zone 1!
     lda #52
-    sta SP0X
-    sta SP4X
+    sta SP6X
+    sta SP7X
 
     ldx menu_cursor_index
     cpx #5
     bcc :+
     ldx #0
 :   lda lut_MMOptionCursor_Y, x
-    sta SP0Y
-    sta SP4Y
+    sta SP6Y
+    sta SP7Y
 
     lda MSIGX
-    and #%11101110             ; Clear bit 0 and bit 4 (X=48 < 256)
+    and #%00111111             ; Clear MSB for Sprites 6 & 7
     sta MSIGX
 
     lda #BLOCK_FINGER_OVERLAY
-    sta $43F8                  ; Sprite 0 = Overlay
+    sta $43FE                  ; Sprite 6 = Overlay
     lda #COLOR_WHITE
-    sta SP0COL
+    sta SP6COL
 
     lda #BLOCK_FINGER_BASE
-    sta $43FC                  ; Sprite 4 = Base
+    sta $43FF                  ; Sprite 7 = Base
     lda #COLOR_WHITE
-    sta SP4COL
+    sta SP7COL
 
     lda SPMC
-    ora #%00010000             ; Sprite 4 is MultiColor
-    and #%11111110             ; Sprite 0 is Hi-Res
+    ora #%10000000             ; Sprite 7 is MultiColor
     sta SPMC
 
-    ; Enable SP0 (cursor), SP1 (hero 2 feet), SP4 (cursor), SP5 (hero 3 feet)
-    lda #%00110011
+    lda SPENA
+    ora #%11000000             ; Enable Sprites 6 & 7
     sta SPENA
-    jmp @ArmZone0Direct
+    jmp @ArmZone0
 
-@Zone2_SubTarget:
-    ; Switch Sprite 1 to Hero 2 feet, Sprite 5 to Hero 3 feet
-    lda ch_ailments + $80
-    cmp #$01
+@Zone1_SubTarget:
+    lda menu_cursor_index
+    cmp #2
+    bcc @NoZone1Cursor
+
+    ldx #136                   ; Hero 2 cursor X
+    lda menu_cursor_index
+    cmp #2
     beq :+
-    lda #192                   ; Restore Hero 2 X
-    sta SP1X
-    lda #183
-    sta SP1Y
-    lda mm_h2_feet_ptr
-    sta $43F9
-    lda mm_h2_feet_col
-    sta SP1COL
-:
-    lda ch_ailments + $C0
-    cmp #$01
-    beq :+
-    lda #24                    ; Restore Hero 3 X
-    sta SP5X
+    ldx #224                   ; Hero 3 cursor X
+:   stx SP6X
+    stx SP7X
+    lda #154                   ; Points to Hero 2/3 name
+    sta SP6Y
+    sta SP7Y
+
     lda MSIGX
-    ora #%00100000             ; Restore MSB for Sprite 5 (X=280)
+    and #%00111111
     sta MSIGX
-    lda #183
-    sta SP5Y
-    lda mm_h3_feet_ptr
-    sta $43FD
-    lda mm_h3_feet_col
-    sta SP5COL
-:
+
+    lda #BLOCK_FINGER_OVERLAY
+    sta $43FE
+    lda #COLOR_WHITE
+    sta SP6COL
+
+    lda #BLOCK_FINGER_BASE
+    sta $43FF
+    lda #COLOR_WHITE
+    sta SP7COL
+
     lda SPMC
-    and #%11011101
+    ora #%10000000
     sta SPMC
 
-@ArmZone0Direct:
+    lda SPENA
+    ora #%11000000
+    sta SPENA
+    jmp @ArmZone0
+
+@NoZone1Cursor:
+    lda SPENA
+    and #%00111111
+    sta SPENA
+
+@ArmZone0:
     lda #250
     sta RASTER
     lda SCROLY
@@ -3567,76 +3266,63 @@ SetupMMHero0:
     cmp #$01
     bne @Alive
     lda SPENA
-    and #%11110000
+    and #%11111000             ; Disable Sprites 0, 1, 2
     sta SPENA
     rts
 @Alive:
     lda SPENA
-    ora #%00001111
+    ora #%00000111             ; Enable Sprites 0, 1, 2
     sta SPENA
 
     lda MSIGX
-    and #%11110000
+    and #%11111000
     sta MSIGX
 
     lda #192
     sta SP0X
     sta SP1X
     sta SP2X
-    sta SP3X
 
-    lda #66
+    lda #70
     sta SP0Y
-    sta SP3Y
-    lda #87
     sta SP1Y
+    sta SP2Y
 
     lda ch_class + 0
     cmp #6
     bcc :+
     sbc #6
-:   asl a
-    asl a
-    tay
-
-    lda #66
-    clc
-    adc lut_Class_dY + 2, y
-    sta SP2Y
-
-    tya
-    clc
-    adc #BLOCK_HERO_BASE
+:   tax
+    lda lut_ClassSpriteBase, x
     sta $43F8
-    tax
-    inx
-    stx $43F9
-    stx mm_h0_feet_ptr
-    inx
-    stx $43FA
-    inx
-    stx $43FB
+    clc
+    adc #1
+    sta $43F9
+    adc #1
+    sta $43FA
+
+    txa
+    asl a
+    stx tmp
+    clc
+    adc tmp                    ; A = X * 3
+    tay
 
     lda ch_ailments + 0
     cmp #$02
     beq @Stone
-    lda lut_ClassColors, y
+    lda lut_ClassColors + 0, y
     sta SP0COL
     lda lut_ClassColors + 1, y
     sta SP1COL
-    sta mm_h0_feet_col
     lda lut_ClassColors + 2, y
     sta SP2COL
-    lda lut_ClassColors + 3, y
-    sta SP3COL
     rts
 @Stone:
     lda #COLOR_DARKGREY
     sta SP0COL
     sta SP1COL
-    sta mm_h0_feet_col
     sta SP2COL
-    sta SP3COL
     rts
 
 SetupMMHero1:
@@ -3644,76 +3330,63 @@ SetupMMHero1:
     cmp #$01
     bne @Alive
     lda SPENA
-    and #%00001111
+    and #%11000111             ; Disable Sprites 3, 4, 5
     sta SPENA
     rts
 @Alive:
     lda SPENA
-    ora #%11110000
+    ora #%00111000             ; Enable Sprites 3, 4, 5
     sta SPENA
 
     lda MSIGX
-    ora #%11110000
+    ora #%00111000             ; X=280 -> MSB set for Sprites 3, 4, 5
     sta MSIGX
 
     lda #24
+    sta SP3X
     sta SP4X
     sta SP5X
-    sta SP6X
-    sta SP7X
 
-    lda #66
+    lda #70
+    sta SP3Y
     sta SP4Y
-    sta SP7Y
-    lda #87
     sta SP5Y
 
     lda ch_class + $40
     cmp #6
     bcc :+
     sbc #6
-:   asl a
-    asl a
-    tay
-
-    lda #66
+:   tax
+    lda lut_ClassSpriteBase, x
+    sta $43FB
     clc
-    adc lut_Class_dY + 2, y
-    sta SP6Y
-
-    tya
-    clc
-    adc #BLOCK_HERO_BASE
+    adc #1
     sta $43FC
-    tax
-    inx
-    stx $43FD
-    stx mm_h1_feet_ptr
-    inx
-    stx $43FE
-    inx
-    stx $43FF
+    adc #1
+    sta $43FD
+
+    txa
+    asl a
+    stx tmp
+    clc
+    adc tmp
+    tay
 
     lda ch_ailments + $40
     cmp #$02
     beq @Stone
-    lda lut_ClassColors, y
-    sta SP4COL
+    lda lut_ClassColors + 0, y
+    sta SP3COL
     lda lut_ClassColors + 1, y
-    sta SP5COL
-    sta mm_h1_feet_col
+    sta SP4COL
     lda lut_ClassColors + 2, y
-    sta SP6COL
-    lda lut_ClassColors + 3, y
-    sta SP7COL
+    sta SP5COL
     rts
 @Stone:
     lda #COLOR_DARKGREY
+    sta SP3COL
     sta SP4COL
     sta SP5COL
-    sta mm_h1_feet_col
-    sta SP6COL
-    sta SP7COL
     rts
 
 SetupMMHero2:
@@ -3721,76 +3394,63 @@ SetupMMHero2:
     cmp #$01
     bne @Alive
     lda SPENA
-    and #%11110000
+    and #%11111000             ; Disable Sprites 0, 1, 2
     sta SPENA
     rts
 @Alive:
     lda SPENA
-    ora #%00001111
+    ora #%00000111             ; Enable Sprites 0, 1, 2
     sta SPENA
 
     lda MSIGX
-    and #%11110000
+    and #%11111000
     sta MSIGX
 
     lda #192
     sta SP0X
     sta SP1X
     sta SP2X
-    sta SP3X
 
-    lda #162
+    lda #166
     sta SP0Y
-    sta SP3Y
-    lda #183
     sta SP1Y
+    sta SP2Y
 
     lda ch_class + $80
     cmp #6
     bcc :+
     sbc #6
-:   asl a
-    asl a
-    tay
-
-    lda #162
-    clc
-    adc lut_Class_dY + 2, y
-    sta SP2Y
-
-    tya
-    clc
-    adc #BLOCK_HERO_BASE
+:   tax
+    lda lut_ClassSpriteBase, x
     sta $43F8
-    tax
-    inx
-    stx $43F9
-    stx mm_h2_feet_ptr
-    inx
-    stx $43FA
-    inx
-    stx $43FB
+    clc
+    adc #1
+    sta $43F9
+    adc #1
+    sta $43FA
+
+    txa
+    asl a
+    stx tmp
+    clc
+    adc tmp
+    tay
 
     lda ch_ailments + $80
     cmp #$02
     beq @Stone
-    lda lut_ClassColors, y
+    lda lut_ClassColors + 0, y
     sta SP0COL
     lda lut_ClassColors + 1, y
     sta SP1COL
-    sta mm_h2_feet_col
     lda lut_ClassColors + 2, y
     sta SP2COL
-    lda lut_ClassColors + 3, y
-    sta SP3COL
     rts
 @Stone:
     lda #COLOR_DARKGREY
     sta SP0COL
     sta SP1COL
-    sta mm_h2_feet_col
     sta SP2COL
-    sta SP3COL
     rts
 
 SetupMMHero3:
@@ -3798,76 +3458,63 @@ SetupMMHero3:
     cmp #$01
     bne @Alive
     lda SPENA
-    and #%00001111
+    and #%11000111             ; Disable Sprites 3, 4, 5
     sta SPENA
     rts
 @Alive:
     lda SPENA
-    ora #%11110000
+    ora #%00111000             ; Enable Sprites 3, 4, 5
     sta SPENA
 
     lda MSIGX
-    ora #%11110000
+    ora #%00111000             ; X=280 -> MSB set for Sprites 3, 4, 5
     sta MSIGX
 
     lda #24
+    sta SP3X
     sta SP4X
     sta SP5X
-    sta SP6X
-    sta SP7X
 
-    lda #162
+    lda #166
+    sta SP3Y
     sta SP4Y
-    sta SP7Y
-    lda #183
     sta SP5Y
 
     lda ch_class + $C0
     cmp #6
     bcc :+
     sbc #6
-:   asl a
-    asl a
-    tay
-
-    lda #162
+:   tax
+    lda lut_ClassSpriteBase, x
+    sta $43FB
     clc
-    adc lut_Class_dY + 2, y
-    sta SP6Y
-
-    tya
-    clc
-    adc #BLOCK_HERO_BASE
+    adc #1
     sta $43FC
-    tax
-    inx
-    stx $43FD
-    stx mm_h3_feet_ptr
-    inx
-    stx $43FE
-    inx
-    stx $43FF
+    adc #1
+    sta $43FD
+
+    txa
+    asl a
+    stx tmp
+    clc
+    adc tmp
+    tay
 
     lda ch_ailments + $C0
     cmp #$02
     beq @Stone
-    lda lut_ClassColors, y
-    sta SP4COL
+    lda lut_ClassColors + 0, y
+    sta SP3COL
     lda lut_ClassColors + 1, y
-    sta SP5COL
-    sta mm_h3_feet_col
+    sta SP4COL
     lda lut_ClassColors + 2, y
-    sta SP6COL
-    lda lut_ClassColors + 3, y
-    sta SP7COL
+    sta SP5COL
     rts
 @Stone:
     lda #COLOR_DARKGREY
+    sta SP3COL
     sta SP4COL
     sta SP5COL
-    sta mm_h3_feet_col
-    sta SP6COL
-    sta SP7COL
     rts
 
 
