@@ -15,6 +15,7 @@
 .export SwapPRG_L, SwapPRG
 .export CoordToNTAddr, lut_ScreenRowLo, lut_ScreenRowHi
 .export DrawCursor, UpdateSprites, VerifyChecksum, DrawOBSprite, EraseBox, DoOverworld, DrawItemBox, SortEquipmentList
+.export DrawEquipMenuStrings, UnadjustEquipStats, ReadjustEquipStats
 .export lut_NES_to_C64, lut_OWMetatileColors
 .export LoadPrice
 
@@ -3869,6 +3870,439 @@ UpdateSprites:
     sta YEXP                     ; $D017 (no Y stretch)
 
     rts
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawEquipMenuStrings  [10616]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawEquipMenuStrings:
+    LDA #0                       ; string will be placed at str_buf+$10, and will be 8 bytes long
+    STA str_buf+$19              ; so put the null terminator at the end right-off
+
+    LDA #1
+    STA menustall                ; set menustall
+
+    LDA #$1C-1                   ; A=$1C-1  (1C = start of weapon names in the item list)
+    LDX equipoffset
+    CPX #ch_weapons - ch_stats   ; buf if we're not dealing with weapons....
+    BEQ :+
+      LDA #$44-1                 ; A=$44-1  (44 = start of armor names in the item list)
+:   STA draweq_stradd            ; this value will be later added to the weapon/armor ID to get
+                                 ; the proper string ID.  For now, just stuff it in RAM
+                                 ; minus 1 because 0 is an empty slot
+
+    LDA #>(str_buf+$10)          ; set high byte of text pointer
+    STA text_ptr+1
+
+    LDA #$00                     ; Set A to zero.  This is our loop counter
+  @MainLoop:
+    PHA                          ; push the loop counter to the stack
+    TAX                          ; then move it to X
+    ASL A
+    TAY                          ; and move it*2 to Y
+
+    LDA lut_EquipStringPositions, Y     ; use Y to index a positioning LUT
+    STA dest_x                          ;  load up x,y coords for this string
+    LDA lut_EquipStringPositions+1, Y
+    STA dest_y
+
+    LDA #BANK_ITEMS
+    JSR SwapPRG_L                ; swap to the bank containing the item strings
+
+    LDA #$FF                     ; fill first 2 bytes of the string with blank spaces (tile FF)
+    STA str_buf+$10              ; later, these spaces will be replaced with "E-" if the item
+    STA str_buf+$11              ;  is currently equipped.
+
+    LDA item_box, X              ; get the current item ID
+    STA tmp+2                    ; and stick it in temp ram for later
+
+    AND #$7F                     ; remove the equip bit (get just the item ID)
+    BNE @LoadName                ; if nonzero, load up the other name...
+
+      LDA #$FF                   ; otherwise (zero), slot is empty, just fill the string with spaces
+      STA str_buf+$12
+      STA str_buf+$13
+      STA str_buf+$14
+      STA str_buf+$15
+      STA str_buf+$16
+      STA str_buf+$17
+      STA str_buf+$18
+      BNE @NotEquipped           ; then skip ahead (always branches)
+
+  @LoadName:                     ; if the slot is not empty....
+    CLC                          ; add the weapon/armor offset to the equipment ID.
+    ADC draweq_stradd            ;  now A is the proper item ID
+
+    ASL A                        ; double it
+    TAX                          ; and stuff it in X to load up the pointer
+    LDA lut_ItemNamePtrTbl, X    ; fetch the pointer and store it to (tmp)
+    STA tmp
+    LDA lut_ItemNamePtrTbl+1, X
+    STA tmp+1
+
+    LDY #$06                     ; copy 7 characters from the item name (doesn't look for null termination)
+   @LoadNameLoop:
+      LDA (tmp), Y               ; load a character in the string
+      STA str_buf+$12, Y         ; and write it to our string buffer.  +2 because the first 2 bytes are the equip state
+      DEY                        ; (that "E-" if equipped).  Then decrement Y
+      BPL @LoadNameLoop          ; and loop until it wraps (7 iterations)
+
+    LDA tmp+2                    ; get the item ID (to see if it's equipped)
+    BPL @NotEquipped             ; if not equipped... skip ahead.  Otherwise
+
+      LDA #$8E                   ; draw 'E' tile
+      STA str_buf+$10
+      LDA #$C2                   ; and '-' tile
+      STA str_buf+$11            ; draw them to indicate item is equipped
+
+  @NotEquipped:
+    LDA #<(str_buf+$10)          ; finally load the low byte of our text pointer
+    STA text_ptr
+    JSR DrawComplexString        ; then draw the complex string
+
+    PLA                          ; pull the main loop counter
+    CLC
+    ADC #$01                     ; increment it by one
+    CMP #16                      ; and loop until it reaches 16 (16 equipment names to draw)
+    BCC @MainLoop
+
+    LDA #BANK_MENUS              ; once all names are drawn
+    STA cur_bank                 ; set cur and ret banks to the MENUS bank
+    STA ret_bank
+    JSR SwapPRG_L                ; then swap back to that bank
+    RTS                          ; and return
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  lut_EquipStringPositions  [10720]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_EquipStringPositions:
+  .BYTE 15,  5,   25,  5        ; character 0
+  .BYTE 15,  7,   25,  7
+  
+  .BYTE 15, 10,   25, 10        ; character 1
+  .BYTE 15, 12,   25, 12
+  
+  .BYTE 15, 15,   25, 15        ; character 2
+  .BYTE 15, 17,   25, 17
+  
+  .BYTE 15, 20,   25, 20        ; character 3
+  .BYTE 15, 22,   25, 22
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  UnadjustEquipStats  [10743]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+UnadjustEquipStats:
+    LDA #BANK_EQUIPSTATS    ; Swap to bank containing equipment stats
+    JSR SwapPRG_L
+
+    LDA equipoffset         ; get the equipment offset (weapon or armor offset)
+    STA equipmenu_tmp       ;  and back it up in equipmenu_tmp.  This is our editable source index
+
+  @Loop:
+    LDX equipmenu_tmp       ; get current source index in X  (it's also in A at this point)
+    AND #$C0                ; mask to get the char index in A
+    STA tmp+7               ; and put char index in tmp+7 for future use
+
+    LDA ch_stats, X         ; get 1st piece of equipment
+    BPL :+                  ; high bit set = equipped.  If equipped... 
+      JSR @Adjust           ;   adjust stats for it
+
+:   LDA ch_stats+1, X       ; then do same for 2nd piece
+    BPL :+
+      JSR @Adjust
+
+:   LDA ch_stats+2, X       ; and 3rd
+    BPL :+
+      JSR @Adjust
+
+:   LDA ch_stats+3, X       ; and 4th
+    BPL :+
+      JSR @Adjust
+
+:   JSR UnadjustBBEquipStats  ; do a few adjustments for BB/MAs... or zero absorb
+
+    LDA equipmenu_tmp         ; add $40 to the source index (look at next character)
+    CLC
+    ADC #$40
+    STA equipmenu_tmp
+    BCC @Loop                 ; keep looping until source index wraps (wraps after 4 characters)
+
+    LDA #BANK_MENUS           ; then restore the menu bank, and exit
+    JMP SwapPRG_L
+
+  ;; local subroutine
+  ;;   subtracts a weapon's hit and dmg bonus from the character's stats
+  ;;   or removes an armor's evade penalty from the char's stats
+  ;;   X remains unchanged by the routine (coming in and going out, X=equipmenu_tmp)
+
+  @Adjust:
+    SEC
+    SBC #$01              ; subtract 1 from the equipment ID (they're 1-based, not 0-based... 0 is empty slot)
+
+    ASL A
+    ASL A                 ; then multiply by 4 (A = equip_id*4) -- high bit (equipped) is lost here, no need to mask it out
+
+    LDY equipoffset              ; see if we're dealing with weapons or armor (use Y so not to disrupt A)
+    CPY #ch_weapons - ch_stats
+    BNE @AdjustArmor
+
+    @AdjustWeapons:
+      ASL A               ; multiply by another 2  (A= weapon_id*8) -- there are 8 bytes of stats per weapon
+      STA tmp             ; this is the low byte of our source pointer
+      LDA #0
+      ADC #>lut_Weapons   ; include carry into high byte of source pointer
+      STA tmp+1           ; (tmp) is now a pointer to stats for this weapon
+
+      LDX tmp+7           ; load char index into X
+      LDY #0              ; zero source index Y
+
+      LDA ch_hitrate, X   ; get character's hit rate
+      SEC
+      SBC (tmp), Y        ; subtract the weapon's hit rate bonus
+      STA ch_hitrate, X   ; and write back to character's hit rate
+      INY                 ; inc source index
+
+      LDA ch_dmg, X       ; get char's dmg
+      SEC
+      SBC (tmp), Y        ; subtract weapon's damage bonus
+      STA ch_dmg, X       ; and write back
+
+      LDX equipmenu_tmp   ; restore X to the equipment source index
+      RTS                 ;  before returning
+
+    @AdjustArmor:
+      CLC                 ; (A= armor_id*8)
+      ADC #<lut_Armor     ; add A to desired pointer
+      STA tmp             ;  and store pointer to (tmp)
+      LDA #0
+      ADC #>lut_Armor
+      STA tmp+1           ; (tmp) is now a pointer to stats for this armor
+
+      LDX tmp+7           ; get char index in X
+      LDY #0              ; zero our source index Y
+
+      LDA ch_evade, X     ; get character's evade
+      CLC
+      ADC (tmp), Y        ; add the armor's evade penalty rate (removing the penalty)
+      STA ch_evade, X     ; and write back
+
+      LDX equipmenu_tmp   ; then restore X to equipment source index
+      RTS                 ; and exit
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  ReadjustEquipStats  [10854]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ReadjustEquipStats:
+    LDA #BANK_EQUIPSTATS     ; swap to bank containing equipment stats
+    JSR SwapPRG_L
+
+    LDA equipoffset          ; get the equipment offset
+    STA equipmenu_tmp        ; and put it in equipmenu_tmp -- this is our runtime source index
+
+  @Loop:
+    LDX equipmenu_tmp        ; get source index (source index also in A at this point)
+    AND #$C0                 ; mask out high bits so A just contains char index
+    STA tmp+7                ; store char index in tmp+7 for future use
+
+    LDA ch_stats, X          ; get first piece of equipment
+    BPL :+                   ; if equipped....
+      JSR @Adjust            ;   adjust for its stats
+
+:   LDA ch_stats+1, X        ; do the same for all 4 pieces of equipment
+    BPL :+
+      JSR @Adjust
+
+:   LDA ch_stats+2, X
+    BPL :+
+      JSR @Adjust
+
+:   LDA ch_stats+3, X
+    BPL :+
+      JSR @Adjust
+
+:   JSR ReadjustBBEquipStats ; adjust for special BB/MA properties
+
+    LDA equipmenu_tmp        ; add $40 to our source index (move to next char)
+    CLC
+    ADC #$40
+    STA equipmenu_tmp
+
+    BCC @Loop                ; and keep looping until it wraps (4 iterations -- all 4 chars)
+
+    LDA #BANK_MENUS          ; then swap back to MENUS bank
+    JMP SwapPRG_L            ;   and exit
+
+  ;; local subroutine
+  ;;   adds a weapon's hit and dmg bonus to the character's stats
+  ;;   or adds armor stats to char stats
+  ;;   X remains unchanged by the routine (coming in and going out, X=equipmenu_tmp)
+
+  @Adjust:
+    SEC
+    SBC #$01               ; subtract 1 from the equip ID (equipment is 1 based -- 0 is an empty slot)
+    ASL A
+    ASL A                  ; multiply by 4 (this drops the high bit -- no need to mask it out)
+
+    LDY equipoffset             ; see if this is weapon or armor
+    CPY #ch_weapons - ch_stats
+    BNE @AdjustArmor
+
+  @AdjustWeapon:
+    ASL A                  ; multiply by another 2 (A now = weapon_id * 8)
+    STA tmp                ; put in tmp as low byte of our pointer
+    LDA #0
+    ADC #>lut_Weapons      ; add high byte of our pointer (including any appropriate carry)
+    STA tmp+1              ; fill tmp+1 to complete our pointer
+
+    LDX tmp+7              ; get the character index
+    LDY #0                 ; zero Y (our source index)
+
+    LDA ch_hitrate, X      ; get char's hit rate
+    CLC
+    ADC (tmp), Y           ; add to it the weapon's hit bonus
+    STA ch_hitrate, X      ; and write it back
+    INY                    ;   inc source index
+
+    LDA ch_dmg, X          ; get char's damage
+    CLC
+    ADC (tmp), Y           ; add weapon's damage bonus
+    STA ch_dmg, X          ; and write back
+
+    LDX equipmenu_tmp      ; restore X to its original state
+    RTS
+
+  @AdjustArmor:            ; A = armor_id * 4
+    CLC
+    ADC #<lut_Armor        ; add low byte of pointer to our A
+    STA tmp                ; and store it in tmp
+    LDA #0
+    ADC #>lut_Armor        ; then get high byte of pointer (ADC to catch appropriate carry)
+    STA tmp+1              ; (tmp) is now a pointer to this armor's stats
+
+    LDX tmp+7              ; get char index
+    LDY #0                 ; zero source pointer
+
+    LDA ch_evade, X        ; get char's evade
+    SEC
+    SBC (tmp), Y           ; subtract armor evade penalty
+    STA ch_evade, X        ; and write it back
+    INY                    ; inc source index
+
+    LDA ch_absorb, X       ; get absorb
+    CLC
+    ADC (tmp), Y           ; add absorb bonus
+    STA ch_absorb, X       ; and write back
+
+    LDA ch_resist, X       ; get elemental resistence
+    INY                    ;   inc source index
+    ORA (tmp), Y           ; combine this armor's elemental resistence
+    STA ch_resist, X       ; and write back
+
+    LDX equipmenu_tmp      ; restore X to original state
+    RTS                    ; and exit
+
+
+;;;;;;;;;;;;;;;;;;;
+;;
+;;  UnadjustBBEquipStats  [10974]
+;;
+;;;;;;;;;;;;;;;;;;;
+
+UnadjustBBEquipStats:
+    LDA equipoffset             ; check to see if we're dealing with weapons or armor
+    CMP #ch_weapons - ch_stats  ; if armor, jump ahead
+    BNE @Armor
+
+  @Weapons:             ; for weapons....
+    LDX tmp+7           ; get char index into X
+    LDA ch_class, X     ; get the char's class
+
+    CMP #CLS_BB         ; check if he's a black belt or master
+    BEQ @BlackBelt      ;  if he isn't, just exit
+    CMP #CLS_MA         ; if he is...
+    BNE @Exit
+
+  @BlackBelt:
+    LDA #0              ; zero his damage stat
+    STA ch_dmg, X
+
+  @Exit:
+    RTS
+
+  @Armor:               ; for armor...
+    LDA #0
+    LDX tmp+7           ; get char index
+    STA ch_absorb, X    ; zero absorb
+    STA ch_resist, X    ; and elemental resistence
+    RTS                 ; then exit
+
+
+;;;;;;;;;;;;;;;;;;;
+;;
+;;  ReadjustBBEquipStats  [11014]
+;;
+;;;;;;;;;;;;;;;;;;;
+
+ReadjustBBEquipStats:
+    LDX tmp+7          ; load up char index into X
+    LDA ch_class, X    ; get this char's class
+
+    CMP #CLS_BB        ; see if he's a black belt or master... if yes, jump ahead
+    BEQ @BlackBelt     ; otherwise, exit
+    CMP #CLS_MA
+    BNE @Exit
+
+  @BlackBelt:
+    LDA equipoffset
+    CMP #ch_weapons - ch_stats   ; see if we're dealing with weapons or armor
+    BNE @Armor
+
+  @Weapons:
+    LDA ch_dmg, X             ; check this BB's damage stat
+    BEQ @NoWeaponEquipped     ; if zero, we know this BB has no weapon equipped
+                              ; we know this because UnadjustBBEquipStats zeros damage for blackbelts.
+                              ; thus the only way it could be nonzero is if it had a weapon bonus added.
+
+  @WeaponEquipped:
+    LDA ch_str, X             ; if a weapon is equipped... get strength stat
+    LSR A                     ;  /2
+    ADC ch_dmg, X             ; and add to damage
+    STA ch_dmg, X
+    RTS                       ; equipped BB's dmg = (str/2 + weapon)
+
+  @NoWeaponEquipped:
+    LDA ch_level, X           ; if unequipped, get current experience level
+    CLC
+    ADC #$01                  ; add 1 (levels are stored 0 based in RAM -- ie '0' is really level 1)
+    ASL A                     ; multiply by 2
+    STA ch_dmg, X             ; and set dmg.  Unequipped BB's dmg = (level*2)
+  @Exit:
+    RTS
+
+  @Armor:                     ; for armor....
+    LDA ch_absorb, X          ; get absorb
+    BNE @Exit                 ; if nonzero he has something equipped (absorb would be 0 otherwise), so just exit
+
+    LDA ch_level, X           ; otherwise, get level + 1
+    CLC
+    ADC #$01
+    STA ch_absorb, X          ; Unequipped BB's absorb=level
+    RTS                       ; and exit
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;

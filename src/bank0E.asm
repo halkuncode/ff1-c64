@@ -22,6 +22,7 @@
 .import LoadMenuCHRPal, LoadNewGameCHRPal, DrawComplexString, WaitForVBlank_L, UpdateJoy_L, DrawBox, DrawOBSprite
 .import GameStart_L, CallMusicPlay_L, ClearOAM, DrawPalette_L, DrawCursor, EraseBox
 .import DoOverworld, DrawItemBox, SortEquipmentList
+.import DrawEquipMenuStrings, UnadjustEquipStats, ReadjustEquipStats
 .import lut_ScreenRowLo, lut_ScreenRowHi, CoordToNTAddr
 .import lut_IntroStoryText
 .import LoadPrice
@@ -4142,8 +4143,796 @@ HideMapObject:
     STA mapobj_id, Y
     RTS
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  EnterEquipMenu  [8826]
+;;
+;;  IN:   A = ch_weapons-ch_stats  for weapon menu
+;;            ch_armor-ch_stats    for armor menu
+;;            this value to be stored in 'equipoffset' by this routine
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 EnterEquipMenu:
+    STA equipoffset       ; record the equipoffset to indicate weapon or armor menu
+
+    LDA #0
+    STA spr_multiplex_mode          ; Disable raster multiplexer
+    STA spr_irq_zone
+    LDA #250
+    STA RASTER
+    LDA SCROLY
+    AND #$7F
+    STA SCROLY
+
+    LDA #0
+    STA joy_a             ; clear joy_a and joy_b counters
+    STA joy_b
+    STA menustall         ; and turn off menu stalling
+
+    JSR SortEquipmentList           ; sort the equipment list to remove gaps
+    JSR DrawEquipMenu               ; draw the equip menu (but not the item text)
+    JSR CopyEquipToItemBox          ; copy equipment from inventory to item_box so it's easier to work with
+    JSR UnadjustEquipStats          ; unadjust equipment stats so they can be readjusted later
+    JSR ClearOAM                    ; clear OAM
+
+    LDA #1
+    STA menustall                   ; now that screen is on, turn on menu stalling
+    JSR DrawEquipMenuStrings        ; draw the menu strings (item names)
+
+  @Start:
+    LDA #0
+    STA eq_modecurs               ; reset the mode cursor to 0  ("Equip")
+
+  @Loop:
+    JSR ClearOAM                  ; clear OAM
+    JSR DrawEquipMenuModeCurs     ; draw the mode cursor
+    JSR EquipMenuFrame            ; then do an Equip Menu Frame
+
+    LDA joy_a
+    BNE @A_Pressed            ; check to see if A pressed
+    LDA joy_b
+    BNE @B_Pressed            ; or B
+
+    JSR MoveEquipMenuModeCurs ; if neither A nor B pressed, move the mode cursor
+    JMP @Loop                 ; and loop until one of them is pressed
+
+  @A_Pressed:
+    JSR @GoToSubMenu          ; go to the desired sub menu
+    JMP @Start                ; then restart this loop once they exit that sub menu
+
+  @B_Pressed:                 ; if B pressed....
+    JSR CopyEquipFromItemBox  ;  move all equipment from item box back to player inventory
+    JSR SortEquipmentList     ;  sort equipment list to remove gaps
+    JMP ReadjustEquipStats    ;  adjust stats to reflect new equipment.  Then exit.
+
+
+  @GoToSubMenu:
+    JSR PlaySFX_MenuSel       ; play the selection sound effect
+
+    LDA #0
+    STA cursor                ; reset the primary
+    STA cursor2               ;   and secondary cursor to zero
+
+    LDA eq_modecurs           ; get the mode cursor to see which sub menu we're to go to.
+    BNE :+
+      JMP EquipMenu_EQUIP     ;   mode=0 -> EQUIP
+:   CMP #$01
+    BNE :+
+      JMP EquipMenu_TRADE     ;   mode=1 -> TRADE
+:   JMP EquipMenu_DROP        ;   mode=2 -> DROP
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  EquipMenu_TRADE  [8892]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+EquipMenu_TRADE:              ; "TRADE" option selected
+    JSR ClearOAM              ; clear OAM
+    JSR DrawEquipMenuCurs     ; draw the cursor (primary cursor only)
+    JSR EquipMenuFrame        ; do a frame
+
+    LDA joy_a                 ; check or A and B button presses
+    BNE @A_Pressed
+    LDA joy_b
+    BNE @B_Pressed
+
+    JSR MoveEquipMenuCurs     ; then move the cursor for directional presses
+    JMP EquipMenu_TRADE       ; rinse, repeat
+
+  @B_Pressed:                 ; if B pressed... just exit
     RTS
+
+  @A_Pressed:                 ; if A pressed...
+    LDA cursor
+    STA cursor2               ; copy the primary cursor to the secondary cursor
+                              ; then proceed to the Trade subloop
+    @SubLoop:
+      JSR ClearOAM                      ; clear OAM
+      JSR DrawEquipMenuCursSecondary    ; draw both primary+secondary cursors
+      JSR EquipMenuFrame                ; do a frame
+
+      LDA joy_a
+      BNE @DoTrade            ; check for A/B button presses
+      LDA joy_b
+      BNE EquipMenu_TRADE     ;   if B pressed, jump back to main Trade loop
+
+      JSR MoveEquipMenuCurs   ; check for cursor movement
+      JMP @SubLoop            ; and loop
+
+  @DoTrade:              ; DoTrade is called when two items to trade have been selected
+    LDX cursor           ; primary cursor in X (one of the items to trade)
+    LDY cursor2          ; secondary cursor in Y (the other item)
+
+    LDA item_box, X      ; get the 'X' item
+    STA tmp              ;  store it to temp RAM
+    LDA item_box, Y      ; get the 'Y' item
+    AND #$7F             ;  unequip it
+    STA item_box, X      ; move Y item to X item
+    LDA tmp              ; get original X item
+    AND #$7F             ;  unequip it
+    STA item_box, Y      ; and move X item to Y item (swapped the two items)
+
+    JSR DrawEquipMenuStrings   ; redraw all the equipment strings to reflect changes
+    JMP EquipMenu_TRADE        ; then jump back to Trade loop
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  EquipMenu_EQUIP  [8945]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+EquipMenu_EQUIP:
+    JSR ClearOAM             ; clear OAM
+    JSR DrawEquipMenuCurs    ; draw the primary cursor
+    JSR EquipMenuFrame       ; do a frame
+
+    LDA joy_a
+    BNE @A_Pressed           ; check for A/B button presses
+    LDA joy_b
+    BNE @B_Pressed
+
+    JSR MoveEquipMenuCurs    ; and check for cursor movement
+    JMP EquipMenu_EQUIP      ; rinse, repeat
+
+  @B_Pressed:                ; if B pressed, just exit
+    RTS
+
+  @A_Pressed:                ; if A pressed...
+    LDX cursor               ; get the cursor in X
+    LDA item_box, X          ; use it to index and get the selected item
+    BNE @ConfirmEquip        ; if this item is nonzero, jump ahead to confirm that it's equippable
+                             ;  otherwise.. can't equip (can't equip a blank slot)
+    @CantEquip:
+      JSR PlaySFX_Error      ; if can't equip, play the error sound effect
+      JMP EquipMenu_EQUIP    ; and keep looping
+
+  @ConfirmEquip:
+    BMI @ToggleEquip         ; see if item is already equipped, if it is, you can ALWAYS unequip it (no check necessary)
+    JSR IsEquipLegal         ; Confirm to see if this item is equippable by this class
+    BCS @CantEquip           ; if it isn't (C set), then we can't equip it
+
+    LDX cursor               ; otherwise (can equip), restore X to be the cursor again, then toggle equip state
+
+  @ToggleEquip:
+    LDA item_box, X           ; get the item
+    EOR #$80                  ; toggle its equip state (unequip it if equipped... or equip it if unequipped)
+    STA item_box, X           ; and write it back
+    JSR DrawEquipMenuStrings  ; redraw the item names to reflect changes
+    JMP EquipMenu_EQUIP       ; and continue looping
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  EquipMenu_DROP  [8989]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+EquipMenu_DROP:
+    JSR ClearOAM              ; clear OAM
+    JSR DrawEquipMenuCurs     ; draw the primary cursor
+    JSR EquipMenuFrame        ; do a frame
+
+    LDA joy_a
+    BNE @A_Pressed            ; check for A and B presses
+    LDA joy_b
+    BNE @B_Pressed
+
+    JSR MoveEquipMenuCurs     ; check for cursor movement
+    JMP EquipMenu_DROP        ; rinse, repeat until A/B pressed
+
+  @B_Pressed:
+    RTS                       ; if B pressed, just exit
+
+  @A_Pressed:                 ; if A pressed....
+    LDX cursor                ; put the cursor in X
+    LDA item_box, X           ; get the item to drop from the item box
+    BNE @ConfirmLoop          ; if it's zero....
+      JSR PlaySFX_Error       ;  ... play the error sound effect (can't drop an empty slot)
+      JMP EquipMenu_DROP      ;      and continue looping
+
+  @ConfirmLoop:
+    JSR ClearOAM              ; clear OAM
+
+    LDA framecounter          ; for confirmation, the cursor is to flicker.
+    LSR A
+    LSR A
+    BCS :+                    ; skip over drawing the cursor if C set (odd frame)
+      JSR DrawEquipMenuCurs   ;   only draw cursor every other frame
+:   JSR EquipMenuFrame        ; Do a frame
+
+    LDA joy_a
+    BNE @DoDrop               ; if they pressed A, do the drop
+    LDA joy_b
+    BNE EquipMenu_DROP        ; if they pressed B, abort, and return to main DROP loop
+
+    JMP @ConfirmLoop          ; if neither A nor B pressed, keep looping until one of them is.
+
+@DoDrop:
+    LDX cursor                ; get the cursor in X
+    LDA #0
+    STA item_box, X           ; erase the item from the item box
+    JSR DrawEquipMenuStrings  ; redraw the item names to reflect changes
+    JMP EquipMenu_DROP        ; and return to Drop loop
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  IsEquipLegal  [9057]
+;;
+;;     Checks to see if a specific class can equip a specific item.
+;;  ALSO!  This routine modifies the item_box to de-equip all items of the same
+;;  type that this character is equipping.  So if you test to see if a weapon is
+;;  equippable, and it is, then all other weapons will be unequipped by this routine.
+;;  Or if you try to equip a helmet.. all other helmets will be unequipped.
+;;
+;;  IN:            A = 1-based ID of item to check (0=blank item)
+;;       equipoffset = indicates to check weapon or armor
+;;            cursor = 4* the character ID whose class we're to check against
+;;
+;;  OUT:           C = set if equipping is illegal for this class (can't equip it)
+;;                     clear if legal (can)
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IsEquipLegal:
+    SEC
+    SBC #$01          ; subtract 1 from the item ID to make it zero based
+    ASL A             ; double it
+    STA tmp           ; tmp = (2*item_id)
+
+    LDA cursor        ; get the cursor
+    ASL A
+    ASL A
+    ASL A
+    ASL A
+    AND #$C0          ; shift and mask to get usable character index
+    TAX               ; put char index in X
+
+    LDA ch_class, X   ; get the character's class
+    ASL A             ; double it (2 bytes for equip permissions)
+    TAX               ; and put in X to index the equip bit
+
+    LDA lut_ClassEquipBit, X        ; get the class permissions bit position word
+    STA tmp+4                       ;  and put in tmp+4,5
+    LDA lut_ClassEquipBit+1, X
+    STA tmp+5
+
+    LDY equipoffset              ; now, see if we're dealing with weapons or armor
+    CPY #ch_weapons-ch_stats
+    BNE @Armor
+
+  @Weapon:
+    LDX tmp                        ; get the weapon id (*2)
+    LDA lut_WeaponPermissions, X   ; use it to get the weapon permissions word (low byte)
+    AND tmp+4                      ; mask with low byte of class permissions
+    STA tmp                        ;  temporarily store result
+    LDA lut_WeaponPermissions+1, X ; then do the same with the high byte of the permissions word
+    AND tmp+5                      ;  mask with high byte of class permissions
+    ORA tmp                        ; then combine with results of low mask
+                          ;  here... any nonzero value will indicate that the item cannot be equipped
+
+    CMP #$01              ; compare with 1 (any nonzero value will set C)
+    BCC :+                ; if C is set (can't equip)....
+      RTS                 ;   ... just exit.  otherwise...
+
+:   LDA cursor            ; get the cursor (character id*4)
+    AND #$0C              ; isolate the character bits
+    TAX                   ; and put in X for indexing
+
+    LDA item_box, X       ; unequip all weapons
+    AND #$7F
+    STA item_box, X
+    LDA item_box+1, X
+    AND #$7F
+    STA item_box+1, X
+    LDA item_box+2, X
+    AND #$7F
+    STA item_box+2, X
+    LDA item_box+3, X
+    AND #$7F
+    STA item_box+3, X
+
+    RTS                   ; then exit (C is still clear, indicating item can be equipped)
+
+  @Armor:
+    LDX tmp                       ; get the armor id (*2)
+    LDA lut_ArmorPermissions, X   ; use it to get the armor permissions word
+    AND tmp+4                     ;  and mask it with the class permissions word
+    STA tmp
+    LDA lut_ArmorPermissions+1, X
+    AND tmp+5
+    ORA tmp               ; and OR both high and low bytes of result together.  A nonzero result here indicates
+                          ;  armor cannot be equipped
+
+    CMP #$01              ; compare with 1 (any nonzero value sets C)
+    BCC :+                ; if armor can't be equipped....
+      RTS                 ; .. just exit.  Otherwise...
+
+:   TXA                   ; get back the armor_id*2
+    LSR A                 ; /2 to restore armor_id
+    TAX                   ; and put back in X
+
+    LDA lut_ArmorTypes, X ; use armor ID to index and find out what kind of armor it is (body, helmet, shield, etc)
+    STA tmp+2             ; store armor type in tmp+2
+
+    LDA cursor            ; store current cursor in tmp
+    STA tmp
+    AND #$0C              ; mask out the charater bits  (char ID * 4)
+    STA tmp+1             ;  store that in tmp+1  (loop's item to unequip)
+
+    LDY #$04              ; set Y (loop counter) to 4 (loop 4 times)
+
+  @ArmorLoop:
+    LDA tmp+1             ; get the loop item index
+    CMP tmp               ; compare to the item we're trying to equip
+    BEQ @ArmorSkip        ; if they're equal, skip over this item
+
+    LDX tmp+1             ; put loop item index in X
+    LDA item_box, X       ;  use it to get that item from the item_box
+    BPL @ArmorSkip        ; if that item is not equipped, skip it
+
+    SEC                   ; otherwise (it is equipped), subtract $81 to get the armor ID
+    SBC #$81
+    TAX                   ; put armor ID in X
+    LDA lut_ArmorTypes, X ; use that to look up what type of armor this is
+
+    CMP tmp+2             ; compare that to the type of armor we're trying to equip
+    BNE @ArmorSkip        ; if it doesn't match (different kind of armor), skip it
+
+                          ; otherwise... it's a match!  need to unequip it.
+    LDX tmp+1             ; get this loop item index in X
+    LDA item_box, X       ; use it to get the item from the item box
+    AND #$7F              ;    unequip it
+    STA item_box, X       ;    then write it back
+
+  @ArmorSkip:
+    INC tmp+1             ; increment our loop item counter (to examine next item in the item box)
+    DEY                   ; decrement our loop counter
+    BNE @ArmorLoop        ; and keep looping until it expires
+
+    CLC                   ; once we're done with all that, CLC to indicate the item can be equipped
+    RTS                   ; and exit
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;   lut_ClassEquipBit  [9191]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_ClassEquipBit: ;  FT   TH   BB   RM   WM   BM      KN   NJ   MA   RW   WW   BW
+   .WORD            $800,$400,$200,$100,$080,$040,   $020,$010,$008,$004,$002,$001
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;   lut_ArmorTypes  [9212]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_ArmorTypes:
+  .BYTE    0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0        ; 16 pieces of body armor
+  .BYTE    1,1,1,1,1, 1,1,1,1                        ; 9 shields
+  .BYTE    2,2,2,2,2, 2,2                            ; 7 helmets
+  .BYTE    3,3,3,3,3, 3,3,3                          ; 8 gauntlets
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  EquipMenuFrame  [9236]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+EquipMenuFrame:
+    JSR WaitForVBlank_L     ; wait for VBlank
+
+    LDA #BANK_THIS
+    STA cur_bank          ; set cur_bank to this bank
+    JSR CallMusicPlay_L   ; so we can call music play routine
+
+    INC framecounter      ; inc the frame counter to count this frame
+
+    LDA #0                ; clear joy_a and joy_b markers so button presses
+    STA joy_a             ;  will be recognized
+    STA joy_b
+
+    INC framecounter      ; inc frame counter again
+
+    LDA joy               ; get the joy data
+    AND #$0F              ; isolate directional buttons
+    STA tmp+7             ; and store it as the previous joy data
+    JSR UpdateJoy_L       ; then update joy data
+
+    LDA joy_a
+    ORA joy_b             ; see if either A or B pressed
+    BEQ @NotPressed       ; if not... jump ahead
+    JMP PlaySFX_MenuSel   ; otherwise, play the selection sound effect and exit
+
+  @NotPressed:            ; if neither A nor B have been pressed
+    LDA joy               ; get the joy data
+    AND #$0F              ; isolate directional buttons
+    BEQ @Exit             ; if no directions are pressed, exit
+
+    CMP tmp+7             ; compare current buttons to previous buttons
+    BEQ @Exit             ; if no change, then exit
+
+    JMP PlaySFX_MenuMove  ; otherwise, a new button has been pressed, so play the menu move sound, then exit
+
+  @Exit:
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  MoveEquipMenuModeCurs  [9297]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+MoveEquipMenuModeCurs:
+    LDA joy           ; get joypad
+    AND #$03          ; isolate left/right buttons
+    CMP joy_prevdir   ; if they equal previous buttons...
+    BEQ @Exit         ;  no new buttons pressed, so exit
+
+    STA joy_prevdir   ; otherwise, record changes
+    CMP #0            ; see if a button was pressed or released
+    BEQ @Exit         ; if released (no buttons currently down), exit
+
+    CMP #1
+    BNE @Left         ; see if they pressed left or right
+
+  @Right:
+    LDA eq_modecurs   ; to move right...
+    CLC
+    ADC #$01          ; add 1 to the mode cursor
+    CMP #$03
+    BCC @WriteAndExit ; if >= 3....
+    LDA #0            ;  ... wrap it to zero
+
+  @WriteAndExit:
+    STA eq_modecurs
+  @Exit:
+    RTS
+
+  @Left:
+    LDA eq_modecurs   ; to move left....
+    SEC
+    SBC #$01          ; subtract one
+    BCS @WriteAndExit ; if still >= 0, we're done
+    LDA #$02          ; otherwise, wrap to 2
+    STA eq_modecurs
+    RTS               ; then exit
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  MoveEquipMenuCurs  [9342]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+MoveEquipMenuCurs:
+    LDA joy            ; get joy data
+    AND #$0F           ; isolate directional buttons
+    CMP joy_prevdir    ; see if there were changes
+    BEQ @Exit          ; if not, exit
+
+    STA joy_prevdir    ; otherwise, record changes
+    CMP #0             ; see if buttons are being pressed
+    BEQ @Exit          ; if not, exit
+
+    CMP #$04           ; see if they're pressing up/down or left/right
+    BCS @UpDown
+
+  @LeftRight:          ; if left/right, simply toggle the column
+    LDA cursor
+    EOR #$01           ; EOR with 1 toggles the column
+    STA cursor         ; then exit
+
+  @Exit:
+    RTS
+
+  @UpDown:
+    BNE @Up            ; If not left/right, see if they pressed up or down.
+
+  @Down:
+    LDA cursor         ; If down, add 2 to the cursor (next row)
+    CLC
+    ADC #$02
+    AND #$0F           ; mask with $0F to keep in bounds / wrap
+    STA cursor
+    RTS                ; then exit
+
+  @Up:
+    LDA cursor         ; for up.. subtract 2
+    SEC
+    SBC #$02
+    AND #$0F           ; and wrap
+    STA cursor
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  CopyEquipToItemBox  [9391]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+CopyEquipToItemBox:
+    LDX equipoffset       ; X is our source index -- start at the equipment offset
+    LDY #0                ; Y is our dest index -- start at zero
+
+  @Loop:
+    LDA ch_stats, X       ; copy 4 bytes from source buffer (character inventory)
+    STA item_box, Y       ;  to dest buffer (item_box)
+    LDA ch_stats+1, X
+    STA item_box+1, Y
+    LDA ch_stats+2, X
+    STA item_box+2, Y
+    LDA ch_stats+3, X
+    STA item_box+3, Y
+
+    TXA                   ; add $40 to source index (look at next character's inventory)
+    CLC
+    ADC #$40
+    TAX
+
+    TYA                   ; add 4 to dest index
+    CLC
+    ADC #4
+    TAY
+
+    CMP #4*4              ; keep looping until we've copied 16 items (4 characters' inventory)
+    BCC @Loop
+
+    RTS                   ; then exit
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  CopyEquipFromItemBox  [9430]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+CopyEquipFromItemBox:
+    LDX equipoffset
+    LDY #0
+
+  @Loop:
+    LDA item_box, Y
+    STA ch_stats, X
+    LDA item_box+1, Y
+    STA ch_stats+1, X
+    LDA item_box+2, Y
+    STA ch_stats+2, X
+    LDA item_box+3, Y
+    STA ch_stats+3, X
+
+    TXA
+    CLC
+    ADC #$40
+    TAX
+
+    TYA
+    CLC
+    ADC #4
+    TAY
+
+    CMP #4*4
+    BCC @Loop
+
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawEquipMenu  [9468]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawEquipMenu:
+    JSR ClearMenuScreen
+
+    LDA #0
+    JSR @DrawEquipBox           ; draw the title box
+    INC dest_y
+    LDA #$34                    ; menu string $34 ("WEAPON")
+    LDX equipoffset
+    CPX #ch_weapons - ch_stats  ; check whether this is the weapon or armor screen
+    BEQ :+
+      LDA #$3E                  ;   if not the weapon screen, change menu string ID to $3E ("ARMOR")
+:   JSR DrawMenuString          ; then draw that title string
+
+    LDA #1
+    JSR @DrawEquipBox           ; then draw the top menu box
+    INC dest_y
+    LDA #$35
+    JSR DrawMenuString          ; and its contained text ("EQUIP   TRADE   DROP")
+
+    LDA #$03
+    JSR @DrawEquipBox           ; char 0's equip box (but leave it empty for now)
+    LDA #$02
+    JSR @DrawEquipBox           ; char 0's name box
+    LDA #$36
+    JSR DrawMenuString          ; char 0's name
+
+    LDA #$05
+    JSR @DrawEquipBox           ; then char 1...
+    LDA #$04
+    JSR @DrawEquipBox
+    LDA #$38
+    JSR DrawMenuString
+
+    LDA #$07
+    JSR @DrawEquipBox           ; char 2...
+    LDA #$06
+    JSR @DrawEquipBox
+    LDA #$3A
+    JSR DrawMenuString
+
+    LDA #$09
+    JSR @DrawEquipBox           ; char 3...
+    LDA #$08
+    JSR @DrawEquipBox
+    LDA #$3C
+    JSR DrawMenuString
+
+    RTS
+
+ @DrawEquipBox:
+    ASL A                     ; *4  (4 bytes per box)
+    ASL A
+    TAX                       ; put box*4 in X
+
+    LDA @lut_EquipBoxes, X    ; use it to index our lut
+    STA box_x                 ; and load box coords/dims
+    LDA @lut_EquipBoxes+1, X
+    STA box_y
+    LDA @lut_EquipBoxes+2, X
+    STA box_wd
+    LDA @lut_EquipBoxes+3, X
+    STA box_ht
+
+    LDA #BANK_THIS
+    STA cur_bank
+
+    JMP DrawBox               ; then draw the box, and return
+
+ @lut_EquipBoxes:
+  .BYTE  5,  0,  7,  4   ; title box
+  .BYTE 13,  0, 22,  4   ; top menu box ("Equip   Trade   Drop")
+  .BYTE  5,  4,  8,  3   ; char 0's name box
+  .BYTE 12,  4, 23,  5   ; char 0's equipment box
+  .BYTE  5,  9,  8,  3   ; ch 1's
+  .BYTE 12,  9, 23,  5
+  .BYTE  5, 14,  8,  3   ; ch 2's
+  .BYTE 12, 14, 23,  5
+  .BYTE  5, 19,  8,  3   ; ch 3's
+  .BYTE 12, 19, 23,  5
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawEquipMenuCursSecondary  [9573]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawEquipMenuCursSecondary:
+    LDA framecounter           ; get the frame counter
+    LSR A                      ;  shift to put bit 1 in C
+    LSR A
+    BCS DrawEquipMenuCurs      ; If odd frame.. just draw the primary cursor
+
+    LDA cursor2                ; get secondary cursor
+    ASL A                      ;  double it and put it in X for LUT indexing
+    TAX
+    LDA lut_EquipMenuCurs, X   ; get cursor X coord
+    CLC
+    ADC #$04                   ; add 4 to draw it a little to the right of the primary cursor
+    BNE EquipMenuCurs_DoDraw   ; then draw it (always branches)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawEquipMenuCurs  [9586]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawEquipMenuCurs:
+    LDA cursor                 ; get primary cursor
+    ASL A                      ;  double it and put in X for LUT indexing
+    TAX
+    LDA lut_EquipMenuCurs, X   ; get cursor X coord... then draw
+
+  EquipMenuCurs_DoDraw:
+    STA spr_x                    ; record X coord
+    LDA lut_EquipMenuCurs+1, X   ; then fetch
+    STA spr_y                    ;    and record Y coord
+    JMP DrawCursor               ; draw the cursor, and exit
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  lut_EquipMenuCurs  [9598]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_EquipMenuCurs:
+  .BYTE 124,  90,   204,  90    ; Hero 0, rows 5, 7
+  .BYTE 124, 106,   204, 106
+  .BYTE 124, 130,   204, 130    ; Hero 1, rows 10, 12
+  .BYTE 124, 146,   204, 146
+  .BYTE 124, 170,   204, 170    ; Hero 2, rows 15, 17
+  .BYTE 124, 186,   204, 186
+  .BYTE 124, 210,   204, 210    ; Hero 3, rows 20, 22
+  .BYTE 124, 226,   204, 226
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawEquipMenuModeCurs  [9615]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawEquipMenuModeCurs:
+    LDX eq_modecurs          ; put mode cursor in X
+    LDA @lut_CursorX, X       ; use it as an index to get x coord
+    STA spr_x                ; set it
+    LDA #66                  ; y coord fixed at 66 (Row 2: 50 + 2*8)
+    STA spr_y
+    JMP DrawCursor           ; draw the cursor and return
+
+  @lut_CursorX:
+     .BYTE 132, 188, 244
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  lut_WeaponPermissions  [9733]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_WeaponPermissions:
+  .WORD   $0DE7,$028A,$0400,$02CB,$074D,   $06CB,$07CF,$02CB,$0DE7,$028A
+  .WORD   $05C7,$02CB,$06CB,$07CF,$02CB,   $028A,$06CB,$074D,$07CF,$06CB
+  .WORD   $06CB,$02CB,$06CB,$06CB,$02CB,   $06CB,$02CB,$0504,$07CF,$0F6D
+  .WORD   $0FAE,$0FCB,$0FFE,$0FCB,$0FCA,   $0FCD,$0FCB,$0FEF,$0FDF,$0000
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  lut_ArmorPermissions  [9745]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_ArmorPermissions:
+  .WORD   $0000,$00C3,$06CB,$07CF,$07DF,   $06CB,$07CF,$07CF,$0FDF,$0FDF
+  .WORD   $0000,$0000,$0000,$0000,$0FFD,   $0FFE,$07CF,$07CF,$07CF,$07CF
+  .WORD   $07CF,$0FDF,$0FDF,$02CB,$0208,   $0000,$07CF,$07CF,$07CF,$0FDF
+  .WORD   $0FCF,$0000,$0000,$07CF,$07CF,   $07CB,$0FCB,$07CB,$0FDF,$0000
+
 
 EnterStatusMenu:
     LDA #0
