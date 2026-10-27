@@ -11,7 +11,7 @@ chr_dest        = $0E ; 2 bytes, C64 Character RAM destination pointer ($4800-$4
 
 tmp             = $10 ; 16 bytes
 
-color_dest      = tmp+8  ; 2 bytes, pointer to Color RAM (shared with mu_scoreptr)
+color_dest      = $04    ; 2 bytes, dedicated pointer to Color RAM ($04-$05)
 mu_scoreptr     = tmp+8  ; 2 bytes, shared tmp
 
 dlgbox_row      = tmp+$C  ; shared tmp

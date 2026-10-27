@@ -15,7 +15,7 @@ I figured the C64 and NES were similar in architecture, at least CPU and graphic
 | Feature | Nintendo Entertainment System (NES) | Commodore 64 (C64) |
 | :--- | :--- | :--- |
 | **CPU** | **Ricoh RP2A03** @ ~1.79 MHz (NTSC) / ~1.66 MHz (PAL)<br>• Basically a 6502 with non-functional BCD due to a suspiciously missing transistor<br>• But in exchange glued to a sound processor<br>• and a DMA controller | **MOS 6510** @ ~1.02 MHz (NTSC) / ~0.985 MHz (PAL)<br>• A 6502 with a 6-bit I/O port for ROM/RAM banking |
-|| **System RAM** | **2 KB** of RAM <br>| **64 KB** base system RAM<br>• Bank switching lets you grab RAM from underneath ROMs & I/O space |
+| **System RAM** | **2 KB** of RAM <br>| **64 KB** base system RAM<br>• Bank switching lets you grab RAM from underneath ROMs & I/O space |
 | **Video Memory (VRAM)** | **2 KB** internal video VRAM (two 32×30 tile screens) | **16 KB** addressable by VIC-II at any time (selectable across 4 banks in 64 KB RAM)<br>• Plus **1 KB** dedicated 4-bit Color RAM |
 | **Character / Tile RAM** | **512 tiles** (two sets of 256 tiles) <br>• 8×8 pixels, 2 bits per pixel (4 colors per tile) | **256 characters** per 2 KB character set <br>• Standard: 8×8 px, 1 bpp (2 colors per cell)<br>• Multicolor: 4×8 double-width px (4 colors per cell)<br>• ECM mode: 64 characters with 4 background colors |
 | **Color Palettes** | **64-color master palette** (~54–56 unique visible colors)<br>• Up to 25 colors on screen at once (4 BG palettes of 3 colors + 1 backdrop; 4 Sprite palettes of 3 colors + transparent) | **Fixed 16-color system palette**<br>• Multicolor character mode allows 3 global background colors + 1 unique color per cell from Color RAM |
@@ -32,7 +32,7 @@ So you can see it's a give/take kinda thing. The good news is that with a c64 yo
 The original NES version of *Final Fantasy* was built on the **MMC1** mapper (specifically the SNROM board), featuring:
 - **256 KB PRG-ROM** split into sixteen 16 KB banks 
 - **8 KB CHR-RAM** for tile graphics.
-- **8 KB Battery-backed Save WRAM** mapped at `$6000–$7FFF`.
+- **8 KB Save RAM** 
 
 To preserve the logic, structure, and bank layout of the original game as closely as possible while adapting to the C64 hardware, this port targets the **EasyFlash cartridge** (1 MB Flash ROM):
 
@@ -59,3 +59,11 @@ To run in VICE:
 ```bash
 make vice
 ```
+
+## Game Input
+This does version not support joystick, so the buttons are...
+- D-Pad:  W (Up), S (Down), A (Left), D (Right)
+- Btn A:  Return or Space
+- Btn B:  Backspace (Inst/Del) or Esc (Run/Stop)
+- Select: Commodore (C=)
+- Start:  F1

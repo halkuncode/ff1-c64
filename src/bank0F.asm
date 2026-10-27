@@ -14,7 +14,7 @@
 .export WaitForVBlank_L, WaitForVBlank
 .export SwapPRG_L, SwapPRG
 .export CoordToNTAddr, lut_ScreenRowLo, lut_ScreenRowHi
-.export DrawCursor, UpdateSprites, VerifyChecksum, DrawOBSprite
+.export DrawCursor, UpdateSprites, VerifyChecksum, DrawOBSprite, EraseBox, DoOverworld, DrawItemBox, SortEquipmentList
 .export lut_NES_to_C64, lut_OWMetatileColors
 .export LoadPrice
 
@@ -1514,6 +1514,14 @@ DrawComplexString:
     JSR SwapPRG_L
     JSR CoordToNTAddr
 
+    ; Initialize color_dest = ppu_dest + ($D800 - $4000)
+    LDA ppu_dest
+    STA color_dest
+    LDA ppu_dest+1
+    CLC
+    ADC #>($D800 - $4000)
+    STA color_dest+1
+
 @StallAndDraw:
 
 @Draw_NoStall:
@@ -1540,49 +1548,70 @@ DrawComplexString:
     LDA lut_DTE1, X               ; First character in DTE pair
     LDY #0
     STA (ppu_dest), Y
+    LDA #COLOR_WHITE
+    STA (color_dest), Y
     INC ppu_dest
     BNE :+
     INC ppu_dest+1
+:   INC color_dest
+    BNE :+
+    INC color_dest+1
 :
     LDA lut_DTE2, X               ; Second character in DTE pair
 
 @NoDTE:
     LDY #0
     STA (ppu_dest), Y
+    LDA #COLOR_WHITE
+    STA (color_dest), Y
     INC ppu_dest
     BNE :+
     INC ppu_dest+1
+:   INC color_dest
+    BNE :+
+    INC color_dest+1
 :
     JMP @Draw_NoStall
 
 @ControlCode:
     CMP #$01                      ; $01 = Double line break
     BEQ @DoubleLineBreak
+    CMP #$05                      ; $05 = Single line break
+    BEQ @SingleLineBreak
     CMP #$02                      ; $02 = Item / class name
     BEQ @Code_02
     CMP #$03                      ; $03 = Item price
     BEQ @Code_03
     CMP #$04                      ; $04 = Current gold
-    BEQ @Code_04
-    CMP #$05                      ; $05 = Single line break
-    BEQ @SingleLineBreak
-
-    CMP #$10
+    BNE :+
+    JMP @Code_04
+:   CMP #$10
     BCC @SingleLineBreak          ; < $10 defaults to line break
     CMP #$14
-    BCC @Code_10to13              ; $10-$13 = Character stat (characters 0-3)
-
-    JMP @SingleLineBreak          ; >= $14 defaults to single line break
+    BCS @SingleLineBreak          ; >= $14 defaults to single line break
+    JMP @Code_10to13              ; $10-$13 = Character stat (characters 0-3)
 
 @DoubleLineBreak:
     INC dest_y
     INC dest_y
     JSR CoordToNTAddr
+    LDA ppu_dest
+    STA color_dest
+    LDA ppu_dest+1
+    CLC
+    ADC #>($D800 - $4000)
+    STA color_dest+1
     JMP @Draw_NoStall
 
 @SingleLineBreak:
     INC dest_y
     JSR CoordToNTAddr
+    LDA ppu_dest
+    STA color_dest
+    LDA ppu_dest+1
+    CLC
+    ADC #>($D800 - $4000)
+    STA color_dest+1
     JMP @Draw_NoStall
 
 @Code_02:
@@ -1747,6 +1776,21 @@ DrawComplexString:
     ADC tmp
     JMP @DrawItem
 @SpellEmpty:
+    ; Draw 4 spaces ($FF) so column alignment is maintained
+    LDX #4
+:   LDY #0
+    LDA #$FF
+    STA (ppu_dest), Y
+    LDA #COLOR_WHITE
+    STA (color_dest), Y
+    INC ppu_dest
+    BNE :+
+    INC ppu_dest+1
+:   INC color_dest
+    BNE :+
+    INC color_dest+1
+:   DEX
+    BNE :---
     JMP @Draw_NoStall
 
 @lut_MagicStat:
@@ -2061,6 +2105,51 @@ DrawBoxRow_Top:
     RTS
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  EraseBox  [7994]
+;;
+;;  Erases a box on C64 by filling it with black tiles ($00) and black color ($00).
+;;
+;;  IN:  box_x, box_y, box_wd, box_ht
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+EraseBox:
+    lda box_y
+    sta dest_y
+@RowLoop:
+    lda box_x
+    sta dest_x
+    jsr CoordToNTAddr
+
+    lda ppu_dest
+    sta color_dest
+    lda ppu_dest+1
+    clc
+    adc #>($D800 - $4000)
+    sta color_dest+1
+
+    ldy #0
+    lda #$00
+@ColLoop:
+    sta (ppu_dest), y
+    lda #COLOR_BLACK
+    sta (color_dest), y
+    lda #$00
+    iny
+    cpy box_wd
+    bne @ColLoop
+
+    inc dest_y
+    lda dest_y
+    sec
+    sbc box_y
+    cmp box_ht
+    bne @RowLoop
+    rts
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;  Menu Conditional Stall  [7962]
@@ -2070,11 +2159,6 @@ DrawBoxRow_Top:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 MenuCondStall:
-    LDA menustall          ; check stall flag
-    BEQ @Exit              ; if zero, we're not to stall, so just exit
-      JSR CallMusicPlay    ; keep music playing
-      JSR WaitForVBlank_L  ; wait a frame
-@Exit:
     RTS
 
 
@@ -3785,3 +3869,209 @@ UpdateSprites:
     sta YEXP                     ; $D017 (no Y stretch)
 
     rts
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawItemBox  [11075]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawItemBox:
+    LDA #5
+    STA box_x
+    LDA #2
+    STA box_y
+    LDA #30
+    STA box_wd
+    LDA #18
+    STA box_ht
+    LDA #BANK_MENUS
+    STA cur_bank
+    JSR DrawBox
+
+    LDX #0           ; X is our dest index -- start it at zero
+    LDY #1           ; Y is our source index -- start it at 1 (first byte in the 'items' buffer is unused)
+
+  @ItemFillLoop:
+      LDA items, Y       ; check our item qty
+      BEQ @IncSrc        ; if it's nonzero...
+        TYA              ;  put this item ID in A
+        STA item_box, X  ;  and write it to the item box buffer
+        INX              ;  inc our dest index
+
+    @IncSrc:
+      INY                         ; inc our source index
+
+      CPY #item_orb_start-items   ; since orb names aren't included in the item box...
+      BCC @ItemFillLoop           ;   this checks to see if the source index is currently on an orb name
+      CPY #item_qty_start-items   ;   if it is, it jumps back to @IncSrc.  If it isn't, it jumps back
+      BCC @IncSrc                 ;   to @ItemFillLoop
+                                  ; this effectively skips over the orbs
+
+      CPY #item_stop-items        ; keep looping until we go through the entire item list
+      BCC @ItemFillLoop
+
+    CPX #0                 ; if the dest index is still zero, the player has no items
+    BNE @StartDrawingItems ;   otherwise (nonzero), start drawing the items they have
+
+    ; no items, so no further work to be done... just exit with C set
+      SEC
+      RTS
+
+  @Exit:
+    CLC    ; C clear on exit indicates there was at least 1 item in inventory
+    RTS
+
+  @StartDrawingItems:
+    STX cursor_max     ; the number of items they have becomes the cursor maximum
+    LDA #0
+    STA item_box, X    ; put a null terminator at the end of the item box (needed for following loop)
+    LDA #0
+    STA cursor         ; also reset the cursor to 0 (which will be used as a loop counter below)
+
+  @DrawItemLoop:
+    LDX cursor         ; get current loop counter and put it in X
+    LDA item_box, X    ; index the item box to see what item name we're to draw
+    BEQ @Exit          ; if the item ID is zero, it's a null terminator, which means we're done
+
+    ASL A              ; otherwise double the item ID
+    TAX                ;  and put it in X to index (will be used to index the string pointer table)
+
+    LDA #BANK_MENUS    ; set the return bank to BANK_MENUS.
+    STA ret_bank       ;   this is required for DrawComplexString (called below)
+    LDA #BANK_ITEMS    ; swap to BANK_ITEMS (bank containing item names)
+    JSR SwapPRG_L
+
+    LDA lut_ItemNamePtrTbl, X   ; get the pointer to this item name
+    STA tmp                     ;  and put it in (tmp)
+    LDA lut_ItemNamePtrTbl+1, X
+    STA tmp+1
+
+                       ; copy 7 characters verbatim (do not look for null terminators!)
+    LDY #$06           ;   this means that shorter item names must be padded with spaces to 7 characters.
+   @CopyLoop:
+      LDA (tmp), Y         ; copy each character
+      STA str_buf+$20, Y   ; and put in str_buf+$20.  Cannot use str_buf as it is,
+      DEY                  ;   because it shares RAM with item_box, which we can't overwrite
+      BPL @CopyLoop        ; loop until Y wraps (copies 7 characters)
+
+    LDA #0
+    STA str_buf+$27    ; end the string buffer with a null terminator
+
+    TXA                ; put X back in A and right-shift it
+    LSR A              ;  this restores the unedited item ID number
+
+    CMP #item_qty_start-items   ; see if this item ID falls within the range of IDs that you can have
+    BCC @SkipQty                ;  multiple of (qty number needs to be drawn).  If not, Skip ahead
+
+       TAX                     ; put item ID in X
+       LDA items, X            ; use it to index inventory to see how many of this item we have
+       STA tmp                 ;  put the qty in tmp
+       LDA #BANK_MENUS
+       STA ret_bank            ; set return bank again
+       JSR SwapPRG_L           ; also swap to BANK_MENUS (for PrintNumber routines)
+
+       JSR PrintNumber_2Digit  ; print the 2 digit number
+
+       LDA format_buf-2        ; copy the printed 2 digit number from the format buffer
+       STA str_buf+$25         ;  to the end of our string buffer (just before the null terminator)
+       LDA format_buf-1
+       STA str_buf+$26
+
+  @SkipQty:
+    LDA #<(str_buf+$20)    ; fill text_ptr with the pointer to our item name in the string buffer
+    STA text_ptr
+    LDA #>(str_buf+$20)
+    STA text_ptr+1
+
+    LDA cursor             ; get current loop counter again
+    ASL A                  ; double it, and stuff it in X
+    TAX
+
+    LDA lutItemBoxStrPos, X     ; load up the dest X,Y coords
+    STA dest_x                  ;  and record them
+    LDA lutItemBoxStrPos+1, X   ; these are the coords at which to draw this item name
+    STA dest_y
+
+    JSR DrawComplexString  ; finally actually call DrawComplexString to draw the item name
+    INC cursor             ; increment our loop counter to draw the next item
+    JMP @DrawItemLoop      ; and continue looping
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  lutItemBoxStrPos  [11211]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lutItemBoxStrPos:
+  .BYTE   8, 4,   17, 4,   26, 4
+  .BYTE   8, 6,   17, 6,   26, 6
+  .BYTE   8, 8,   17, 8,   26, 8
+  .BYTE   8,10,   17,10,   26,10
+  .BYTE   8,12,   17,12,   26,12
+  .BYTE   8,14,   17,14,   26,14
+  .BYTE   8,16,   17,16,   26,16
+  .BYTE   8,18,   17,18,   26,18
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  SortEquipmentList  [11236]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+SortEquipmentList:
+    LDY #$04
+    LDX equipoffset
+
+   @Loop:
+      JSR @SortOne
+
+      TXA
+      CLC
+      ADC #$40
+      AND #$FC
+      TAX
+
+      DEY
+      BNE @Loop
+
+    RTS
+
+  @SortOne:
+    LDA ch_stats, X
+    STA tmp
+    LDA ch_stats+1, X
+    STA tmp+1
+    LDA ch_stats+2, X
+    STA tmp+2
+    LDA ch_stats+3, X
+    STA tmp+3
+
+    LDA #0
+    STA ch_stats, X
+    STA ch_stats+1, X
+    STA ch_stats+2, X
+    STA ch_stats+3, X
+
+    LDA tmp
+    BEQ :+
+      STA ch_stats, X
+      INX
+
+:   LDA tmp+1
+    BEQ :+
+      STA ch_stats, X
+      INX
+
+:   LDA tmp+2
+    BEQ :+
+      STA ch_stats, X
+      INX
+
+:   LDA tmp+3
+    BEQ :+
+      STA ch_stats, X
+
+:   RTS
