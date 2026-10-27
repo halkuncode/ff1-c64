@@ -292,6 +292,9 @@ shop_spell      = $0381  ; shared
 shop_curitem    = $0382  ; shared
 shop_curprice   = $0384  ; 2 shared bytes
 
+lu_slot_order   = $0390  ; 4 bytes: sorted slot offsets for LineupMenu_IRQ
+lu_split_raster = $0394  ; 1 byte: dynamic split scanline for LineupMenu_IRQ
+
 tileset_data    = $0400  ; $400 bytes -- must be on page bound
 
 mm_drawbuf      = $0500  ;$100 bytes, shared, should be on page bound, but don't think it's absolutely required

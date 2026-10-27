@@ -17,7 +17,7 @@
 .export EnterMainMenu, ResumeMainMenu, MainMenuLoop, MainMenuSubTarget
 .export MoveMainMenuSubCursor, MoveCursorUpDown, MenuFrame
 .export PlaySFX_MenuMove, PlaySFX_MenuSel, PlaySFX_Error
-.export EnterItemMenu, EnterMagicMenu, EnterEquipMenu, EnterStatusMenu, ClearMenuScreen
+.export EnterItemMenu, EnterMagicMenu, EnterEquipMenu, EnterStatusMenu, ClearMenuScreen, EnterLineupMenu
 .export DrawCharMenuString, DrawCharMenuString_Len, MenuWaitForBtn_SFX, MenuWaitForBtn, lut_StatusBoxes
 .import LoadMenuCHRPal, LoadNewGameCHRPal, DrawComplexString, WaitForVBlank_L, UpdateJoy_L, DrawBox, DrawOBSprite
 .import GameStart_L, CallMusicPlay_L, ClearOAM, DrawPalette_L, DrawCursor, EraseBox
@@ -26,6 +26,7 @@
 .import lut_ScreenRowLo, lut_ScreenRowHi, CoordToNTAddr
 .import lut_IntroStoryText
 .import LoadPrice
+.import lut_ClassSpriteBase, lut_ClassColors
 
 BANK_THIS = $0E
 
@@ -736,6 +737,689 @@ TurnMenuScreenOn_ClearOAM:  ; [8087]
 
 TurnMenuScreenOn:  ; [8091]
     RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  EnterLineupMenu  [1831]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+EnterLineupMenu:
+    LDA #0
+    STA spr_multiplex_mode          ; Disable raster multiplexer
+    STA spr_irq_zone
+    LDA #250
+    STA RASTER
+    LDA SCROLY
+    AND #$7F
+    STA SCROLY
+
+    LDA #0
+    STA menustall
+    STA joy_a
+    STA joy_b
+    STA joy_select
+    STA joy
+    STA joy_prevdir
+
+    ; 1. Load Menu CHR, font, and palettes
+    JSR LoadMenuCHRPal
+
+    ; 2. Ensure Character $00 at $4800-$4807 is a solid 1s block ($FF)
+    ; In text mode with Color RAM = COLOR_BLACK, character $00 renders
+    ; as 100% solid pitch black!
+    LDY #$07
+    LDA #$FF
+:   STA $4800, Y
+    DEY
+    BPL :-
+
+    ; 3. Clear Screen RAM with character $00, and Color RAM with COLOR_BLACK
+    JSR ClearMenuScreen
+
+    ; 4. Draw the centered window box
+    ; Centered: box_x = 11, box_y = 3, box_wd = 18, box_ht = 19
+    LDA #11
+    STA box_x
+    LDA #3
+    STA box_y
+    LDA #18
+    STA box_wd
+    LDA #19
+    STA box_ht
+    JSR DrawBox
+
+    ; 5. Fill slot table in str_buf
+    LDX #$1F
+  @CopyLoop:
+      LDA lut_LineupSlots, X
+      STA str_buf, X
+      DEX
+      BPL @CopyLoop
+
+    LDA ch_ailments             ; char 0
+    CLC
+    ADC #$01
+    AND #$02
+    STA str_buf
+
+    LDA ch_ailments+(1<<6)      ; char 1
+    CLC
+    ADC #$01
+    AND #$02
+    STA str_buf+(1*8)
+
+    LDA ch_ailments+(2<<6)      ; char 2
+    CLC
+    ADC #$01
+    AND #$02
+    STA str_buf+(2*8)
+
+    LDA ch_ailments+(3<<6)      ; char 3
+    CLC
+    ADC #$01
+    AND #$02
+    STA str_buf+(3*8)
+
+    ; 6. Draw names
+    JSR DrawLineupMenuNames
+
+    ; 7. Reset cursors & mode
+    LDA #0
+    STA lu_cursor2
+    STA lu_mode
+    STA lu_cursor
+    STA spr_irq_zone
+
+    LDA joy
+    AND #$0C
+    STA lu_joyprev
+
+    ; 8. Play music track $55 (crystal theme)
+    LDA #$55
+    STA music_track
+    LDA #BANK_THIS
+    STA cur_bank
+    JSR CallMusicPlay_L
+
+    ; 9. Activate Formation 2-Zone Multiplexer (mode 3)
+    LDA #3
+    STA spr_multiplex_mode
+
+  @MainLoop:
+    JSR LineupMenu_Frame             ; frame sync & audio
+    JSR LineupMenu_UpdateJoy         ; update joypad & play SFX
+    JSR LineupMenu_ProcessMode       ; process animation
+    JSR LineupMenu_ProcessJoy        ; process button input
+    JMP @MainLoop
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  LineupMenu_Frame  [1917]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LineupMenu_Frame:
+    JSR WaitForVBlank_L
+    LDA #BANK_THIS
+    STA cur_bank
+    JSR CallMusicPlay_L
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  LineupMenu_UpdateJoy  [1959]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LineupMenu_UpdateJoy:
+    LDA joy
+    AND #$0C               ; isolate up/down buttons
+    STA tmp+7
+
+    JSR UpdateJoy_L
+
+    LDA joy_a
+    ORA joy_b
+    BEQ :+
+      JMP PlaySFX_MenuSel
+
+:   LDA joy
+    AND #$0C
+    BEQ @Exit
+
+    CMP tmp+7
+    BEQ @Exit
+
+    JMP PlaySFX_MenuMove
+
+  @Exit:
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  LineupMenu_ProcessJoy  [2028]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  LUJoy_BPressed:      ; B was pressed (must be in mode 0 or 2 to reach here)
+    LDA lu_mode
+    BEQ @ExitMenu
+
+    LDA #$04
+    STA lu_mode
+
+    LDA lu_cursor2
+    STA lu_cursor
+
+    LDA #0
+    STA joy_b
+    RTS
+
+  @ExitMenu:
+    PLA
+    PLA
+    JMP LineupMenu_Finalize
+
+  LUJoy_Exit:
+    RTS
+
+LineupMenu_ProcessJoy:
+    LDY lu_mode
+    BEQ @Mode_0or2
+    CPY #$02
+    BNE LUJoy_Exit
+
+  @Mode_0or2:
+    LDA joy_b
+    BNE LUJoy_BPressed
+    LDA joy_a
+    BNE @A_Pressed
+
+    LDA joy
+    AND #$0C
+    CMP lu_joyprev
+    BEQ LUJoy_Exit
+    STA lu_joyprev
+    AND #$0C
+    BEQ LUJoy_Exit
+
+    CMP #$08
+    BEQ @Up
+
+  @Down:
+    LDA lu_cursor
+    CLC
+    ADC #$08
+    BNE @MoveDone
+
+  @Up:
+    LDA lu_cursor
+    SEC
+    SBC #$08
+
+  @MoveDone:
+    AND #$1F
+    STA lu_cursor
+    RTS
+
+@A_Pressed:
+    LDA #0
+    STA joy_a
+
+    LDA lu_mode
+    BNE @A_Mode2
+
+  @A_Mode0:
+    INC lu_mode
+    LDA lu_cursor
+    STA lu_cursor2
+    RTS
+
+  @A_Mode2:
+    LDA lu_cursor
+    CMP lu_cursor2
+    BNE @LeaderCheck1
+
+  @KillSwap:
+    LDA lu_cursor2
+    STA lu_cursor
+    INC lu_mode
+    RTS
+
+  @LeaderCheck1:
+    TAY
+    BNE @LeaderCheck2
+      LDX lu_cursor2
+      LDA str_buf, X
+      BNE @KillSwap
+
+  @LeaderCheck2:
+    LDX lu_cursor2
+    BNE @SwapSafe
+      LDA str_buf, Y
+      BNE @KillSwap
+
+  @SwapSafe:
+    LDA str_buf+5, Y
+    STA tmp
+
+    LDA str_buf+5, X
+    STA str_buf+5, Y
+
+    LDA tmp
+    STA str_buf+5, X
+
+    INC lu_mode
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  LineupMenu_ProcessMode  [2141]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  LUMode_Exit:
+    RTS
+
+LineupMenu_ProcessMode:
+    LDA lu_mode
+    BEQ LUMode_Exit
+
+    CMP #$02
+    BEQ LUMode_Exit
+
+    CMP #$01
+    BNE @Mode_3or4
+
+  @Mode_1:
+    LDY lu_cursor2
+    LDA str_buf+2, Y
+
+    CMP #185
+    BCC @IncModeAndExit
+    BEQ @IncModeAndExit
+
+    SEC
+    SBC #$01
+    STA str_buf+2, Y
+    RTS
+
+  @Mode_3or4:
+    CMP #$03
+    BNE @Mode_4
+
+  @Mode_3:
+    LDY lu_cursor
+    LDA str_buf+2, Y
+
+    CMP #216
+    BCS @IncModeAndExit
+
+    CLC
+    ADC #$01
+    STA str_buf+2, Y
+    RTS
+
+  @IncModeAndExit:
+    INC lu_mode
+    RTS
+
+  @Mode_4:
+    LDY lu_cursor
+    JSR LineupMenu_AnimStep
+    BCC @M4_FirstDone
+
+      LDY lu_cursor2
+      JMP LineupMenu_AnimStep
+
+  @M4_FirstDone:
+    LDY lu_cursor2
+    JSR LineupMenu_AnimStep
+    BCS LUMode_Exit
+
+    LDY lu_cursor
+    LDA #$08
+    LDX lu_cursor2
+
+  @SwapLoop:
+    PHA
+      LDA str_buf, Y
+      PHA
+        LDA str_buf, X
+        STA str_buf, Y
+      PLA
+      STA str_buf, X
+
+      INX
+      INY
+
+    PLA
+    SEC
+    SBC #$01
+    BNE @SwapLoop
+
+    LDA #0
+    STA lu_mode
+
+    LDA lu_cursor2
+    STA lu_cursor
+
+    LDA #1
+    STA menustall
+    JMP DrawLineupMenuNames
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  LineupMenu_AnimStep  [2260]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LineupMenu_AnimStep:
+    LDA str_buf+3, Y
+    CMP str_buf+5, Y
+    BNE @MoveVertical
+
+    LDA str_buf+2, Y
+    CMP str_buf+4, Y
+    BNE @MoveHorizontal
+
+    CLC
+    RTS
+
+  @MoveHorizontal:
+    BCS @MoveLeft
+
+  @MoveRight:
+    ADC #$01
+    STA str_buf+2, Y
+    SEC
+    RTS
+
+  @MoveLeft:
+    SBC #$01
+    STA str_buf+2, Y
+    SEC
+    RTS
+
+  @MoveVertical:
+    BCS @MoveUp
+
+  @MoveDown:
+    ADC #$01
+    STA str_buf+3, Y
+    SEC
+    RTS
+
+  @MoveUp:
+    SBC #$01
+    STA str_buf+3, Y
+    SEC
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  LineupMenu_DrawCursor  [2308]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LineupMenu_DrawCursor:
+    LDY lu_cursor
+    LDA #116               ; Finger cursor X coord (pointing to col 14)
+    STA spr_x
+    LDA str_buf+3, Y       ; Selected slot's Y coord
+    CLC
+    ADC #$08               ; Point at character name (+8 pixels)
+    STA spr_y
+    JMP DrawCursor
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  LineupMenu_DrawCharSprites  [2363]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LineupMenu_DrawCharSprites:
+    LDA #%11001111         ; Enable Sprites 0-3 (heroes) and 6-7 (cursor)
+    STA shadow_spr_en
+    STA SPENA
+
+    LDA #%10000000         ; Sprite 7 Multicolor, Sprites 0-6 Hi-Res
+    STA shadow_spr_mcm
+    STA SPMC
+
+    LDA #0
+    STA shadow_spr_msb
+    STA MSIGX
+
+    ; Slot 0 -> Sprite 0
+    LDY #0
+    LDX #0
+    JSR @SetupOneHero
+
+    ; Slot 1 -> Sprite 1
+    LDY #8
+    LDX #1
+    JSR @SetupOneHero
+
+    ; Slot 2 -> Sprite 2
+    LDY #16
+    LDX #2
+    JSR @SetupOneHero
+
+    ; Slot 3 -> Sprite 3
+    LDY #24
+    LDX #3
+    JSR @SetupOneHero
+    RTS
+
+@SetupOneHero:
+    LDA str_buf+2, Y           ; X coord
+    STA shadow_spr_x, X
+    LDA str_buf+3, Y           ; Y coord
+    STA shadow_spr_y, X
+
+    TXA
+    ASL A
+    TAX                        ; X * 2 for VIC-II hardware registers
+    LDA str_buf+2, Y
+    STA SP0X, X
+    LDA str_buf+3, Y
+    STA SP0Y, X
+    TXA
+    LSR A
+    TAX                        ; restore X (0..3)
+
+    LDA str_buf+1, Y           ; party char index ($00, $40, $80, $C0)
+    STY tmp+8                  ; save slot offset Y
+    TAY                        ; char index in Y
+    LDA ch_class, Y            ; class 0..11
+    CMP #6
+    BCC :+
+      SBC #6
+:   TAY                        ; class 0..5 in Y
+    LDA lut_ClassSpriteBase, Y
+    STA shadow_spr_ptr, X
+    STA $43F8, X               ; sprite pointer
+
+    ; Determine color
+    LDY tmp+8                  ; slot offset
+    LDA str_buf+1, Y           ; char index
+    TAY
+    LDA ch_ailments, Y
+    CMP #$01                   ; dead?
+    BNE :+
+      LDA #COLOR_DARKGREY
+      BNE @SetCol
+:   CMP #$02                   ; stone?
+    BNE :+
+      LDA #COLOR_GREY
+      BNE @SetCol
+:   LDA ch_class, Y
+    CMP #6
+    BCC :+
+      SBC #6
+:   TAY
+    TYA
+    ASL A
+    STA tmp
+    TYA
+    CLC
+    ADC tmp                    ; class * 3
+    TAY
+    LDA lut_ClassColors, Y     ; Class main color
+
+@SetCol:
+    STA shadow_spr_col, X
+    STA SP0COL, X
+    LDY tmp+8                  ; restore Y (slot offset)
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  lut_LineupSlots  [2395]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_LineupSlots:
+  .BYTE   $00,$00, 200, 90,  200, 90,  $00,$00
+  .BYTE   $00,$40, 200,122,  200,122,  $00,$00
+  .BYTE   $00,$80, 200,154,  200,154,  $00,$00
+  .BYTE   $00,$C0, 200,186,  200,186,  $00,$00
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawLineupMenuNames  [2410]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawLineupMenuNames:
+    LDA #14
+    STA dest_x
+    LDA #6
+    STA dest_y              ; Slot 0 at (14, 6)
+    LDA str_buf+1
+    JSR DrawCharacterName
+
+    LDA #10
+    STA dest_y              ; Slot 1 at (14, 10)
+    LDA str_buf+1+(1*8)
+    JSR DrawCharacterName
+
+    LDA #14
+    STA dest_y              ; Slot 2 at (14, 14)
+    LDA str_buf+1+(2*8)
+    JSR DrawCharacterName
+
+    LDA #18
+    STA dest_y              ; Slot 3 at (14, 18)
+    LDA str_buf+1+(3*8)
+    JMP DrawCharacterName
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  LineupMenu_Finalize  [2447]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LineupMenu_Finalize:
+    LDA #0
+    STA spr_multiplex_mode          ; Disable raster multiplexer
+    STA spr_irq_zone
+    STA SPENA                       ; Disable all sprites
+    LDA #250
+    STA RASTER
+    LDA SCROLY
+    AND #$7F
+    STA SCROLY
+
+    LDX #0
+   @BackupLoop:
+      LDA ch_stats, X
+      STA lutmp_ch_stats, X
+      LDA ch_magicdata, X
+      STA lutmp_ch_magic, X
+      INX
+      BNE @BackupLoop
+
+    LDX str_buf+1
+    LDY #0
+    JSR @PutInSlot
+
+    LDX str_buf+1+(1*8)
+    LDY #(1<<6)
+    JSR @PutInSlot
+
+    LDX str_buf+1+(2*8)
+    LDY #(2<<6)
+    JSR @PutInSlot
+
+    LDX str_buf+1+(3*8)
+    LDY #(3<<6)
+    JSR @PutInSlot
+    RTS
+
+  @PutInSlot:
+    LDA #$40
+    STA tmp
+
+   @SlotLoop:
+      LDA lutmp_ch_stats, X
+      STA ch_stats, Y
+
+      LDA lutmp_ch_magic, X
+      STA ch_magicdata, Y
+
+      INX
+      INY
+
+      DEC tmp
+      BNE @SlotLoop
+
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawCharacterName  [2549]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawCharacterName:
+    TAX
+
+    LDA ch_name, X
+    STA format_buf-4
+    LDA ch_name+1, X
+    STA format_buf-3
+    LDA ch_name+2, X
+    STA format_buf-2
+    LDA ch_name+3, X
+    STA format_buf-1
+    LDA #0
+    STA format_buf
+
+    LDA #<(format_buf-4)
+    STA text_ptr
+    LDA #>(format_buf-4)
+    STA text_ptr+1
+
+    LDA #BANK_THIS
+    STA cur_bank
+    STA ret_bank
+
+    JMP DrawComplexString
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -3470,7 +4154,7 @@ DrawItemTargetCursor:
     LDX cursor
     LDA @lut, X
     STA spr_x
-    LDA #138
+    LDA #130
     STA spr_y
     JMP DrawCursor
 

@@ -19,7 +19,7 @@
 .export lut_NES_to_C64, lut_OWMetatileColors
 .export LoadPrice
 
-.import EnterIntroStory, EnterTitleScreen, NewGamePartyGeneration, EnterMainMenu
+.import EnterIntroStory, EnterTitleScreen, NewGamePartyGeneration, EnterMainMenu, EnterLineupMenu
 .import lut_MenuCHR
 .import lut_FingerSprite, lut_HeroSprites
 .import lut_BattleFormations
@@ -276,6 +276,16 @@ ProcessOWInput:
     JMP DoOverworld             ; Redraw overworld when main menu exits
 
 @NoStart:
+    LDA joy_select
+    BEQ @NoSelect
+    LDA #0
+    STA joy_select
+    LDA #BANK_MENUS             ; Swap to Bank $0E (BANK_MENUS)
+    JSR SwapPRG_L
+    JSR EnterLineupMenu         ; Enter formation/lineup menu!
+    JMP DoOverworld             ; Redraw overworld when lineup menu exits
+
+@NoSelect:
     LDA joy
     AND #(RIGHT | LEFT | DOWN | UP)
     BEQ @Exit           ; if no direction pressed, exit
@@ -2824,10 +2834,15 @@ OnIRQ:
     beq @NormalIRQ
     cmp #1
     beq @PartyGen
-    jmp MainMenu_IRQ
+    cmp #2
+    beq @MainMenu
+    jmp LineupMenu_IRQ
 
 @PartyGen:
     jmp PartyGen_IRQ
+
+@MainMenu:
+    jmp MainMenu_IRQ
 
 @NormalIRQ:
     ; Increment frame counter
@@ -3610,6 +3625,315 @@ SetupMMHero3:
 ;;     This routine resets the BG palette to all black (0)
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_ClassColorOffset:
+    .byte 0, 3, 6, 9, 12, 15
+
+LineupMenu_IRQ:
+    lda #$01
+    sta VICIRQ                 ; Acknowledge VIC-II Raster IRQ
+
+    lda spr_irq_zone
+    beq @Zone0
+    jmp @Zone1
+
+@Zone0:
+    inc vblank_count
+
+    lda #$00
+    sta MSIGX
+    sta XEXP
+    sta YEXP
+    sta SPBGPR
+    sta SPMC
+
+    ; Sort 4 slots by Y coordinate using 5-comparator network
+    lda #0
+    sta lu_slot_order+0
+    lda #8
+    sta lu_slot_order+1
+    lda #16
+    sta lu_slot_order+2
+    lda #24
+    sta lu_slot_order+3
+
+    ; 1. Compare (0, 1)
+    ldx lu_slot_order+0
+    ldy lu_slot_order+1
+    lda str_buf+3, x
+    cmp str_buf+3, y
+    bcc :+
+    stx lu_slot_order+1
+    sty lu_slot_order+0
+:   ; 2. Compare (2, 3)
+    ldx lu_slot_order+2
+    ldy lu_slot_order+3
+    lda str_buf+3, x
+    cmp str_buf+3, y
+    bcc :+
+    stx lu_slot_order+3
+    sty lu_slot_order+2
+:   ; 3. Compare (0, 2)
+    ldx lu_slot_order+0
+    ldy lu_slot_order+2
+    lda str_buf+3, x
+    cmp str_buf+3, y
+    bcc :+
+    stx lu_slot_order+2
+    sty lu_slot_order+0
+:   ; 4. Compare (1, 3)
+    ldx lu_slot_order+1
+    ldy lu_slot_order+3
+    lda str_buf+3, x
+    cmp str_buf+3, y
+    bcc :+
+    stx lu_slot_order+3
+    sty lu_slot_order+1
+:   ; 5. Compare (1, 2)
+    ldx lu_slot_order+1
+    ldy lu_slot_order+2
+    lda str_buf+3, x
+    cmp str_buf+3, y
+    bcc :+
+    stx lu_slot_order+2
+    sty lu_slot_order+1
+:
+
+    ; Dynamic split raster = Y(2nd lowest) + 22
+    ldx lu_slot_order+1
+    lda str_buf+3, x
+    clc
+    adc #22
+    sta lu_split_raster
+
+    ; Setup Hero with lowest Y (Sprites 0-2)
+    ldx lu_slot_order+0
+    jsr SetupLineupHero_012
+
+    ; Setup Hero with 2nd lowest Y (Sprites 3-5)
+    ldx lu_slot_order+1
+    jsr SetupLineupHero_345
+
+    ; Enable Sprites 0-5
+    lda #%00111111
+    sta SPENA
+
+    ; Setup Cursor in Zone 0
+    ldx #0
+    jsr SetupLineupCursor
+
+    ; Arm Zone 1 at lu_split_raster
+    lda lu_split_raster
+    sta RASTER
+    lda SCROLY
+    and #$7F
+    sta SCROLY
+    lda #1
+    sta spr_irq_zone
+    jmp $FEBC
+
+@Zone1:
+    lda #$00
+    sta MSIGX
+    sta XEXP
+    sta YEXP
+    sta SPBGPR
+    sta SPMC
+
+    ; Setup Hero with 3rd lowest Y (Sprites 0-2)
+    ldx lu_slot_order+2
+    jsr SetupLineupHero_012
+
+    ; Setup Hero with largest Y (Sprites 3-5)
+    ldx lu_slot_order+3
+    jsr SetupLineupHero_345
+
+    ; Enable Sprites 0-5
+    lda #%00111111
+    sta SPENA
+
+    ; Setup Cursor in Zone 1
+    ldx #1
+    jsr SetupLineupCursor
+
+    ; Arm Zone 0 at Scanline 250 (VBlank)
+    lda #250
+    sta RASTER
+    lda SCROLY
+    and #$7F
+    sta SCROLY
+    lda #0
+    sta spr_irq_zone
+    jmp $FEBC
+
+SetupLineupHero_012:
+    lda str_buf+2, x
+    sta SP0X
+    sta SP1X
+    sta SP2X
+    lda str_buf+3, x
+    sta SP0Y
+    sta SP1Y
+    sta SP2Y
+
+    lda str_buf+1, x           ; char index
+    tay
+    lda ch_class, y
+    cmp #6
+    bcc :+
+    sbc #6
+:   tay
+    lda lut_ClassSpriteBase, y
+    sta $43F8
+    clc
+    adc #1
+    sta $43F9
+    adc #1
+    sta $43FA
+
+    ; Determine colors
+    lda str_buf+1, x
+    tay
+    lda ch_ailments, y
+    cmp #$01                   ; dead?
+    bne :+
+    lda #COLOR_DARKGREY
+    sta SP0COL
+    lda #COLOR_BLACK
+    sta SP1COL
+    sta SP2COL
+    rts
+:   cmp #$02                   ; stone?
+    bne :+
+    lda #COLOR_GREY
+    sta SP0COL
+    lda #COLOR_BLACK
+    sta SP1COL
+    sta SP2COL
+    rts
+:   lda ch_class, y
+    cmp #6
+    bcc :+
+    sbc #6
+:   tay
+    ldx lut_ClassColorOffset, y
+    lda lut_ClassColors + 0, x
+    sta SP0COL
+    lda lut_ClassColors + 1, x
+    sta SP1COL
+    lda lut_ClassColors + 2, x
+    sta SP2COL
+    rts
+
+SetupLineupHero_345:
+    lda str_buf+2, x
+    sta SP3X
+    sta SP4X
+    sta SP5X
+    lda str_buf+3, x
+    sta SP3Y
+    sta SP4Y
+    sta SP5Y
+
+    lda str_buf+1, x           ; char index
+    tay
+    lda ch_class, y
+    cmp #6
+    bcc :+
+    sbc #6
+:   tay
+    lda lut_ClassSpriteBase, y
+    sta $43FB
+    clc
+    adc #1
+    sta $43FC
+    adc #1
+    sta $43FD
+
+    ; Determine colors
+    lda str_buf+1, x
+    tay
+    lda ch_ailments, y
+    cmp #$01                   ; dead?
+    bne :+
+    lda #COLOR_DARKGREY
+    sta SP3COL
+    lda #COLOR_BLACK
+    sta SP4COL
+    sta SP5COL
+    rts
+:   cmp #$02                   ; stone?
+    bne :+
+    lda #COLOR_GREY
+    sta SP3COL
+    lda #COLOR_BLACK
+    sta SP4COL
+    sta SP5COL
+    rts
+:   lda ch_class, y
+    cmp #6
+    bcc :+
+    sbc #6
+:   tay
+    ldx lut_ClassColorOffset, y
+    lda lut_ClassColors + 0, x
+    sta SP3COL
+    lda lut_ClassColors + 1, x
+    sta SP4COL
+    lda lut_ClassColors + 2, x
+    sta SP5COL
+    rts
+
+SetupLineupCursor:
+    ldy lu_cursor
+    lda str_buf+3, y           ; Hero Y
+    clc
+    adc #8                     ; Point at character name (+8 pixels)
+    cmp lu_split_raster
+    bcs @InZone1
+
+@InZone0:
+    cpx #0                     ; Are we in Zone 0?
+    bne @NoCursor
+    jmp @DrawCursor
+
+@InZone1:
+    cpx #1                     ; Are we in Zone 1?
+    bne @NoCursor
+
+@DrawCursor:
+    lda #116                   ; Finger cursor X coord (points to col 14)
+    sta SP6X
+    sta SP7X
+    lda str_buf+3, y           ; Hero Y
+    clc
+    adc #8                     ; Finger cursor Y coord (+8 pixels)
+    sta SP6Y
+    sta SP7Y
+    lda #BLOCK_FINGER_OVERLAY
+    sta $43FE
+    lda #COLOR_WHITE
+    sta SP6COL
+    lda #BLOCK_FINGER_BASE
+    sta $43FF
+    lda #COLOR_WHITE
+    sta SP7COL
+    lda SPMC
+    ora #%10000000             ; Sprite 7 Multicolor
+    sta SPMC
+    lda SPENA
+    ora #%11000000             ; Enable Sprites 6 & 7
+    sta SPENA
+    rts
+
+@NoCursor:
+    lda SPENA
+    and #%00111111             ; Disable Sprites 6 & 7
+    sta SPENA
+    lda SPMC
+    and #%01111111
+    sta SPMC
+    rts
 
 ClearBGPalette:
     lda #COLOR_BLACK
