@@ -514,3 +514,14 @@ SPRITE_BASE_ADDR        = $5800
 BLOCK_FINGER_BASE       = ($5800 - $4000) / 64   ; Block 96 ($60)
 BLOCK_FINGER_OVERLAY    = ($5840 - $4000) / 64   ; Block 97 ($61)
 BLOCK_MAPMAN_BASE       = ($5800 - $4000) / 64   ; Block 96 ($60, $5800-$5BFF: 16 blocks for 1 hero)
+
+; ==============================================================================
+; Overworld Player Screen & Coordinate Constants
+; ==============================================================================
+; On NES (32x30 tiles = 16x15 metatiles), player was fixed at screen tile (7, 7).
+; On C64 (40x25 tiles = 20x12.5 metatiles), screen center is tile (9, 6).
+; Screen col 0 starts at VIC-II X = 24; screen row 0 starts at VIC-II Y = 50.
+OW_PLAYER_METATILE_X    = 9
+OW_PLAYER_METATILE_Y    = 6
+OW_PLAYER_SPR_X         = 24 + (OW_PLAYER_METATILE_X * 16)   ; 168
+OW_PLAYER_SPR_Y         = 50 + (OW_PLAYER_METATILE_Y * 16)   ; 146

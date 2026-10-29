@@ -853,8 +853,13 @@ EnterLineupMenu:
     JSR CallMusicPlay_L
 
     ; 9. Activate Formation 2-Zone Multiplexer (mode 3)
+    JSR WaitForVBlank_L
+    SEI
+    LDA #0
+    STA spr_irq_zone
     LDA #3
     STA spr_multiplex_mode
+    CLI
 
   @MainLoop:
     JSR LineupMenu_Frame             ; frame sync & audio
@@ -1495,10 +1500,18 @@ PtyGen_Confirmed:
     JSR @RecordClassAndName
 
     ; Disable multiplexer and clear sprites before continuing
+    SEI
     LDA #0
     STA spr_multiplex_mode
+    STA spr_irq_zone
     STA shadow_spr_en
     STA SPENA
+    LDA #250
+    STA RASTER
+    LDA SCROLY
+    AND #$7F
+    STA SCROLY
+    CLI
     RTS
 
 @RecordClassAndName:
@@ -1938,10 +1951,13 @@ PtyGen_DrawScreen:
     JSR PtyGen_DrawText
 
     ; Enable 2-zone raster multiplexer for all 4 heroes
-    LDA #1
-    STA spr_multiplex_mode
+    JSR WaitForVBlank_L
+    SEI
     LDA #0
     STA spr_irq_zone
+    LDA #1
+    STA spr_multiplex_mode
+    CLI
     RTS
 
 
@@ -2889,8 +2905,13 @@ ResumeMainMenu:
     LDA #5                          ; 5 options (Item, Magic, Weapon, Armor, Status)
     STA cursor_max
 
+    JSR WaitForVBlank_L
+    SEI
+    LDA #0
+    STA spr_irq_zone
     LDA #2                          ; Activate Main Menu 2-Zone Multiplexer
     STA spr_multiplex_mode
+    CLI
 
 MainMenuLoop:
     JSR MenuFrame                   ; VBlank sync, audio update, joypad read
@@ -2907,9 +2928,18 @@ MainMenuLoop:
     JMP MainMenuLoop
 
 @B_Pressed:
+    SEI
     LDA #0
     STA spr_multiplex_mode          ; Restore standard IRQ
+    STA spr_irq_zone
     STA SPENA                       ; Turn off sprites
+    LDA #250
+    STA RASTER
+    LDA SCROLY
+    AND #$7F
+    STA SCROLY
+    CLI
+    LDA #0
     STA joy_a
     STA joy_b
     STA joy_start

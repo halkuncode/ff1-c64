@@ -398,8 +398,47 @@ OverworldMovement:
     STA move_ctr_y
     STA move_speed
     JSR DrawFullMap
+    JSR GetOWTile
     RTS
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  GetOWTile  [1635]
+;;
+;;  Fetches the overworld metatile ID and properties for the tile
+;;  the player is currently standing on:
+;;    World X = ow_scroll_x + OW_PLAYER_METATILE_X
+;;    World Y = ow_scroll_y + OW_PLAYER_METATILE_Y
+;;
+;;  OUT:  ow_tile   = metatile ID (0..127)
+;;        inforest  = non-zero if special tile (caravan, chime, floater)
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+GetOWTile:
+    LDA ow_scroll_x
+    CLC
+    ADC #OW_PLAYER_METATILE_X
+    STA tmp                     ; Column index in decompressed row (low byte of pointer)
+
+    LDA ow_scroll_y
+    CLC
+    ADC #OW_PLAYER_METATILE_Y
+    AND #$0F                    ; Ring buffer row (0..15)
+    ORA #>mapdata               ; $70..$7F
+    STA tmp+1                   ; High byte of pointer
+
+    LDY #0
+    LDA (tmp), Y                ; Get metatile ID
+    STA ow_tile
+
+    ASL A                       ; 2 bytes per metatile property
+    TAX
+    LDA tileset_prop, X         ; Read first property byte
+    AND #OWTP_SPEC_MASK
+    STA inforest
+    RTS
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -648,6 +687,7 @@ PrepOverworld:
     BNE @InitMapLoop
 
     JSR DrawFullMap         ; then draw the map
+    JSR GetOWTile           ; record the tile and properties the player is standing on
 
     ; LDA ow_scroll_x      ; get ow scroll X
     ; AND #$10             ; isolate the '16' bit (nametable bit)
@@ -2345,11 +2385,11 @@ LoadPlayerMapmanSprites:
     STA shadow_spr_col + 0  ; Sprite 0 individual color = black (hi-res outline)
     STA SP0COL
 
-    ; Position Sprites at screen center (X = 176, Y = 144)
-    LDA #176
+    ; Position Sprites at screen center (Metatile X = 9, Metatile Y = 6)
+    LDA #OW_PLAYER_SPR_X
     STA shadow_spr_x + 0
     STA shadow_spr_x + 1
-    LDA #144
+    LDA #OW_PLAYER_SPR_Y
     STA shadow_spr_y + 0
     STA shadow_spr_y + 1
     LDA #0
@@ -3058,6 +3098,10 @@ OnIRQ:
     jmp MainMenu_IRQ
 
 @NormalIRQ:
+    ; Ensure zone tracker is clean
+    lda #0
+    sta spr_irq_zone
+
     ; Increment frame counter
     inc vblank_count
 
@@ -3210,12 +3254,7 @@ SetupHero0:
     adc #1
     sta $43FA                  ; Sprite 2 pointer (Layer 2)
 
-    txa
-    asl a
-    stx tmp
-    clc
-    adc tmp                    ; A = X * 3
-    tay
+    ldy lut_ClassColorOffset, x
 
     lda lut_ClassColors + 0, y
     sta SP0COL
@@ -3248,12 +3287,7 @@ SetupHero1:
     adc #1
     sta $43FD                  ; Sprite 5 pointer (Layer 2)
 
-    txa
-    asl a
-    stx tmp
-    clc
-    adc tmp                    ; A = X * 3
-    tay
+    ldy lut_ClassColorOffset, x
 
     lda lut_ClassColors + 0, y
     sta SP3COL
@@ -3286,12 +3320,7 @@ SetupHero2:
     adc #1
     sta $43FA                  ; Sprite 2 pointer (Layer 2)
 
-    txa
-    asl a
-    stx tmp
-    clc
-    adc tmp                    ; A = X * 3
-    tay
+    ldy lut_ClassColorOffset, x
 
     lda lut_ClassColors + 0, y
     sta SP0COL
@@ -3324,12 +3353,7 @@ SetupHero3:
     adc #1
     sta $43FD                  ; Sprite 5 pointer (Layer 2)
 
-    txa
-    asl a
-    stx tmp
-    clc
-    adc tmp                    ; A = X * 3
-    tay
+    ldy lut_ClassColorOffset, x
 
     lda lut_ClassColors + 0, y
     sta SP3COL
@@ -3349,7 +3373,7 @@ SetupHero3:
     sta SP5Y
     rts
 
-.export lut_ClassSpriteBase, lut_ClassColors
+.export lut_ClassSpriteBase, lut_ClassColors, lut_ClassColorOffset
 
 lut_ClassSpriteBase:
     .byte BLOCK_HERO_BASE + (0 * 3)   ; Class 0 (Fighter): Index 0 (Block 98)
@@ -3377,6 +3401,9 @@ lut_ClassColors:
 
     ; Class 5 (Black Mage): Yellow, Brown, Cyan
     .byte COLOR_YELLOW, COLOR_BROWN, COLOR_CYAN
+
+lut_ClassColorOffset:
+    .byte 0, 3, 6, 9, 12, 15
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -3621,12 +3648,7 @@ SetupMMHero0:
     adc #1
     sta $43FA
 
-    txa
-    asl a
-    stx tmp
-    clc
-    adc tmp                    ; A = X * 3
-    tay
+    ldy lut_ClassColorOffset, x
 
     lda ch_ailments + 0
     cmp #$02
@@ -3685,12 +3707,7 @@ SetupMMHero1:
     adc #1
     sta $43FD
 
-    txa
-    asl a
-    stx tmp
-    clc
-    adc tmp
-    tay
+    ldy lut_ClassColorOffset, x
 
     lda ch_ailments + $40
     cmp #$02
@@ -3749,12 +3766,7 @@ SetupMMHero2:
     adc #1
     sta $43FA
 
-    txa
-    asl a
-    stx tmp
-    clc
-    adc tmp
-    tay
+    ldy lut_ClassColorOffset, x
 
     lda ch_ailments + $80
     cmp #$02
@@ -3813,12 +3825,7 @@ SetupMMHero3:
     adc #1
     sta $43FD
 
-    txa
-    asl a
-    stx tmp
-    clc
-    adc tmp
-    tay
+    ldy lut_ClassColorOffset, x
 
     lda ch_ailments + $C0
     cmp #$02
@@ -3845,9 +3852,6 @@ SetupMMHero3:
 ;;     This routine resets the BG palette to all black (0)
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-lut_ClassColorOffset:
-    .byte 0, 3, 6, 9, 12, 15
 
 LineupMenu_IRQ:
     lda #$01
@@ -4295,12 +4299,7 @@ DrawOBSprite:
     sta shadow_spr_ptr + 2
     sta $43FA
 
-    txa
-    asl a
-    stx tmp
-    clc
-    adc tmp                       ; A = Class * 3
-    tay
+    ldy lut_ClassColorOffset, x
 
     ldx char_index
     lda ch_ailments, x
