@@ -241,6 +241,8 @@ EnterOverworldLoop:
 
     LDA #0
     STA move_speed
+    STA move_ctr_x
+    STA move_ctr_y
     STA mapdraw_job
 
 @Loop:
@@ -332,12 +334,67 @@ ProcessOWInput:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 OverworldMovement:
-    LDA mapdraw_job
+    LDA move_speed
     BEQ @Exit
-    JSR DoMapDrawJob
-    LDA #0
-    STA move_speed      ; movement step complete
+
+    LDA facing
+    LSR A
+    BCS @MoveRight
+    LSR A
+    BCS @MoveLeft
+    LSR A
+    BCS @MoveDown
+    LSR A
+    BCS @MoveUp
 @Exit:
+    RTS
+
+@MoveRight:
+    LDA move_ctr_x
+    CLC
+    ADC move_speed
+    STA move_ctr_x
+    CMP #16
+    BCC @Exit
+    INC ow_scroll_x
+    JMP @StepDone
+
+@MoveLeft:
+    LDA move_ctr_x
+    CLC
+    ADC move_speed
+    STA move_ctr_x
+    CMP #16
+    BCC @Exit
+    DEC ow_scroll_x
+    JMP @StepDone
+
+@MoveDown:
+    LDA move_ctr_y
+    CLC
+    ADC move_speed
+    STA move_ctr_y
+    CMP #16
+    BCC @Exit
+    INC ow_scroll_y
+    JMP @StepDone
+
+@MoveUp:
+    LDA move_ctr_y
+    CLC
+    ADC move_speed
+    STA move_ctr_y
+    CMP #16
+    BCC @Exit
+    DEC ow_scroll_y
+    JMP @StepDone
+
+@StepDone:
+    LDA #0
+    STA move_ctr_x
+    STA move_ctr_y
+    STA move_speed
+    JSR DrawFullMap
     RTS
 
 
@@ -363,7 +420,13 @@ OWCanMove:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 StartMapMove:
-    ; Option 1: Vehicle speed logic (mirroring NES lines 3952-3958)
+    ; Reset movement counters
+    LDA #0
+    STA move_ctr_x
+    STA move_ctr_y
+
+    ; Determine speed based on vehicle (mirroring NES lines 3952-3958)
+    ; canoe=1, ship=2, airship=4, walking=1
     LDA vehicle
     CMP #$02
     BCC @OnFoot
@@ -371,12 +434,12 @@ StartMapMove:
     STA move_speed
     BNE @CheckDir
 @OnFoot:
-    LDA #$01
+    LDA #$01          ; canoe/walking speed
     STA move_speed
 
 @CheckDir:
-    ; Option 2: NES decompression logic (mirroring NES line 4026)
-    ; Only decompress when moving vertically; zero decompression when moving horizontally!
+    ; Mirror NES line 4026: Only decompress when moving vertically;
+    ; zero decompression when moving horizontally!
     LDA facing
     LSR A
     BCS @Right
@@ -390,34 +453,28 @@ StartMapMove:
 
 @Right:
     ; Horizontal move: rows already in mapdata ring buffer!
-    INC ow_scroll_x
-    JMP @DoneDir
+    RTS
 
 @Left:
     ; Horizontal move: rows already in mapdata ring buffer!
-    DEC ow_scroll_x
-    JMP @DoneDir
+    RTS
 
 @Down:
-    ; Vertical move: decompress new bottom incoming row into mapdata
-    INC ow_scroll_y
+    ; Vertical move: pre-decompress incoming bottom row (row + 13) into ring buffer
     LDA ow_scroll_y
     CLC
-    ADC #12
+    ADC #13
     STA mapdraw_y
     JSR LoadOWMapRow
-    JMP @DoneDir
+    RTS
 
 @Up:
-    ; Vertical move: decompress new top incoming row into mapdata
-    DEC ow_scroll_y
+    ; Vertical move: pre-decompress incoming top row (row - 1) into ring buffer
     LDA ow_scroll_y
+    SEC
+    SBC #1
     STA mapdraw_y
     JSR LoadOWMapRow
-
-@DoneDir:
-    LDA #$01
-    STA mapdraw_job     ; flag that map needs redraw
     RTS
 
 
@@ -1559,9 +1616,12 @@ DrawComplexString:
     LDA lut_DTE1, X               ; First character in DTE pair
     LDY #0
     STA (ppu_dest), Y
+    LDA text_color
+    CMP #$FF
+    BEQ :+
     LDA #COLOR_WHITE
     STA (color_dest), Y
-    INC ppu_dest
+:   INC ppu_dest
     BNE :+
     INC ppu_dest+1
 :   INC color_dest
@@ -1573,9 +1633,12 @@ DrawComplexString:
 @NoDTE:
     LDY #0
     STA (ppu_dest), Y
+    LDA text_color
+    CMP #$FF
+    BEQ :+
     LDA #COLOR_WHITE
     STA (color_dest), Y
-    INC ppu_dest
+:   INC ppu_dest
     BNE :+
     INC ppu_dest+1
 :   INC color_dest

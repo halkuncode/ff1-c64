@@ -1,4 +1,5 @@
 
+text_color      = $06 ; Text color for DrawComplexString ($FF = skip Color RAM write)
 story_dropinput = $07
 vblank_count    = $08 ; Frame counter incremented by VIC-II Raster IRQ
 spr_multiplex_mode = $09 ; 0 = Standard single-zone VBlank IRQ, 1 = Party Gen 2-Zone Multiplexer, 2 = Main Menu 2-Zone Multiplexer

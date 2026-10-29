@@ -253,7 +253,13 @@ EnterIntroStory:
     LDA #1                     ; Start at Row 1 (prologue spans rows 1 to 23)
     STA dest_y
 
+    LDA #$FF
+    STA text_color             ; $FF = Skip Color RAM write so initial Blue Color RAM is preserved!
+
     JSR DrawComplexString      ; Draw intro story to Screen RAM!
+
+    LDA #0
+    STA text_color             ; Reset text_color back to normal
 
     JSR TurnMenuScreenOn_ClearOAM ; turn on the screen and clear OAM
 
@@ -300,6 +306,7 @@ EnterTitleScreen:
     LDA #10
     STA box_wd
     JSR DrawBox
+    INC dest_y       ; Center text vertically on inner row 2 (row 10)
     LDA #<lut_TitleText_Continue
     STA text_ptr
     LDA #>lut_TitleText_Continue
@@ -311,6 +318,7 @@ EnterTitleScreen:
     LDA #13          ; next box is same X pos and same dims, but at Y=13
     STA box_y        ;  and contains text "New Game"
     JSR DrawBox
+    INC dest_y       ; Center text vertically on inner row 2 (row 15)
     LDA #<lut_TitleText_NewGame
     STA text_ptr
     LDA #>lut_TitleText_NewGame
@@ -324,6 +332,7 @@ EnterTitleScreen:
     LDA #16
     STA box_wd
     JSR DrawBox
+    INC dest_y       ; Center text vertically on inner row 2 (row 20, matching digit "1")
     LDA #<lut_TitleText_RespondRate
     STA text_ptr
     LDA #>lut_TitleText_RespondRate
