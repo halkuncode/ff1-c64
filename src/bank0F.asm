@@ -599,15 +599,18 @@ LoadOWTilesetData:
 
 SetOWScroll_PPUOn:
 SetOWScroll:
-    ; Enable MultiColor Mode and 40 Columns on VIC-II
+    ; Step 3: Configure 38 Columns and MultiColor Mode on VIC-II
+    ; Bit 4 = 1 (MultiColor Mode ON), Bit 3 = 0 (38 Columns - masks columns 0 and 39)
     LDA SCROLX
-    ORA #$10            ; Bit 4 = MultiColor Mode ON
+    AND #$E8            ; Clear fine scroll bits 0..2, clear bit 3 (38 cols)
+    ORA #$10            ; MultiColor Mode ON, 38 columns, fine scroll X = 0
     STA SCROLX
 
-    ; Ensure 25 rows, screen enabled, and Raster MSB = 0
+    ; Step 3: Configure 24 rows, screen enabled, and Raster MSB = 0
+    ; Bit 4 = 1 (Screen ON), Bit 3 = 0 (24 Rows - masks rows 0 and 24)
     LDA SCROLY
-    AND #$7F            ; Clear bit 7 (Raster bit 8 = 0)
-    ORA #$18            ; Bit 4 = Screen ON, Bit 3 = 25 rows
+    AND #$70            ; Clear bit 7 (Raster MSB), bit 3 (24 rows), bits 0..2 (fine scroll Y)
+    ORA #$10            ; Screen ON, 24 rows, fine scroll Y = 0
     STA SCROLY
     RTS
 

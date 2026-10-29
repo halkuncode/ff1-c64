@@ -93,3 +93,64 @@ The 1,024-byte leader sprite cache is refreshed only on:
 1. Entering the overworld, town, or dungeon.
 2. Exiting the Lineup/Formation menu (if the party order changed).
 3. Bahamut class promotion sequence.
+
+---
+
+## 5. Vehicle & Special Map Sprites Architecture
+
+Vehicle and map transition sprites are stored in `res/maps/vechicles/vechicles.spr`.
+Like the heroes, each vehicle visual object uses the **2-layer composite architecture**:
+* **Layer 0 (Outline):** Hi-res (single-color) sprite, dedicated to a crisp black outline (`COLOR_BLACK = $00`).
+* **Layer 1 (Base Fill):** Multicolor sprite, rendering the colors using shared and custom registers.
+
+### Total Sprite Count & Memory
+* **Total Visual Objects / Poses:** 26 objects/frames
+* **Sprites per Object:** 2 sprites (1 Hi-Res Outline + 1 Multicolor Base)
+* **Total Sprites:** $26 \times 2 = 52 \text{ sprites}$
+* **Total ROM Size:** $52 \times 64 \text{ bytes} = 3,328 \text{ bytes}$ (`res/maps/vechicles/vechicles.spr`)
+
+### Vehicle Palette & Color Register Architecture
+All 52 sprites share a unified palette configuration:
+* **Hi-Res Outline Sprite:** Individual Sprite Color Register = `COLOR_BLACK` (`$00`).
+* **Multicolor Base Sprite:**
+  * **Multicolor 1 (`$D025` / `SPMC0`):** White (`$01`)
+  * **Multicolor 2 (`$D026` / `SPMC1`):** Brown (`$08` / C64 Color 9 / Orange-Brown)
+  * **Custom Color (`SPxCOL`):** Green (`$05`)
+
+*(Note: Depending on context, when a vehicle is boarded, the vehicle sprites replace or overlay the mapman sprites, or are loaded into dedicated VIC-II sprite slots).*
+
+---
+
+## 6. Vehicle Sprite Layout & NES Mirroring Table (52 Sprites)
+
+The 52 sprites directly mirror the NES sprite sheet layout and numbering:
+
+| Index | Visual Object / Pose | Direction / Animation Frame | Layer 0 (Hi-Res Outline) | Layer 1 (Multicolor Base) |
+| :---: | :--- | :--- | :---: | :---: |
+| **0** | **Airship Shadow** | Static shadow below airship | Sprite 0 | Sprite 1 |
+| **1** | **Bridge** | World map bridge object | Sprite 2 | Sprite 3 |
+| **2** | **Canal** | Blown canal cutscene / transition | Sprite 4 | Sprite 5 |
+| **3** | **(Blank)** | Blank placeholder (matches NES) | Sprite 6 | Sprite 7 |
+| **4** | **Ship** | North, Frame 1 | Sprite 8 | Sprite 9 |
+| **5** | **Ship** | North, Frame 2 | Sprite 10 | Sprite 11 |
+| **6** | **Ship** | South, Frame 1 | Sprite 12 | Sprite 13 |
+| **7** | **Ship** | South, Frame 2 | Sprite 14 | Sprite 15 |
+| **8** | **Ship** | East, Frame 1 | Sprite 16 | Sprite 17 |
+| **9** | **Ship** | East, Frame 2 | Sprite 18 | Sprite 19 |
+| **10** | **Ship** | West, Frame 1 | Sprite 20 | Sprite 21 |
+| **11** | **Ship** | West, Frame 2 | Sprite 22 | Sprite 23 |
+| **12** | **Airship** | North, Frame 1 | Sprite 24 | Sprite 25 |
+| **13** | **Airship** | North, Frame 2 | Sprite 26 | Sprite 27 |
+| **14** | **Airship** | South, Frame 1 | Sprite 28 | Sprite 29 |
+| **15** | **Airship** | South, Frame 2 | Sprite 30 | Sprite 31 |
+| **16** | **Airship** | East, Frame 1 | Sprite 32 | Sprite 33 |
+| **17** | **Airship** | East, Frame 2 | Sprite 34 | Sprite 35 |
+| **18** | **Airship** | West, Frame 1 | Sprite 36 | Sprite 37 |
+| **19** | **Airship** | West, Frame 2 | Sprite 38 | Sprite 39 |
+| **20** | **Canoe** | North, Frame 1 | Sprite 40 | Sprite 41 |
+| **21** | **Canoe** | North, Frame 2 | Sprite 42 | Sprite 43 |
+| **22** | **Canoe** | South, Frame 1 | Sprite 44 | Sprite 45 |
+| **23** | **Canoe** | South, Frame 2 | Sprite 46 | Sprite 47 |
+| **24** | **Canoe** | East/West, Frame 1 (shared) | Sprite 48 | Sprite 49 |
+| **25** | **Canoe** | East/West, Frame 2 (shared) | Sprite 50 | Sprite 51 |
+
