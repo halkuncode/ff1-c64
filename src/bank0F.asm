@@ -22,6 +22,7 @@
 .import EnterIntroStory, EnterTitleScreen, NewGamePartyGeneration, EnterMainMenu, EnterLineupMenu
 .import lut_MenuCHR
 .import lut_FingerSprite, lut_HeroSprites
+.import lut_MapmanSprites
 .import lut_BattleFormations
 .import MusicPlay_L
 .import PrintCharStat, PrintPrice, PrintGold
@@ -247,6 +248,7 @@ EnterOverworldLoop:
 
 @Loop:
     JSR WaitForVBlank_L
+    JSR CallMusicPlay_NoSwap
     JSR UpdateJoy_L
 
     JSR OverworldMovement
@@ -255,6 +257,7 @@ EnterOverworldLoop:
     BNE :+
       JSR ProcessOWInput
 :
+    JSR DrawOWSprites
     JMP @Loop
 
 
@@ -562,9 +565,10 @@ SetOWScroll:
     ORA #$10            ; Bit 4 = MultiColor Mode ON
     STA SCROLX
 
-    ; Ensure 25 rows and screen enabled
+    ; Ensure 25 rows, screen enabled, and Raster MSB = 0
     LDA SCROLY
-    ORA #$10            ; Bit 4 = Screen ON
+    AND #$7F            ; Clear bit 7 (Raster bit 8 = 0)
+    ORA #$18            ; Bit 4 = Screen ON, Bit 3 = 25 rows
     STA SCROLY
     RTS
 
@@ -623,6 +627,7 @@ PrepOverworld:
     STA joy_start
     STA joy_select
     STA mapflags        ; zeroing map flags indicates we're on the overworld map
+    STA spr_multiplex_mode ; normal single-zone VBlank IRQ
 
     JSR LoadOWCHR           ; load up necessary CHR
     JSR LoadOWTilesetData   ; the tileset
@@ -2259,31 +2264,176 @@ LoadOWCHR:                     ; overworld map -- does not load any palettes
     LDA #BANK_MAPCHR
     JSR SwapPRG_L
     JSR LoadOWBGCHR
-    ;JSR LoadPlayerMapmanCHR    ; skipped for now - sprite architecture under rework
-    ;JMP LoadOWObjectCHR
+    JSR LoadPlayerMapmanSprites
     RTS
 
 
+; Mapmen Color and Direction LUTs
+lut_MapmanColor1:
+    .byte $02, $03, $03, $02, $01, $06 ; Fighter, Thief, BB, RM, WM, BM (SPMC0 - $D025)
+lut_MapmanColor2:
+    .byte $0A, $0A, $0A, $0A, $0A, $07 ; Peach for 0..4, Yellow for BM (SPMC1 - $D026)
+lut_MapmanCustomColor:
+    .byte $00, $08, $08, $01, $00, $0A ; 0=none, Thief/BB=08, RM=01, WM=none, BM=0A (SP1COL)
+
+; Facing index (0..15) -> Base Pose (0=South, 2=North, 4=West, 6=East)
+lut_FacingBasePose:
+    .byte 0, 6, 4, 6, 0, 6, 4, 6, 2, 6, 4, 6, 0, 6, 4, 6
+    ;     -  R  L  RL D  RD LD RLD U  RU LU RLU DU RDU LDU RLDU
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  Load Player Mapman CHR  [9710]
+;;  Load Player Mapman Sprites  [9710]
 ;;
-;;   Loads CHR for the player mapman graphic based on the lead party member's class
-;;
-;;  TMP:  tmp and tmp+1 used
+;;  Loads 16 sprites (1,024 bytes) for the lead party member from
+;;  BANK_MAPCHR ($8800 + class * 1024) into VIC-II RAM ($5800-$5BFF).
+;;  Configures VIC-II sprite colors (SPMC0, SPMC1, custom color)
+;;  and sets up physical Sprite 0 (outline) & Sprite 1 (base fill).
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-LoadPlayerMapmanCHR:
-    LDA #0          ; #0 -> tmp
-    STA tmp
-    LDA ch_class    ; Get lead party member's class
-    ORA #$90        ; ORA with #$90, and put in tmp+1
-    STA tmp+1       ; (tmp) is now $9x00 (where x=lead party member's class).
-                    ;    This points to mapman graphics for that class
-    LDX #1          ; X=1  (load 1 row of tiles)
-    LDA #$10        ; A=$10 (high byte of dest address:  $1000)
-    JMP CHRLoadToA  ; jump to CHR loader
+LoadPlayerMapmanSprites:
+    LDA #BANK_MAPCHR
+    JSR SwapPRG_L
+
+    LDA ch_class            ; Lead character's class (0..11)
+    CMP #6
+    BCC :+
+    SBC #6                  ; Map promoted classes (6..11) to base classes (0..5)
+:   STA tmp                 ; tmp = class (0..5)
+
+    ; Calculate source pointer: lut_MapmanSprites + (class * 1024)
+    ; Base = $8800. Each class = 1024 bytes = 4 pages (4 * 256 bytes)
+    ASL A
+    ASL A                   ; class * 4
+    CLC
+    ADC #>lut_MapmanSprites ; $88 + (class * 4)
+    STA tmp+2               ; source high byte
+    LDA #<lut_MapmanSprites ; $00
+    STA tmp+1               ; source low byte
+
+    ; Destination pointer: $5800
+    LDA #$00
+    STA tmp+3               ; dest low byte
+    LDA #$58
+    STA tmp+4               ; dest high byte
+
+    ; Copy 4 pages (1024 bytes = 16 sprites)
+    LDX #4                  ; 4 pages
+    LDY #0
+@CopyLoop:
+    LDA (tmp+1), Y
+    STA (tmp+3), Y
+    INY
+    BNE @CopyLoop
+    INC tmp+2               ; advance source page
+    INC tmp+4               ; advance dest page
+    DEX
+    BNE @CopyLoop
+
+    ; Setup VIC-II Sprite Colors for active leader
+    LDX tmp                 ; class index (0..5)
+    LDA lut_MapmanColor1, X
+    STA SPMC0               ; $D025 (Shared Sprite Multicolor 0)
+    LDA lut_MapmanColor2, X
+    STA SPMC1               ; $D026 (Shared Sprite Multicolor 1)
+    LDA lut_MapmanCustomColor, X
+    STA shadow_spr_col + 1  ; Sprite 1 individual color = custom color
+    STA SP1COL
+    LDA #COLOR_BLACK
+    STA shadow_spr_col + 0  ; Sprite 0 individual color = black (hi-res outline)
+    STA SP0COL
+
+    ; Position Sprites at screen center (X = 176, Y = 144)
+    LDA #176
+    STA shadow_spr_x + 0
+    STA shadow_spr_x + 1
+    LDA #144
+    STA shadow_spr_y + 0
+    STA shadow_spr_y + 1
+    LDA #0
+    STA shadow_spr_msb
+
+    ; Sprite modes: Sprite 0 = Hi-res (bit 0 = 0), Sprite 1 = Multicolor (bit 1 = 1)
+    LDA #%00000010
+    STA shadow_spr_mcm
+    STA SPMC
+
+    ; Sprite enables: Sprites 0 and 1 enabled
+    LDA #%00000011
+    STA shadow_spr_en
+    STA SPENA
+
+    ; Priorities and expansions (normal size, in front of BG)
+    LDA #$00
+    STA shadow_spr_pri
+    STA SPBGPR
+    STA shadow_spr_xexp
+    STA XEXP
+    STA shadow_spr_yexp
+    STA YEXP
+
+    ; Update initial pose and pointers
+    JSR UpdatePlayerMapmanPose
+    JMP UpdateSprites
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Draw OW Sprites  [$E1DC]
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawOWSprites:
+    JMP DrawPlayerMapmanSprite
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Draw Player Mapman Sprite / Update Pose  [$E281]
+;;
+;;  Calculates the current pose index (0..7) based on facing direction
+;;  and walk animation counter (move_ctr_x / move_ctr_y), then sets
+;;  the hardware sprite pointers for Sprite 0 (outline) & Sprite 1 (base).
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawPlayerMapmanSprite:
+UpdatePlayerMapmanPose:
+    ; 1. Determine walk frame (0 or 1)
+    LDA move_speed
+    BEQ @Stationary
+    LDA move_ctr_x
+    BNE :+
+    LDA move_ctr_y
+:   AND #$08
+    LSR A
+    LSR A
+    LSR A               ; Frame 0 (first 8 frames of step) or Frame 1 (second 8 frames)
+    JMP @GotFrame
+@Stationary:
+    LDA #0
+@GotFrame:
+    ; A = anim frame (0 or 1)
+
+    ; 2. Add base pose for facing direction
+    LDX facing
+    CLC
+    ADC lut_FacingBasePose, X ; + 0 (South), 2 (North), 4 (West), 6 (East)
+    ; A = Pose Index (0..7)
+
+    ; 3. Compute sprite block pointers
+    ASL A                      ; Pose * 2 (0, 2, 4, 6, 8, 10, 12, 14)
+    CLC
+    ADC #BLOCK_MAPMAN_BASE     ; 96 ($60) -> $5800
+    STA shadow_spr_ptr + 0
+    STA $43F8                  ; Outline sprite pointer
+    CLC
+    ADC #1
+    STA shadow_spr_ptr + 1
+    STA $43F9                  ; Base sprite pointer
+    RTS
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -2913,6 +3063,13 @@ OnIRQ:
 
     ; Push sprites to VIC-II hardware during VBlank
     jsr UpdateSprites
+
+    ; Re-arm Raster IRQ to line 250, bit 7 = 0
+    lda #250
+    sta RASTER
+    lda SCROLY
+    and #$7F
+    sta SCROLY
 
     ; Acknowledge VIC-II Raster IRQ
     lda #$01

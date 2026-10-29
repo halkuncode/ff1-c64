@@ -513,3 +513,4 @@ lut_ClassStartingStats  = $B040 ; BANK_STARTINGSTATS
 SPRITE_BASE_ADDR        = $5800
 BLOCK_FINGER_BASE       = ($5800 - $4000) / 64   ; Block 96 ($60)
 BLOCK_FINGER_OVERLAY    = ($5840 - $4000) / 64   ; Block 97 ($61)
+BLOCK_MAPMAN_BASE       = ($5800 - $4000) / 64   ; Block 96 ($60, $5800-$5BFF: 16 blocks for 1 hero)
