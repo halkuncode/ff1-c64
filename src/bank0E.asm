@@ -758,7 +758,7 @@ EnterLineupMenu:
     LDA #0
     STA spr_multiplex_mode          ; Disable raster multiplexer
     STA spr_irq_zone
-    LDA #250
+    LDA #0
     STA RASTER
     LDA SCROLY
     AND #$7F
@@ -1352,7 +1352,7 @@ LineupMenu_Finalize:
     STA spr_multiplex_mode          ; Disable raster multiplexer
     STA spr_irq_zone
     STA SPENA                       ; Disable all sprites
-    LDA #250
+    LDA #0
     STA RASTER
     LDA SCROLY
     AND #$7F
@@ -1506,7 +1506,7 @@ PtyGen_Confirmed:
     STA spr_irq_zone
     STA shadow_spr_en
     STA SPENA
-    LDA #250
+    LDA #0
     STA RASTER
     LDA SCROLY
     AND #$7F
@@ -1642,7 +1642,7 @@ DoNameInput:
     LDA #$00
     STA spr_multiplex_mode
     STA spr_irq_zone
-    LDA #250
+    LDA #0
     STA RASTER
     LDA SCROLY
     AND #$7F
@@ -2933,7 +2933,7 @@ MainMenuLoop:
     STA spr_multiplex_mode          ; Restore standard IRQ
     STA spr_irq_zone
     STA SPENA                       ; Turn off sprites
-    LDA #250
+    LDA #0
     STA RASTER
     LDA SCROLY
     AND #$7F
@@ -3206,7 +3206,7 @@ EnterMagicMenu:
     LDA #0
     STA spr_multiplex_mode          ; Disable raster multiplexer
     STA spr_irq_zone
-    LDA #250
+    LDA #0
     STA RASTER
     LDA SCROLY
     AND #$7F
@@ -3670,7 +3670,7 @@ EnterItemMenu:
     LDA #0
     STA spr_multiplex_mode          ; Disable raster multiplexer
     STA spr_irq_zone
-    LDA #250
+    LDA #0
     STA RASTER
     LDA SCROLY
     AND #$7F
@@ -4882,7 +4882,7 @@ EnterEquipMenu:
     LDA #0
     STA spr_multiplex_mode          ; Disable raster multiplexer
     STA spr_irq_zone
-    LDA #250
+    LDA #0
     STA RASTER
     LDA SCROLY
     AND #$7F
@@ -5661,7 +5661,7 @@ EnterStatusMenu:
     LDA #0
     STA spr_multiplex_mode          ; Disable raster multiplexer
     STA spr_irq_zone
-    LDA #250
+    LDA #0
     STA RASTER
     LDA SCROLY
     AND #$7F

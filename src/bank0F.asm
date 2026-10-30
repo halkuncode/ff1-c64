@@ -92,10 +92,10 @@ GameStart:
     STA shadow_spr_en
     STA SPENA
 
-    ; 3. Setup standard VBlank Raster IRQ at line 250
+    ; 3. Setup standard VBlank Raster IRQ at line 0
     LDA #1
     STA IRQMSK
-    LDA #250
+    LDA #0
     STA RASTER
     LDA SCROLY
     AND #$7F
@@ -526,10 +526,6 @@ OverworldMovement:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 UpdateOWFineScroll:
-    ; Standard 40 cols, 25 rows, fine scroll 0
-    LDA #$18
-    STA SCROLX
-    STA SCROLY
     RTS
 
 
@@ -1767,11 +1763,11 @@ lut_TownCharColors:
     .byte $08, $0A, $08, $09, $08, $08, $09, $09, $09, $08, $08, $08, $08, $08, $08, $0B
     .byte $08, $0A, $08, $09, $08, $08, $09, $09, $09, $08, $08, $08, $08, $08, $08, $08
     .byte $08, $08, $0B, $0B, $08, $08, $0F, $08, $08, $08, $08, $08, $08, $08, $08, $08
-    .byte $08, $08, $0B, $0B, $08, $08, $0F, $08, $08, $08, $0F, $08, $08, $08, $08, $08
-    .byte $0B, $0B, $09, $09, $08, $09, $09, $09, $09, $08, $08, $08, $08, $0E, $08, $08
-    .byte $0B, $0B, $09, $09, $08, $08, $08, $0F, $08, $08, $08, $08, $08, $0E, $08, $08
-    .byte $0E, $0E, $08, $08, $08, $08, $09, $08, $08, $08, $08, $08, $08, $08, $08, $08
-    .byte $0E, $0E, $08, $08, $08, $08, $09, $09, $08, $08, $08, $08, $08, $08, $08, $08
+    .byte $08, $08, $0B, $0B, $08, $08, $0A, $0A, $08, $08, $0F, $08, $08, $08, $08, $08
+    .byte $0B, $0B, $09, $09, $08, $09, $09, $09, $09, $08, $08, $08, $08, $0B, $08, $08
+    .byte $0B, $0B, $09, $09, $08, $08, $08, $0F, $08, $08, $08, $08, $08, $0B, $08, $08
+    .byte $0B, $0B, $08, $08, $08, $08, $09, $08, $08, $08, $08, $08, $08, $08, $08, $08
+    .byte $0B, $0B, $08, $08, $08, $08, $09, $09, $08, $08, $08, $08, $08, $08, $08, $08
 
 
 
@@ -4934,8 +4930,8 @@ OnIRQ:
     ; Update SID music playback at rock-solid 50/60 Hz
     jsr CallMusicPlay
 
-    ; Re-arm Raster IRQ to line 250, bit 7 = 0
-    lda #250
+    ; Re-arm Raster IRQ to line 0, bit 7 = 0
+    lda #0
     sta RASTER
     lda SCROLY
     and #$7F

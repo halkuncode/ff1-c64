@@ -134,11 +134,11 @@ copy_page:
     lda #$02
     sta VMCSB
 
-    ; 8. Setup VIC-II Raster IRQ on scanline 250 (VBlank)
+    ; 8. Setup VIC-II Raster IRQ on scanline 0 (VBlank)
     lda #$01
     sta IRQMSK      ; Enable Raster IRQ
-    lda #250
-    sta RASTER      ; Trigger at raster line 250
+    lda #0
+    sta RASTER      ; Trigger at raster line 0
     lda SCROLY
     and #$7F        ; Clear bit 8 of raster line
     sta SCROLY
