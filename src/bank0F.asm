@@ -296,10 +296,6 @@ ProcessOWInput:
     AND #(RIGHT | LEFT | DOWN | UP)
     BEQ @Exit           ; if no direction pressed, exit
 
-    ; Check if movement is legal
-    JSR OWCanMove
-    BCS @Exit
-
     ; Determine facing direction (priority: Right, Left, Down, Up)
     LDA joy
     AND #RIGHT
@@ -322,6 +318,11 @@ ProcessOWInput:
     LDA #DOWN
 @SetFacing:
     STA facing
+
+    ; Check if movement is legal in the facing direction
+    JSR OWCanMove
+    BCS @Exit
+
     JSR StartMapMove
 
 @Exit:
@@ -468,10 +469,117 @@ GetOWTile:
 ;;
 ;;  OWCanMove  [1086]
 ;;
+;;  Checks whether the player can move onto the target tile
+;;  based on current vehicle and tile properties.
+;;
+;;  IN:   facing = direction (RIGHT, LEFT, DOWN, UP)
+;;  OUT:  C clear = movement allowed
+;;        C set   = movement blocked
+;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 OWCanMove:
-    CLC                 ; Allow movement everywhere for now
+    LDA facing
+    LSR A               ; bit 0: RIGHT
+    BCS @Right
+    LSR A               ; bit 1: LEFT
+    BCS @Left
+    LSR A               ; bit 2: DOWN
+    BCS @Down
+
+@Up:
+    LDX #OW_PLAYER_METATILE_X
+    LDY #OW_PLAYER_METATILE_Y - 1
+    JMP @Calc
+
+@Down:
+    LDX #OW_PLAYER_METATILE_X
+    LDY #OW_PLAYER_METATILE_Y + 1
+    JMP @Calc
+
+@Right:
+    LDX #OW_PLAYER_METATILE_X + 1
+    LDY #OW_PLAYER_METATILE_Y
+    JMP @Calc
+
+@Left:
+    LDX #OW_PLAYER_METATILE_X - 1
+    LDY #OW_PLAYER_METATILE_Y
+
+@Calc:
+    TXA
+    CLC
+    ADC ow_scroll_x     ; Target World X
+    STA tmp             ; Low byte of pointer
+
+    TYA
+    CLC
+    ADC ow_scroll_y     ; Target World Y
+    AND #$0F            ; Ring buffer row (0..15)
+    ORA #>mapdata       ; $70..$7F
+    STA tmp+1           ; High byte of pointer
+
+    LDY #0
+    LDA (tmp), Y        ; Metatile ID at target coords
+
+    ASL A               ; 2 bytes per tile properties
+    TAX
+    LDA tileset_prop, X ; Copy tile properties from tileset
+    STA tileprop
+    LDA tileset_prop+1, X
+    STA tileprop+1
+
+    ; Airship (vehicle == 8) can fly over everything
+    LDA vehicle
+    CMP #$08
+    BEQ @Success
+
+    ; Vehicle collision check:
+    ; Bit 0 = impassable on foot, Bit 1 = canoe, Bit 2 = ship
+    LDA tileprop
+    AND vehicle
+    BNE @Blocked        ; If non-zero, movement forbidden!
+
+    ; If on foot, check special tiles
+    LDA vehicle
+    CMP #$01
+    BEQ @OnFoot
+
+@Success:
+    CLC                 ; Movement allowed
+    RTS
+
+@Blocked:
+    SEC                 ; Movement blocked
+    RTS
+
+@OnFoot:
+    LDA tileprop
+    AND #OWTP_SPEC_MASK
+    BEQ @Success        ; Nothing special, success!
+
+    CMP #OWTP_SPEC_CHIME ; Mirage Tower requires Chime
+    BEQ @NeedChime
+
+    CMP #OWTP_SPEC_CARAVAN ; Caravan check
+    BNE @Success
+
+@Caravan:
+    LDA game_flags+OBJID_FAIRY
+    AND #$01            ; If fairy already freed, cannot re-enter
+    BNE @Success
+
+    LDA #$01            ; Entering caravan shop
+    STA entering_shop
+    LDA #70
+    STA shop_id
+    CLC
+    RTS
+
+@NeedChime:
+    LDA item_chime      ; Check if Chime is in inventory
+    BNE @Success        ; If so, allowed
+    SEC                 ; Otherwise blocked!
     RTS
 
 
