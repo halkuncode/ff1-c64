@@ -23,6 +23,7 @@
 .import lut_MenuCHR
 .import lut_FingerSprite, lut_HeroSprites
 .import lut_MapmanSprites
+.import lut_VehicleSprites
 .import lut_BattleFormations
 .import MusicPlay_L
 .import PrintCharStat, PrintPrice, PrintGold
@@ -272,6 +273,14 @@ EnterOverworldLoop:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ProcessOWInput:
+    LDA vehchgpause             ; Check vehicle change pause counter
+    BEQ @NoVehPause
+    SEC
+    SBC #$01
+    STA vehchgpause
+    RTS                         ; Ignore input during transition pause
+
+@NoVehPause:
     LDA joy_start
     BEQ @NoStart
     LDA #0
@@ -319,10 +328,35 @@ ProcessOWInput:
 @SetFacing:
     STA facing
 
-    ; Check if movement is legal in the facing direction
+    LDX vehicle
+    CPX #$04
+    BEQ @MoveShip
+    CPX #$08
+    BEQ @StartMove
+
+@MoveOnFoot:
     JSR OWCanMove
+    BCC @StartMove
+
+    ; Check if stepping onto the docked ship
+    JSR BoardShip
+    BCC @StartMove
     BCS @Exit
 
+@MoveShip:
+    JSR OWCanMove
+    BCC @StartMove
+
+    ; If blocked by land, check if target tile allows docking!
+    LDA tileprop
+    AND #(OWTP_DOCKSHIP | 1)
+    CMP #OWTP_DOCKSHIP
+    BNE @Exit           ; Cannot dock here
+
+    JSR UnboardBoat_Abs
+    ; Flow into @StartMove to step onto land on foot!
+
+@StartMove:
     JSR StartMapMove
 
 @Exit:
@@ -404,6 +438,16 @@ OverworldMovement:
     STA move_speed
     STA ow_sub_x
     STA ow_sub_y
+
+    ; Update vehicle if changing (e.g. boarding ship)
+    LDA vehicle
+    CMP vehicle_next
+    BEQ @NoVehChange
+    LDA vehicle_next
+    STA vehicle
+    JSR LoadPlayerMapmanSprites
+@NoVehChange:
+
     JSR DrawFullMap
     JSR GetOWTile
     JSR UpdateOWFineScroll
@@ -511,10 +555,12 @@ OWCanMove:
     CLC
     ADC ow_scroll_x     ; Target World X
     STA tmp             ; Low byte of pointer
+    STA tmp+2           ; Save target X for BoardShip
 
     TYA
     CLC
     ADC ow_scroll_y     ; Target World Y
+    STA tmp+3           ; Save target Y for BoardShip
     AND #$0F            ; Ring buffer row (0..15)
     ORA #>mapdata       ; $70..$7F
     STA tmp+1           ; High byte of pointer
@@ -580,6 +626,81 @@ OWCanMove:
     LDA item_chime      ; Check if Chime is in inventory
     BNE @Success        ; If so, allowed
     SEC                 ; Otherwise blocked!
+    RTS
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  BoardShip  [C609]
+;;
+;;  Attempts to board the parked ship if target coords match (ship_x, ship_y).
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+BoardShip:
+    LDA ship_vis        ; is ship visible / available?
+    BEQ @Fail           ; if not, fail
+
+    LDA ship_x          ; does target X match ship_x?
+    CMP tmp+2
+    BNE @Fail
+    LDA ship_y          ; does target Y match ship_y?
+    CMP tmp+3
+    BNE @Fail
+
+    LDA #$01
+    STA vehicle         ; keep current vehicle on foot for the step
+    LDA #$04
+    STA vehicle_next    ; next vehicle becomes ship when step completes
+    LDA #$04
+    STA vehchgpause     ; pause briefly to board the ship
+    LDA #0
+    STA tileprop+1      ; prevent unwanted battle
+
+    LDA #$45
+    STA music_track     ; switch to ship music track
+    CLC
+    RTS
+
+@Fail:
+    SEC
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  UnboardBoat_Abs  [C5E4]
+;;
+;;  Docks the ship at current position and switches player to on foot.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+UnboardBoat_Abs:
+    LDA #$01
+    STA vehicle
+    STA vehicle_next
+    LDA #0
+    STA tileprop+1
+
+    ; Dock the ship at player's current position (where ship was floating)
+    LDA ow_scroll_x
+    CLC
+    ADC #OW_PLAYER_METATILE_X
+    STA ship_x
+
+    LDA ow_scroll_y
+    CLC
+    ADC #OW_PLAYER_METATILE_Y
+    STA ship_y
+
+    LDA #$44
+    STA music_track     ; switch back to overworld theme
+
+    ; Immediately switch player back to walking hero sprites
+    JSR LoadPlayerMapmanSprites
+
+    CLC
     RTS
 
 
@@ -794,6 +915,17 @@ PrepOverworld:
     STA spr_multiplex_mode ; normal single-zone VBlank IRQ
     STA ow_sub_x
     STA ow_sub_y
+    STA vehchgpause
+
+.if SKIP_TO_MAP
+    ; Place ship in the water inside the dock south of Coneria for testing:
+    LDA #1
+    STA ship_vis
+    LDA #$98
+    STA ship_x
+    LDA #$A9
+    STA ship_y
+.endif
 
     JSR LoadOWCHR           ; load up necessary CHR
     JSR LoadOWTilesetData   ; the tileset
@@ -2486,7 +2618,54 @@ LoadOWCHR:                     ; overworld map -- does not load any palettes
     LDA #BANK_MAPCHR
     JSR SwapPRG_L
     JSR LoadOWBGCHR
+    JSR LoadParkedShipSprites
     JSR LoadPlayerMapmanSprites
+    RTS
+
+
+LoadParkedShipSprites:
+    LDA #BANK_VEHICLES
+    JSR SwapPRG_L
+
+    ; 1. Copy Sprite 8 (outline, 64 bytes) directly to $5C00-$5C3F
+    LDX #64
+:   LDA lut_VehicleSprites + 512 - 1, X
+    STA $5C00 - 1, X
+    DEX
+    BNE :-
+
+    ; 2. Copy Sprite 9 (base, 64 bytes) to $5C40-$5C7F, remapping bit pair %01 -> %10
+    ; so that sails use SP3COL (individual color) instead of SPMC0 (shared with hero)
+    LDX #63             ; 63 bitmap bytes (byte 63 is mode byte)
+@RemapLoop:
+    LDA lut_VehicleSprites + 512 + 64 - 1, X
+    STA tmp
+    LSR A
+    AND #$55
+    AND tmp
+    STA tmp+1           ; tmp+1 = new_even (bits 6, 4, 2, 0)
+    LDA tmp
+    ASL A
+    AND #$AA
+    ORA tmp
+    AND #$AA            ; A = new_odd (bits 7, 5, 3, 1)
+    ORA tmp+1           ; A = new_odd | new_even
+    STA $5C40 - 1, X
+    DEX
+    BNE @RemapLoop
+
+    ; Copy byte 63 (mode byte)
+    LDA lut_VehicleSprites + 512 + 64 + 63
+    STA $5C40 + 63
+
+    LDA #BLOCK_PARKED_SHIP
+    STA shadow_spr_ptr + 2
+    LDA #(BLOCK_PARKED_SHIP + 1)
+    STA shadow_spr_ptr + 3
+    LDA #COLOR_BLACK
+    STA shadow_spr_col + 2
+    LDA #COLOR_WHITE
+    STA shadow_spr_col + 3
     RTS
 
 
@@ -2516,6 +2695,11 @@ lut_FacingBasePose:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 LoadPlayerMapmanSprites:
+    LDA vehicle
+    CMP #$04
+    BEQ @LoadShipSprites
+
+    ; --- Load Walking Hero Sprites ---
     LDA #BANK_MAPCHR
     JSR SwapPRG_L
 
@@ -2566,7 +2750,50 @@ LoadPlayerMapmanSprites:
     LDA #COLOR_BLACK
     STA shadow_spr_col + 0  ; Sprite 0 individual color = black (hi-res outline)
     STA SP0COL
+    JMP @FinishSetup
 
+@LoadShipSprites:
+    ; --- Load Ship Sprites ---
+    LDA #BANK_VEHICLES
+    JSR SwapPRG_L
+
+    ; Ship sprites in vechicles.spr start at sprite 8 (512 bytes offset = 2 pages)
+    LDA #<(lut_VehicleSprites + 512)
+    STA tmp+1
+    LDA #>(lut_VehicleSprites + 512)
+    STA tmp+2
+
+    ; Destination pointer: $5800
+    LDA #$00
+    STA tmp+3
+    LDA #$58
+    STA tmp+4
+
+    ; Copy 4 pages (1024 bytes = 16 sprites for 8 poses)
+    LDX #4
+    LDY #0
+@CopyShipLoop:
+    LDA (tmp+1), Y
+    STA (tmp+3), Y
+    INY
+    BNE @CopyShipLoop
+    INC tmp+2
+    INC tmp+4
+    DEX
+    BNE @CopyShipLoop
+
+    ; Setup VIC-II Sprite Colors for Ship
+    LDA #COLOR_WHITE
+    STA SPMC0               ; Shared Sprite Multicolor 0 = White (sails)
+    LDA #COLOR_LIGHTRED
+    STA SPMC1               ; Shared Sprite Multicolor 1 = Light Brown (hull)
+    LDA #COLOR_BLACK
+    STA shadow_spr_col + 0  ; Sprite 0 outline = black
+    STA SP0COL
+    STA shadow_spr_col + 1  ; Sprite 1 custom = black
+    STA SP1COL
+
+@FinishSetup:
     ; Position Sprites at screen center (Metatile X = 9, Metatile Y = 6)
     LDA #OW_PLAYER_SPR_X
     STA shadow_spr_x + 0
@@ -2574,16 +2801,20 @@ LoadPlayerMapmanSprites:
     LDA #OW_PLAYER_SPR_Y
     STA shadow_spr_y + 0
     STA shadow_spr_y + 1
-    LDA #0
+    LDA shadow_spr_msb
+    AND #%11111100          ; Sprites 0 & 1 MSB = 0
     STA shadow_spr_msb
 
     ; Sprite modes: Sprite 0 = Hi-res (bit 0 = 0), Sprite 1 = Multicolor (bit 1 = 1)
-    LDA #%00000010
+    LDA shadow_spr_mcm
+    AND #%11111100
+    ORA #%00000010
     STA shadow_spr_mcm
     STA SPMC
 
     ; Sprite enables: Sprites 0 and 1 enabled
-    LDA #%00000011
+    LDA shadow_spr_en
+    ORA #%00000011
     STA shadow_spr_en
     STA SPENA
 
@@ -2608,7 +2839,108 @@ LoadPlayerMapmanSprites:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 DrawOWSprites:
-    JMP DrawPlayerMapmanSprite
+    JSR DrawPlayerMapmanSprite
+    JSR DrawOWObj_Ship
+    JMP UpdateSprites
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawOWObj_Ship  [$E2A0]
+;;
+;;  Renders the parked ship using physical Sprites 2 & 3 when
+;;  player is on foot (vehicle == 1) and ship_vis != 0.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawOWObj_Ship:
+    LDA vehicle
+    CMP #$01
+    BNE @HideShip
+    LDA ship_vis
+    BEQ @HideShip
+
+    ; Check X bounds: ship_x - ow_scroll_x
+    LDA ship_x
+    SEC
+    SBC ow_scroll_x
+    CMP #20              ; Visible columns: 0..19 metatiles
+    BCS @HideShip
+    STA tmp+4            ; tmp+4 = screen metatile X (0..19)
+
+    ; Check Y bounds: ship_y - ow_scroll_y
+    LDA ship_y
+    SEC
+    SBC ow_scroll_y
+    CMP #13              ; Visible rows: 0..12 metatiles
+    BCS @HideShip
+    STA tmp+5            ; tmp+5 = screen metatile Y (0..12)
+
+    ; Calculate Pixel X = 24 + tmp+4 * 16
+    LDA tmp+4
+    ASL A
+    ASL A
+    ASL A
+    ASL A                ; tmp+4 * 16
+    CLC
+    ADC #24
+    STA shadow_spr_x + 2
+    STA shadow_spr_x + 3
+
+    ; MSB of X: if tmp+4 >= 15 (24 + 15*16 = 264 >= 256), set bits 2 & 3
+    LDA tmp+4
+    CMP #15
+    BCS @SetMSB
+    LDA shadow_spr_msb
+    AND #%11110011
+    STA shadow_spr_msb
+    JMP @CalcY
+@SetMSB:
+    LDA shadow_spr_msb
+    ORA #%00001100
+    STA shadow_spr_msb
+
+@CalcY:
+    ; Calculate Pixel Y = 50 + tmp+5 * 16 - 7
+    LDA tmp+5
+    ASL A
+    ASL A
+    ASL A
+    ASL A                ; tmp+5 * 16
+    CLC
+    ADC #(50 - 7)        ; + 43
+    STA shadow_spr_y + 2
+    STA shadow_spr_y + 3
+
+    ; Sprite pointers: Block 112 ($5C00) and 113 ($5C40)
+    LDA #BLOCK_PARKED_SHIP
+    STA shadow_spr_ptr + 2
+    LDA #(BLOCK_PARKED_SHIP + 1)
+    STA shadow_spr_ptr + 3
+
+    ; Sprite modes: Sprite 2 = Hi-Res (bit 2 = 0), Sprite 3 = Multicolor (bit 3 = 1)
+    LDA shadow_spr_mcm
+    AND #%11111011
+    ORA #%00001000
+    STA shadow_spr_mcm
+
+    ; Sprite colors: Sprite 2 = Black, Sprite 3 = White (sails)
+    LDA #COLOR_BLACK
+    STA shadow_spr_col + 2
+    LDA #COLOR_WHITE
+    STA shadow_spr_col + 3
+
+    ; Enable Sprites 2 and 3
+    LDA shadow_spr_en
+    ORA #%00001100
+    STA shadow_spr_en
+    RTS
+
+@HideShip:
+    LDA shadow_spr_en
+    AND #%11110011
+    STA shadow_spr_en
+    RTS
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
