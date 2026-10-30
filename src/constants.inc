@@ -514,8 +514,10 @@ lut_ClassStartingStats  = $B040 ; BANK_STARTINGSTATS
 SPRITE_BASE_ADDR        = $5800
 BLOCK_FINGER_BASE       = ($5800 - $4000) / 64   ; Block 96 ($60)
 BLOCK_FINGER_OVERLAY    = ($5840 - $4000) / 64   ; Block 97 ($61)
-BLOCK_MAPMAN_BASE       = ($5800 - $4000) / 64   ; Block 96 ($60, $5800-$5BFF: 16 blocks for 1 hero/ship)
+BLOCK_MAPMAN_BASE       = ($5800 - $4000) / 64   ; Block 96 ($60, $5800-$5BFF: 16 blocks for 1 hero/ship/airship)
 BLOCK_PARKED_SHIP       = ($5C00 - $4000) / 64   ; Block 112 ($70, $5C00-$5C7F: 2 blocks for parked ship)
+BLOCK_AIRSHIP_SHADOW    = ($5C80 - $4000) / 64   ; Block 114 ($72, $5C80-$5CBF: 1 block for shadow)
+BLOCK_PARKED_AIRSHIP    = ($5CC0 - $4000) / 64   ; Block 115 ($73, $5CC0-$5D3F: 2 blocks for parked airship)
 
 ; ==============================================================================
 ; Overworld Player Screen & Coordinate Constants
@@ -527,3 +529,4 @@ OW_PLAYER_METATILE_X    = 9
 OW_PLAYER_METATILE_Y    = 6
 OW_PLAYER_SPR_X         = 24 + (OW_PLAYER_METATILE_X * 16)       ; 168
 OW_PLAYER_SPR_Y         = 50 + (OW_PLAYER_METATILE_Y * 16) - 7   ; 139 (aligned to 25-row screen)
+AIRSHIP_ALTITUDE        = 32                                     ; Airship altitude above ground (32 pixels)

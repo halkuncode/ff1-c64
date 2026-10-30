@@ -258,6 +258,7 @@ EnterOverworldLoop:
       JSR ProcessOWInput
 :
     JSR WaitForVBlank_L
+    INC framecounter
     JSR UpdateOWFineScroll
     JSR DrawOWSprites
     JMP @Loop
@@ -281,6 +282,26 @@ ProcessOWInput:
     RTS                         ; Ignore input during transition pause
 
 @NoVehPause:
+    LDA joy_a
+    BEQ @NoJoyA
+    LDA #0
+    STA joy_a
+    LDA vehicle
+    CMP #$08
+    BEQ @DoLandAirship
+    CMP #$01
+    BEQ @DoFlyAirship
+    JMP @NoJoyA
+
+@DoFlyAirship:
+    JSR FlyAirship
+    RTS
+
+@DoLandAirship:
+    JSR LandAirship
+    RTS
+
+@NoJoyA:
     LDA joy_start
     BEQ @NoStart
     LDA #0
@@ -329,13 +350,19 @@ ProcessOWInput:
     STA facing
 
     LDX vehicle
-    CPX #$04
-    BEQ @MoveShip
     CPX #$08
     BEQ @StartMove
+    CPX #$04
+    BEQ @MoveShip
+    CPX #$02
+    BEQ @MoveCanoe
 
 @MoveOnFoot:
     JSR OWCanMove
+    BCC @StartMove
+
+    ; Check if stepping into river/lake via canoe
+    JSR BoardCanoe
     BCC @StartMove
 
     ; Check if stepping onto the docked ship
@@ -343,8 +370,25 @@ ProcessOWInput:
     BCC @StartMove
     BCS @Exit
 
+@MoveCanoe:
+    JSR OWCanMove
+    BCC @StartMove
+
+    ; Check if unboarding canoe onto land on foot
+    JSR UnboardBoat
+    BCC @StartMove
+
+    ; Check if boarding docked ship directly from canoe
+    JSR BoardShip
+    BCC @StartMove
+    BCS @Exit
+
 @MoveShip:
     JSR OWCanMove
+    BCC @StartMove
+
+    ; Check if boarding canoe directly from ship
+    JSR BoardCanoe
     BCC @StartMove
 
     ; If blocked by land, check if target tile allows docking!
@@ -450,7 +494,12 @@ OverworldMovement:
 
     JSR DrawFullMap
     JSR GetOWTile
-    JSR UpdateOWFineScroll
+    LDA vehicle
+    CMP #$08
+    BNE :+
+    LDA #0
+    STA tileprop+1      ; No random encounters in airship
+:   JSR UpdateOWFineScroll
     RTS
 
 
@@ -640,14 +689,14 @@ OWCanMove:
 
 BoardShip:
     LDA ship_vis        ; is ship visible / available?
-    BEQ @Fail           ; if not, fail
+    BEQ Board_Fail      ; if not, fail
 
     LDA ship_x          ; does target X match ship_x?
     CMP tmp+2
-    BNE @Fail
+    BNE Board_Fail
     LDA ship_y          ; does target Y match ship_y?
     CMP tmp+3
-    BNE @Fail
+    BNE Board_Fail
 
     LDA #$01
     STA vehicle         ; keep current vehicle on foot for the step
@@ -663,27 +712,71 @@ BoardShip:
     CLC
     RTS
 
-@Fail:
-    SEC
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  BoardCanoe  [$C5E6]
+;;
+;;  Attempts to board the canoe from on foot or from ship.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+BoardCanoe:
+    LDA tileprop
+    AND #$02            ; Can canoe enter target tile? (bit 1 == 0)
+    BNE Board_Fail
+
+    LDA has_canoe       ; Does player have the canoe?
+    BEQ Board_Fail
+
+    LDA #$04
+    STA vehchgpause
+
+    LDA vehicle         ; Old vehicle
+    LDX #$01
+    STX vehicle         ; Remain on foot during transition step
+    LDX #$02
+    STX vehicle_next    ; Become canoe when step finishes
+
+    LDX #0
+    STX tileprop+1      ; Prevent battle on transition step
+
+    CMP #$04            ; Did we transition directly from the ship?
+    BNE :+
+    JSR DockShip        ; If so, dock the ship at our previous position!
+:   CLC
     RTS
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;  UnboardBoat_Abs  [C5E4]
+;;  UnboardBoat  [$C5CC]
 ;;
-;;  Docks the ship at current position and switches player to on foot.
+;;  Exits the canoe or ship onto walkable land on foot.
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-UnboardBoat_Abs:
-    LDA #$01
-    STA vehicle
-    STA vehicle_next
-    LDA #0
-    STA tileprop+1
+UnboardBoat:
+    LDA tileprop
+    AND #$01            ; Walkable on foot? (bit 0 == 0)
+    BNE Board_Fail
 
-    ; Dock the ship at player's current position (where ship was floating)
+UnboardBoat_Abs:
+    LDA vehicle         ; Old vehicle
+    LDX #$01
+    STX vehicle_next    ; Next vehicle = foot
+    STX vehicle         ; Current vehicle = foot
+    LDX #0
+    STX tileprop+1      ; Prevent battle
+
+    CMP #$04            ; Was old vehicle the ship?
+    BNE :+
+    JSR DockShip        ; If so, dock the ship!
+:   JSR LoadPlayerMapmanSprites
+    CLC
+    RTS
+
+DockShip:
     LDA ow_scroll_x
     CLC
     ADC #OW_PLAYER_METATILE_X
@@ -695,13 +788,247 @@ UnboardBoat_Abs:
     STA ship_y
 
     LDA #$44
+    STA music_track     ; Switch back to overworld theme
+    RTS
+
+Board_Fail:
+    SEC
+    RTS
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  FlyAirship  [C215]
+;;
+;;  Takes off in the airship if player is standing on (airship_x, airship_y).
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+FlyAirship:
+    LDA airship_vis
+    BEQ @Exit
+
+    ; Check if player coords match airship coords
+    LDA ow_scroll_x
+    CLC
+    ADC #OW_PLAYER_METATILE_X
+    CMP airship_x
+    BNE @Exit
+
+    LDA ow_scroll_y
+    CLC
+    ADC #OW_PLAYER_METATILE_Y
+    CMP airship_y
+    BNE @Exit
+
+    LDA #$08
+    STA vehicle_next
+    STA vehicle
+    LDA #$04
+    STA vehchgpause
+    LDA #$46
+    STA music_track     ; switch to airship theme
+
+    JSR LoadPlayerMapmanSprites
+    JMP AnimateAirshipTakeoff
+@Exit:
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  LandAirship  [C6B8]
+;;
+;;  Attempts to land the airship at current player coords.
+;;  Animates descent; if landing is illegal, lifts back into the air.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LandAirship:
+    ; 1. Animate descending to the ground
+    JSR AnimateAirshipLanding
+
+    ; 2. Check if landing is legal on current tile (tileset_prop & $08 == 0)
+    LDA ow_scroll_x
+    CLC
+    ADC #OW_PLAYER_METATILE_X
+    STA tmp
+
+    LDA ow_scroll_y
+    CLC
+    ADC #OW_PLAYER_METATILE_Y
+    AND #$0F
+    ORA #>mapdata
+    STA tmp+1
+
+    LDY #0
+    LDA (tmp), Y        ; Tile ID
+    ASL A
+    TAX
+    LDA tileset_prop, X ; Tile properties byte 0
+    AND #$08            ; Bit 3 = "no airship" landing flag
+    BEQ @LegalLand
+
+    ; Illegal landing (mountains, trees, water, etc.):
+    ; Bounce right back into the air!
+    JSR AnimateAirshipTakeoff
+    RTS
+
+@LegalLand:
+    ; Legal landing:
+    LDA ow_scroll_x
+    CLC
+    ADC #OW_PLAYER_METATILE_X
+    STA airship_x
+
+    LDA ow_scroll_y
+    CLC
+    ADC #OW_PLAYER_METATILE_Y
+    STA airship_y
+
+    LDA #$01
+    STA vehicle_next
+    STA vehicle
+    LDA #$04
+    STA vehchgpause
+    LDA #$44
     STA music_track     ; switch back to overworld theme
 
-    ; Immediately switch player back to walking hero sprites
     JSR LoadPlayerMapmanSprites
-
-    CLC
     RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  AnimateAirshipTakeoff  [$E1A8]
+;;
+;;  Animates the airship rising from ground level (OW_PLAYER_SPR_Y)
+;;  to cruising altitude (OW_PLAYER_SPR_Y - AIRSHIP_ALTITUDE).
+;;  Rises 1 pixel every 2 frames.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+AnimateAirshipTakeoff:
+    LDA #OW_PLAYER_SPR_Y
+    STA tmp+10              ; Start Y at ground level
+
+@TakeoffLoop:
+    JSR AirshipTransitionFrame
+
+    LDA framecounter
+    AND #$01
+    BNE @TakeoffLoop        ; Ascend once every 2 frames
+
+    DEC tmp+10              ; Move up 1 pixel
+    LDA tmp+10
+    CMP #(OW_PLAYER_SPR_Y - AIRSHIP_ALTITUDE)
+    BCS @TakeoffLoop        ; Loop until Y < (OW_PLAYER_SPR_Y - AIRSHIP_ALTITUDE)
+
+    LDA #(OW_PLAYER_SPR_Y - AIRSHIP_ALTITUDE)
+    STA shadow_spr_y + 0
+    STA shadow_spr_y + 1
+    LDA #1                  ; East (RIGHT)
+    STA facing
+    JSR UpdatePlayerMapmanPose
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  AnimateAirshipLanding  [$E1C2]
+;;
+;;  Animates the airship descending from cruising altitude
+;;  down to ground level (OW_PLAYER_SPR_Y).
+;;  Lowers 1 pixel every 2 frames.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+AnimateAirshipLanding:
+    LDA #(OW_PLAYER_SPR_Y - AIRSHIP_ALTITUDE)
+    STA tmp+10              ; Start Y at cruising altitude
+
+@LandingLoop:
+    JSR AirshipTransitionFrame
+
+    LDA framecounter
+    AND #$01
+    BNE @LandingLoop        ; Descend once every 2 frames
+
+    INC tmp+10              ; Move down 1 pixel
+    LDA tmp+10
+    CMP #OW_PLAYER_SPR_Y
+    BCC @LandingLoop        ; Loop until Y >= OW_PLAYER_SPR_Y
+
+    LDA #OW_PLAYER_SPR_Y
+    STA shadow_spr_y + 0
+    STA shadow_spr_y + 1
+    LDA #1                  ; East (RIGHT)
+    STA facing
+    JSR UpdatePlayerMapmanPose
+    RTS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  AirshipTransitionFrame  [$E1E1]
+;;
+;;  Renders a single frame during takeoff/landing transition:
+;;  - Waits for VBlank & increments framecounter
+;;  - Plays music
+;;  - Updates airship Y position (tmp+10)
+;;  - Keeps propeller spinning
+;;  - Draws ground shadow below airship (Sprite 4)
+;;  - Updates VIC-II sprites
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+AirshipTransitionFrame:
+    JSR WaitForVBlank_L
+    INC framecounter
+    JSR CallMusicPlay_NoSwap
+
+    ; Set airship sprite Y coordinates
+    LDA tmp+10
+    STA shadow_spr_y + 0
+    STA shadow_spr_y + 1
+
+    ; Airship sprite X coordinates
+    LDA #OW_PLAYER_SPR_X
+    STA shadow_spr_x + 0
+    STA shadow_spr_x + 1
+
+    ; Update propeller animation
+    JSR UpdatePlayerMapmanPose
+
+    ; Draw ground shadow at stationary ground coords (Sprite 4)
+    LDA #OW_PLAYER_SPR_X
+    STA shadow_spr_x + 4
+    LDA #OW_PLAYER_SPR_Y
+    STA shadow_spr_y + 4
+    LDA shadow_spr_msb
+    AND #%11101111          ; Sprite 4 MSB = 0
+    STA shadow_spr_msb
+
+    LDA #BLOCK_AIRSHIP_SHADOW
+    STA shadow_spr_ptr + 4
+    LDA shadow_spr_mcm
+    AND #%11101111          ; Sprite 4 = Hi-Res
+    STA shadow_spr_mcm
+    LDA #COLOR_BLACK
+    STA shadow_spr_col + 4
+
+    ; Enable Sprite 0, 1 (airship) and 4 (shadow), disable Sprite 5
+    LDA shadow_spr_en
+    AND #%11011100
+    ORA #%00010011
+    STA shadow_spr_en
+
+    ; Draw parked ship if visible
+    JSR DrawOWObj_Ship
+
+    ; Flush to VIC-II
+    JMP UpdateSprites
 
 
 
@@ -925,6 +1252,18 @@ PrepOverworld:
     STA ship_x
     LDA #$A9
     STA ship_y
+
+    ; Place airship on the grass east of Castle Coneria for testing:
+    LDA #1
+    STA airship_vis
+    LDA #$9A
+    STA airship_x
+    LDA #$A6
+    STA airship_y
+
+    ; Enable canoe for testing:
+    LDA #1
+    STA has_canoe
 .endif
 
     JSR LoadOWCHR           ; load up necessary CHR
@@ -2618,26 +2957,26 @@ LoadOWCHR:                     ; overworld map -- does not load any palettes
     LDA #BANK_MAPCHR
     JSR SwapPRG_L
     JSR LoadOWBGCHR
-    JSR LoadParkedShipSprites
+    JSR LoadParkedVehicleSprites
     JSR LoadPlayerMapmanSprites
     RTS
 
 
-LoadParkedShipSprites:
+LoadParkedVehicleSprites:
     LDA #BANK_VEHICLES
     JSR SwapPRG_L
 
-    ; 1. Copy Sprite 8 (outline, 64 bytes) directly to $5C00-$5C3F
+    ; 1. Copy Sprite 8 (Ship outline, 64 bytes) to $5C00-$5C3F
     LDX #64
 :   LDA lut_VehicleSprites + 512 - 1, X
     STA $5C00 - 1, X
     DEX
     BNE :-
 
-    ; 2. Copy Sprite 9 (base, 64 bytes) to $5C40-$5C7F, remapping bit pair %01 -> %10
+    ; 2. Copy Sprite 9 (Ship base, 64 bytes) to $5C40-$5C7F, remapping bit pair %01 -> %10
     ; so that sails use SP3COL (individual color) instead of SPMC0 (shared with hero)
     LDX #63             ; 63 bitmap bytes (byte 63 is mode byte)
-@RemapLoop:
+@RemapShip:
     LDA lut_VehicleSprites + 512 + 64 - 1, X
     STA tmp
     LSR A
@@ -2652,12 +2991,49 @@ LoadParkedShipSprites:
     ORA tmp+1           ; A = new_odd | new_even
     STA $5C40 - 1, X
     DEX
-    BNE @RemapLoop
+    BNE @RemapShip
 
     ; Copy byte 63 (mode byte)
     LDA lut_VehicleSprites + 512 + 64 + 63
     STA $5C40 + 63
 
+    ; 3. Copy Sprite 0 (Airship shadow, 64 bytes) to $5C80-$5CBF
+    LDX #64
+:   LDA lut_VehicleSprites - 1, X
+    STA $5C80 - 1, X
+    DEX
+    BNE :-
+
+    ; 4. Copy Sprite 28 (Airship Front outline, 64 bytes) to $5CC0-$5CFF
+    LDX #64
+:   LDA lut_VehicleSprites + 1792 - 1, X
+    STA $5CC0 - 1, X
+    DEX
+    BNE :-
+
+    ; 5. Copy Sprite 29 (Airship Front base, 64 bytes) to $5D00-$5D3F, remapping %01 -> %10
+    LDX #63
+@RemapAirship:
+    LDA lut_VehicleSprites + 1792 + 64 - 1, X
+    STA tmp
+    LSR A
+    AND #$55
+    AND tmp
+    STA tmp+1
+    LDA tmp
+    ASL A
+    AND #$AA
+    ORA tmp
+    AND #$AA
+    ORA tmp+1
+    STA $5D00 - 1, X
+    DEX
+    BNE @RemapAirship
+
+    LDA lut_VehicleSprites + 1792 + 64 + 63
+    STA $5D00 + 63
+
+    ; Setup initial sprite pointers and colors for parked ship
     LDA #BLOCK_PARKED_SHIP
     STA shadow_spr_ptr + 2
     LDA #(BLOCK_PARKED_SHIP + 1)
@@ -2696,8 +3072,16 @@ lut_FacingBasePose:
 
 LoadPlayerMapmanSprites:
     LDA vehicle
-    CMP #$04
-    BEQ @LoadShipSprites
+    CMP #$02
+    BNE :+
+    JMP @LoadCanoeSprites
+:   CMP #$04
+    BNE :+
+    JMP @LoadShipSprites
+:   CMP #$08
+    BNE :+
+    JMP @LoadAirshipSprites
+:
 
     ; --- Load Walking Hero Sprites ---
     LDA #BANK_MAPCHR
@@ -2792,14 +3176,95 @@ LoadPlayerMapmanSprites:
     STA SP0COL
     STA shadow_spr_col + 1  ; Sprite 1 custom = black
     STA SP1COL
+    JMP @FinishSetup
+
+@LoadAirshipSprites:
+    ; --- Load Airship Sprites ---
+    LDA #BANK_VEHICLES
+    JSR SwapPRG_L
+
+    ; In vechicles.spr:
+    ; Sprites 24..27 (offset 1536) = Rear / North poses
+    ; Sprites 28..31 (offset 1792) = Front / South poses
+    ; Sprites 32..35 (offset 2048) = West poses
+    ; Sprites 36..39 (offset 2304) = East poses
+    ; Map them into VIC-II RAM:
+    ; $5800: South (Poses 0 & 1) <- Sprites 28..31 (offset 1792)
+    ; $5900: North (Poses 2 & 3) <- Sprites 24..27 (offset 1536)
+    ; $5A00: West  (Poses 4 & 5) <- Sprites 32..35 (offset 2048)
+    ; $5B00: East  (Poses 6 & 7) <- Sprites 36..39 (offset 2304)
+    LDY #0
+@CopyAirshipLoop:
+    LDA lut_VehicleSprites + 1792, Y
+    STA $5800, Y
+    LDA lut_VehicleSprites + 1536, Y
+    STA $5900, Y
+    LDA lut_VehicleSprites + 2048, Y
+    STA $5A00, Y
+    LDA lut_VehicleSprites + 2304, Y
+    STA $5B00, Y
+    INY
+    BNE @CopyAirshipLoop
+
+    ; Setup VIC-II Sprite Colors for Airship
+    LDA #COLOR_WHITE
+    STA SPMC0               ; Shared Sprite Multicolor 0 = White (fins/props)
+    LDA #COLOR_LIGHTRED
+    STA SPMC1               ; Shared Sprite Multicolor 1 = Light Brown (hull)
+    LDA #COLOR_BLACK
+    STA shadow_spr_col + 0  ; Sprite 0 outline = black
+    STA SP0COL
+    STA shadow_spr_col + 1  ; Sprite 1 custom = black
+    STA SP1COL
+    JMP @FinishSetup
+
+@LoadCanoeSprites:
+    ; --- Load Canoe Sprites ---
+    LDA #BANK_VEHICLES
+    JSR SwapPRG_L
+
+    ; In vechicles.spr:
+    ; Sprites 40..43 (offset 2560) = South poses
+    ; Sprites 44..47 (offset 2816) = North poses
+    ; Sprites 48..51 (offset 3072) = West poses
+    ; Sprites 48..51 (offset 3072) = East poses
+    LDY #0
+@CopyCanoeLoop:
+    LDA lut_VehicleSprites + 2560, Y
+    STA $5800, Y
+    LDA lut_VehicleSprites + 2816, Y
+    STA $5900, Y
+    LDA lut_VehicleSprites + 3072, Y
+    STA $5A00, Y
+    STA $5B00, Y
+    INY
+    BNE @CopyCanoeLoop
+
+    ; Setup VIC-II Sprite Colors for Canoe
+    LDA #COLOR_WHITE
+    STA SPMC0               ; Shared Sprite Multicolor 0 = White (paddles / splashes)
+    LDA #COLOR_LIGHTRED
+    STA SPMC1               ; Shared Sprite Multicolor 1 = Light Brown (hull)
+    LDA #COLOR_BLACK
+    STA shadow_spr_col + 0  ; Sprite 0 outline = black
+    STA SP0COL
+    STA shadow_spr_col + 1  ; Sprite 1 custom = black
+    STA SP1COL
+    JMP @FinishSetup
 
 @FinishSetup:
     ; Position Sprites at screen center (Metatile X = 9, Metatile Y = 6)
     LDA #OW_PLAYER_SPR_X
     STA shadow_spr_x + 0
     STA shadow_spr_x + 1
+
     LDA #OW_PLAYER_SPR_Y
-    STA shadow_spr_y + 0
+    LDX vehicle
+    CPX #$08
+    BNE :+
+    SEC
+    SBC #AIRSHIP_ALTITUDE   ; Airship cruising altitude (32 pixels above ground)
+:   STA shadow_spr_y + 0
     STA shadow_spr_y + 1
     LDA shadow_spr_msb
     AND #%11111100          ; Sprites 0 & 1 MSB = 0
@@ -2841,6 +3306,7 @@ LoadPlayerMapmanSprites:
 DrawOWSprites:
     JSR DrawPlayerMapmanSprite
     JSR DrawOWObj_Ship
+    JSR DrawOWObj_Airship
     JMP UpdateSprites
 
 
@@ -2943,6 +3409,139 @@ DrawOWObj_Ship:
     RTS
 
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawOWObj_Airship  [$E2B8]
+;;
+;;  Renders either:
+;;  1. The shadow below the airship (Sprite 4) when flying (vehicle == 8).
+;;  2. The parked airship on the ground (Sprites 4 & 5) when airship_vis != 0
+;;     and player is not in the airship (vehicle != 8).
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawOWObj_Airship:
+    LDA vehicle
+    CMP #$08
+    BNE :+
+    JMP @FlyingShadow
+:
+
+    ; --- Parked Airship on Ground ---
+    LDA airship_vis
+    BEQ @HideAirship
+
+    ; Check X bounds: airship_x - ow_scroll_x
+    LDA airship_x
+    SEC
+    SBC ow_scroll_x
+    CMP #20              ; Visible columns: 0..19 metatiles
+    BCS @HideAirship
+    STA tmp+4            ; tmp+4 = screen metatile X (0..19)
+
+    ; Check Y bounds: airship_y - ow_scroll_y
+    LDA airship_y
+    SEC
+    SBC ow_scroll_y
+    CMP #13              ; Visible rows: 0..12 metatiles
+    BCS @HideAirship
+    STA tmp+5            ; tmp+5 = screen metatile Y (0..12)
+
+    ; Calculate Pixel X = 24 + tmp+4 * 16
+    LDA tmp+4
+    ASL A
+    ASL A
+    ASL A
+    ASL A                ; tmp+4 * 16
+    CLC
+    ADC #24
+    STA shadow_spr_x + 4
+    STA shadow_spr_x + 5
+
+    ; MSB of X for bits 4 & 5: if tmp+4 >= 15, set bits 4 & 5
+    LDA tmp+4
+    CMP #15
+    BCS @SetMSB
+    LDA shadow_spr_msb
+    AND #%11001111
+    STA shadow_spr_msb
+    JMP @CalcY
+@SetMSB:
+    LDA shadow_spr_msb
+    ORA #%00110000
+    STA shadow_spr_msb
+
+@CalcY:
+    ; Calculate Pixel Y = 50 + tmp+5 * 16 - 7
+    LDA tmp+5
+    ASL A
+    ASL A
+    ASL A
+    ASL A                ; tmp+5 * 16
+    CLC
+    ADC #(50 - 7)        ; + 43
+    STA shadow_spr_y + 4
+    STA shadow_spr_y + 5
+
+    ; Sprite pointers: Block 115 ($5CC0) and 116 ($5D00)
+    LDA #BLOCK_PARKED_AIRSHIP
+    STA shadow_spr_ptr + 4
+    LDA #(BLOCK_PARKED_AIRSHIP + 1)
+    STA shadow_spr_ptr + 5
+
+    ; Sprite modes: Sprite 4 = Hi-Res (bit 4 = 0), Sprite 5 = Multicolor (bit 5 = 1)
+    LDA shadow_spr_mcm
+    AND #%11101111
+    ORA #%00100000
+    STA shadow_spr_mcm
+
+    ; Sprite colors: Sprite 4 = Black, Sprite 5 = White (fins/props)
+    LDA #COLOR_BLACK
+    STA shadow_spr_col + 4
+    LDA #COLOR_WHITE
+    STA shadow_spr_col + 5
+
+    ; Enable Sprites 4 and 5
+    LDA shadow_spr_en
+    ORA #%00110000
+    STA shadow_spr_en
+    RTS
+
+@HideAirship:
+    LDA shadow_spr_en
+    AND #%11001111
+    STA shadow_spr_en
+    RTS
+
+@FlyingShadow:
+    ; Ground shadow below flying airship at (OW_PLAYER_SPR_X, OW_PLAYER_SPR_Y)
+    LDA #OW_PLAYER_SPR_X
+    STA shadow_spr_x + 4
+    LDA #OW_PLAYER_SPR_Y
+    STA shadow_spr_y + 4
+    LDA shadow_spr_msb
+    AND #%11101111       ; Sprite 4 MSB = 0
+    STA shadow_spr_msb
+
+    LDA #BLOCK_AIRSHIP_SHADOW
+    STA shadow_spr_ptr + 4
+
+    ; Sprite 4 = Hi-Res Black
+    LDA shadow_spr_mcm
+    AND #%11101111
+    STA shadow_spr_mcm
+    LDA #COLOR_BLACK
+    STA shadow_spr_col + 4
+
+    ; Enable Sprite 4 (shadow), disable Sprite 5
+    LDA shadow_spr_en
+    AND #%11011111
+    ORA #%00010000
+    STA shadow_spr_en
+    RTS
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;  Draw Player Mapman Sprite / Update Pose  [$E281]
@@ -2956,6 +3555,16 @@ DrawOWObj_Ship:
 DrawPlayerMapmanSprite:
 UpdatePlayerMapmanPose:
     ; 1. Determine walk frame (0 or 1)
+    LDA vehicle
+    CMP #$08
+    BNE @NotAirship
+    LDA framecounter
+    AND #$04            ; Airship propellers spin constantly (alternates every 4 frames)
+    LSR A
+    LSR A
+    JMP @GotFrame
+
+@NotAirship:
     LDA move_speed
     BEQ @Stationary
     LDA move_ctr_x
