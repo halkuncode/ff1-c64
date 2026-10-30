@@ -45,7 +45,7 @@
 GameStart_L:          JMP GameStart
 DrawComplexString_L:  JMP DrawComplexString
 DrawBox_L:            JMP DrawBox
-CallMusicPlay_L:      JMP CallMusicPlay
+CallMusicPlay_L:      RTS                 ; Music is driven automatically by Raster IRQ at 60 Hz
 UpdateJoy_L:          JMP UpdateJoy
 DrawPalette_L:        JMP DrawPalette
 
@@ -248,7 +248,6 @@ EnterOverworldLoop:
     STA mapdraw_job
 
 @Loop:
-    JSR CallMusicPlay_NoSwap
     JSR UpdateJoy_L
 
     JSR OverworldMovement
@@ -986,7 +985,6 @@ AnimateAirshipLanding:
 AirshipTransitionFrame:
     JSR WaitForVBlank_L
     INC framecounter
-    JSR CallMusicPlay_NoSwap
 
     ; Set airship sprite Y coordinates
     LDA tmp+10
@@ -4107,17 +4105,21 @@ lut_DTE1:
 SwapPRG_L:       JMP SwapPRG
 
 SwapPRG:
+    php
+    sei
     pha
     txa
     pha
     tsx
     lda $0102, x                ; Fetch original A (bank ID) from stack
     tax
+    sta cur_bank                ; Keep cur_bank in sync with hardware bank
     lda lut_EasyFlashBanks, x   ; Lookup EasyFlash physical bank
     sta EASYFLASH_BANK          ; Perform hardware bank switch
     pla
     tax
     pla
+    plp
     rts
 
 lut_EasyFlashBanks:
@@ -4230,6 +4232,9 @@ OnIRQ:
     ; Push sprites to VIC-II hardware during VBlank
     jsr UpdateSprites
 
+    ; Update SID music playback at rock-solid 50/60 Hz
+    jsr CallMusicPlay
+
     ; Re-arm Raster IRQ to line 250, bit 7 = 0
     lda #250
     sta RASTER
@@ -4273,6 +4278,7 @@ PartyGen_IRQ:
 
 @Zone0:
     inc vblank_count           ; Increment frame counter once per frame on VBlank
+    jsr CallMusicPlay
 
     jsr SetupHero0
     jsr SetupHero1
@@ -4559,6 +4565,7 @@ MainMenu_IRQ:
 
 @Zone0:
     inc vblank_count
+    jsr CallMusicPlay
 
     lda #$00
     sta XEXP
@@ -4985,6 +4992,7 @@ LineupMenu_IRQ:
 
 @Zone0:
     inc vblank_count
+    jsr CallMusicPlay
 
     lda #$00
     sta MSIGX

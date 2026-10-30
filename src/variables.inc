@@ -13,7 +13,9 @@ chr_dest        = $0E ; 2 bytes, C64 Character RAM destination pointer ($4800-$4
 tmp             = $10 ; 16 bytes
 
 color_dest      = $04    ; 2 bytes, dedicated pointer to Color RAM ($04-$05)
-mu_scoreptr     = tmp+8  ; 2 bytes, shared tmp
+mu_scoreptr     = $E0    ; 2 bytes ($E0-$E1), dedicated private pointer for SID music driver
+mu_tmp          = $E2    ; 2 bytes ($E2-$E3), dedicated private temp for SID music driver
+mu_tmp14        = $E4    ; 1 byte  ($E4), dedicated private temp for SID music driver
 
 dlgbox_row      = tmp+$C  ; shared tmp
 palcyc_mode     = tmp+$C  ; shared tmp

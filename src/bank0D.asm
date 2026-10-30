@@ -96,9 +96,9 @@ Music_NewSong:
     asl a
     asl a
     ora mu_chanprimer
-    sta tmp
+    sta mu_tmp
     lda #>lut_ScoreData
-    sta tmp+1
+    sta mu_tmp+1
 
     ldx mu_chanprimer
     lda lut_PrimerToChan, x
@@ -106,10 +106,10 @@ Music_NewSong:
     tax
 
     ldy #0
-    lda (tmp), y
+    lda (mu_tmp), y
     sta ch_scoreptr, x
     iny
-    lda (tmp), y
+    lda (mu_tmp), y
     sta ch_scoreptr+1, x
 
     ; Initialize default length and frequency table pointers
@@ -435,7 +435,7 @@ Music_DoScore:
 
 Music_LoopCode:
     and #$0F
-    sta tmp
+    sta mu_tmp
 
     lda ch_loopctr, x
     beq @StartLoop
@@ -457,17 +457,17 @@ Music_LoopCode:
     ldy #1
     lda (mu_scoreptr), y
     sta ch_scoreptr, x
-    sta tmp
+    sta mu_tmp
     iny
     lda (mu_scoreptr), y
     sta ch_scoreptr+1, x
     sta mu_scoreptr+1
-    lda tmp
+    lda mu_tmp
     sta mu_scoreptr
     rts
 
 @StartLoop:
-    lda tmp
+    lda mu_tmp
     sta ch_loopctr, x
     jmp @ResumeLoop
 
@@ -477,9 +477,9 @@ Music_LoopCode:
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Music_Note:
-    sta tmp+14
+    sta mu_tmp14
     jsr Music_ApplyTone
-    lda tmp+14
+    lda mu_tmp14
     jmp Music_ApplyLength
 
 Music_Rest:
@@ -500,14 +500,14 @@ Music_ApplyTone:
     tay
 
     lda ch_frqtblptr, x
-    sta tmp
+    sta mu_tmp
     lda ch_frqtblptr+1, x
-    sta tmp+1
+    sta mu_tmp+1
 
-    lda (tmp), y
+    lda (mu_tmp), y
     sta ch_freq, x
     iny
-    lda (tmp), y
+    lda (mu_tmp), y
     sta ch_freq+1, x
     rts
 
@@ -516,11 +516,11 @@ Music_ApplyLength:
     tay
 
     lda ch_lentblptr, x
-    sta tmp
+    sta mu_tmp
     lda ch_lentblptr+1, x
-    sta tmp+1
+    sta mu_tmp+1
 
-    lda (tmp), y
+    lda (mu_tmp), y
     sta ch_lenctr, x
     lda #0
     sta ch_envpos, x
@@ -532,11 +532,11 @@ Music_ApplyLength_Rest:
     tay
 
     lda ch_lentblptr, x
-    sta tmp
+    sta mu_tmp
     lda ch_lentblptr+1, x
-    sta tmp+1
+    sta mu_tmp+1
 
-    lda (tmp), y
+    lda (mu_tmp), y
     sta ch_lenctr, x
     rts
 
