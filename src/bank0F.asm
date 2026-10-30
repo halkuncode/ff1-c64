@@ -273,7 +273,6 @@ EnterOverworldLoop:
 :
     JSR WaitForVBlank_L
     INC framecounter
-    JSR UpdateOWFineScroll
     JSR DrawOWSprites
     JMP @Loop
 
@@ -430,9 +429,6 @@ ProcessOWInput:
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ow_sub_x:           .byte $00
-ow_sub_y:           .byte $00
-
 OverworldMovement:
     LDA move_speed
     BEQ @Exit
@@ -494,8 +490,6 @@ OverworldMovement:
     STA move_ctr_x
     STA move_ctr_y
     STA move_speed
-    STA ow_sub_x
-    STA ow_sub_y
 
     ; Update vehicle if changing (e.g. boarding ship)
     LDA vehicle
@@ -513,20 +507,7 @@ OverworldMovement:
     BNE :+
     LDA #0
     STA tileprop+1      ; No random encounters in airship
-:   JSR UpdateOWFineScroll
-    RTS
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;;  UpdateOWFineScroll
-;;
-;;  Standard 40-column / 25-row screen display (fine scroll 0).
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-UpdateOWFineScroll:
-    RTS
+:   RTS
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1252,8 +1233,6 @@ PrepOverworld:
     STA joy_select
     STA mapflags        ; zeroing map flags indicates we're on the overworld map
     STA spr_multiplex_mode ; normal single-zone VBlank IRQ
-    STA ow_sub_x
-    STA ow_sub_y
     STA vehchgpause
 
 .if SKIP_TO_MAP
@@ -1533,190 +1512,135 @@ CallMusicPlay:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 DrawFullMap:
-    LDX #0              ; X = screen row index (0..24)
-@ScreenRowLoop:
-    STX tmp+15          ; tmp+15 = screen row
+    ; Loop for rows 0 to 11 (24 screen rows: top and bottom halves)
+    LDA #0
+    STA tmp+14          ; metatile row index (0..11)
 
-    ; 1. Calculate which metatile row and which half (top or bot)
-    TXA
+@RowLoop:
+    ; Get pointer to decompressed row in mapdata ($7000 + (row & $0F) * 256)
+    LDA ow_scroll_y
     CLC
-    ADC ow_sub_y        ; A = screen row + ow_sub_y
-    LSR A               ; C = half (0 = TOP, 1 = BOT), A = metatile row offset (0..12)
-    PHP                 ; save Carry (half) on stack
-    CLC
-    ADC ow_scroll_y     ; A = world map row
+    ADC tmp+14
     AND #$0F
     ORA #>mapdata
     STA tmp+9
     LDA #<mapdata
-    STA tmp+8           ; (tmp+8) = mapdata row pointer
+    STA tmp+8
 
-    ; 2. Screen & Color RAM row pointers for screen row tmp+15
-    LDX tmp+15
+    ; Calculate Screen RAM row pointers & Color RAM row pointers
+    ; top screen row = tmp+14 * 2
+    LDA tmp+14
+    ASL A
+    TAX
     LDA lut_ScreenRowLo, X
-    STA tmp+0           ; scr low
-    STA tmp+2           ; col low
+    STA tmp+0           ; scr_top low
+    STA tmp+2           ; col_top low
     LDA lut_ScreenRowHi, X
-    STA tmp+1           ; scr high ($40..$43)
+    STA tmp+1           ; scr_top high ($40..$43)
     CLC
     ADC #$98
-    STA tmp+3           ; col high ($D8..$DB)
+    STA tmp+3           ; col_top high ($D8..$DB)
 
-    ; 3. Pull Carry from stack to determine top half vs bot half
-    PLP
-    BCC :+
-    JMP @DrawBotHalf
-:
-@DrawTopHalf:
-    LDA ow_sub_x
-    BNE @TopShifted
-
-    ; Top Half, Normal (sub_x = 0)
-    LDA ow_scroll_x
-    STA tmp+11
-    LDY #0
-    STY tmp+10
-:   LDY tmp+11
-    LDA (tmp+8), Y
-    TAX
-    LDY tmp+10
-    LDA lut_OWMetatileColors, X
-    STA (tmp+2), Y
-    LDA tsa_ul, X
-    STA (tmp+0), Y
-    INY
-    LDA lut_OWMetatileColors, X
-    STA (tmp+2), Y
-    LDA tsa_ur, X
-    STA (tmp+0), Y
-    INY
-    STY tmp+10
-    INC tmp+11
-    CPY #40
-    BNE :-
-    JMP @NextScreenRow
-
-@TopShifted:
-    ; Top Half, Shifted (sub_x = 1)
-    LDA ow_scroll_x
-    STA tmp+11
-    LDY tmp+11
-    LDA (tmp+8), Y
-    TAX
-    LDY #0
-    LDA lut_OWMetatileColors, X
-    STA (tmp+2), Y
-    LDA tsa_ur, X
-    STA (tmp+0), Y
-    INC tmp+11
-    LDY #1
-    STY tmp+10
-:   LDY tmp+11
-    LDA (tmp+8), Y
-    TAX
-    LDY tmp+10
-    LDA lut_OWMetatileColors, X
-    STA (tmp+2), Y
-    LDA tsa_ul, X
-    STA (tmp+0), Y
-    INY
-    LDA lut_OWMetatileColors, X
-    STA (tmp+2), Y
-    LDA tsa_ur, X
-    STA (tmp+0), Y
-    INY
-    STY tmp+10
-    INC tmp+11
-    CPY #39
-    BNE :-
-    LDY tmp+11
-    LDA (tmp+8), Y
-    TAX
-    LDY #39
-    LDA lut_OWMetatileColors, X
-    STA (tmp+2), Y
-    LDA tsa_ul, X
-    STA (tmp+0), Y
-    JMP @NextScreenRow
-
-@DrawBotHalf:
-    LDA ow_sub_x
-    BNE @BotShifted
-
-    ; Bot Half, Normal (sub_x = 0)
-    LDA ow_scroll_x
-    STA tmp+11
-    LDY #0
-    STY tmp+10
-:   LDY tmp+11
-    LDA (tmp+8), Y
-    TAX
-    LDY tmp+10
-    LDA lut_OWMetatileColors, X
-    STA (tmp+2), Y
-    LDA tsa_dl, X
-    STA (tmp+0), Y
-    INY
-    LDA lut_OWMetatileColors, X
-    STA (tmp+2), Y
-    LDA tsa_dr, X
-    STA (tmp+0), Y
-    INY
-    STY tmp+10
-    INC tmp+11
-    CPY #40
-    BNE :-
-    JMP @NextScreenRow
-
-@BotShifted:
-    ; Bot Half, Shifted (sub_x = 1)
-    LDA ow_scroll_x
-    STA tmp+11
-    LDY tmp+11
-    LDA (tmp+8), Y
-    TAX
-    LDY #0
-    LDA lut_OWMetatileColors, X
-    STA (tmp+2), Y
-    LDA tsa_dr, X
-    STA (tmp+0), Y
-    INC tmp+11
-    LDY #1
-    STY tmp+10
-:   LDY tmp+11
-    LDA (tmp+8), Y
-    TAX
-    LDY tmp+10
-    LDA lut_OWMetatileColors, X
-    STA (tmp+2), Y
-    LDA tsa_dl, X
-    STA (tmp+0), Y
-    INY
-    LDA lut_OWMetatileColors, X
-    STA (tmp+2), Y
-    LDA tsa_dr, X
-    STA (tmp+0), Y
-    INY
-    STY tmp+10
-    INC tmp+11
-    CPY #39
-    BNE :-
-    LDY tmp+11
-    LDA (tmp+8), Y
-    TAX
-    LDY #39
-    LDA lut_OWMetatileColors, X
-    STA (tmp+2), Y
-    LDA tsa_dl, X
-    STA (tmp+0), Y
-
-@NextScreenRow:
-    LDX tmp+15
     INX
-    CPX #25             ; All 25 screen rows done (0..24)?
-    BEQ :+
-    JMP @ScreenRowLoop
-:   RTS
+    LDA lut_ScreenRowLo, X
+    STA tmp+4           ; scr_bot low
+    STA tmp+6           ; col_bot low
+    LDA lut_ScreenRowHi, X
+    STA tmp+5           ; scr_bot high ($40..$43)
+    CLC
+    ADC #$98
+    STA tmp+7           ; col_bot high ($D8..$DB)
+
+    ; Plot 20 metatiles (40 columns) across top and bottom rows
+    LDA #0
+    STA tmp+10          ; tmp+10 = screen column index (0, 2, 4, ... 38)
+    LDA ow_scroll_x
+    STA tmp+11          ; tmp+11 = current world X
+
+@ColLoop:
+    LDY tmp+11
+    LDA (tmp+8), Y      ; A = metatile ID (0..127)
+    TAX                 ; X = metatile ID
+
+    LDY tmp+10          ; Y = screen column
+    ; Write Color RAM for all 4 cells (top-left, top-right, bot-left, bot-right)
+    LDA lut_OWMetatileColors, X
+    STA (tmp+2), Y      ; col_top left
+    STA (tmp+6), Y      ; col_bot left
+    LDA tsa_ul, X
+    STA (tmp+0), Y      ; scr_top left
+    LDA tsa_dl, X
+    STA (tmp+4), Y      ; scr_bot left
+
+    INY
+    LDA lut_OWMetatileColors, X
+    STA (tmp+2), Y      ; col_top right
+    STA (tmp+6), Y      ; col_bot right
+    LDA tsa_ur, X
+    STA (tmp+0), Y      ; scr_top right
+    LDA tsa_dr, X
+    STA (tmp+4), Y      ; scr_bot right
+
+    INY
+    STY tmp+10
+    INC tmp+11          ; next world X
+    CPY #40
+    BNE @ColLoop
+
+    INC tmp+14
+    LDA tmp+14
+    CMP #12             ; rows 0..11 done?
+    BNE @RowLoop
+
+    ; Now draw row 12 (screen row 24: top half only!)
+    LDA ow_scroll_y
+    CLC
+    ADC #12
+    AND #$0F
+    ORA #>mapdata
+    STA tmp+9
+    LDA #<mapdata
+    STA tmp+8
+
+    LDX #24
+    LDA lut_ScreenRowLo, X
+    STA tmp+0
+    STA tmp+2
+    LDA lut_ScreenRowHi, X
+    STA tmp+1
+    CLC
+    ADC #$98
+    STA tmp+3
+
+    LDA #0
+    STA tmp+10
+    LDA ow_scroll_x
+    STA tmp+11
+
+@LastRowLoop:
+    LDY tmp+11
+    LDA (tmp+8), Y
+    TAX
+
+    LDY tmp+10
+    LDA lut_OWMetatileColors, X
+    STA (tmp+2), Y
+    LDA tsa_ul, X
+    STA (tmp+0), Y
+    INY
+
+    LDA lut_OWMetatileColors, X
+    STA (tmp+2), Y
+    LDA tsa_ur, X
+    STA (tmp+0), Y
+    INY
+
+    STY tmp+10
+    INC tmp+11
+    CPY #40
+    BNE @LastRowLoop
+
+    RTS
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1835,7 +1759,6 @@ EnterCorneliaTown:
     JSR DrawStandardMap
     JSR UpdatePlayerMapmanPose
     JSR UpdateSprites
-    JSR UpdateOWFineScroll
 
 CorneliaTownLoop:
     JSR UpdateJoy_L
@@ -1849,7 +1772,6 @@ CorneliaTownLoop:
       JSR ProcessTownInput
 :   JSR WaitForVBlank_L
     INC framecounter
-    JSR UpdateOWFineScroll
     JSR DrawPlayerMapmanSprite
     JSR UpdateSprites
     JMP CorneliaTownLoop
