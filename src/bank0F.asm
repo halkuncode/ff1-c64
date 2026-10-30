@@ -16,7 +16,8 @@
 .export CoordToNTAddr, lut_ScreenRowLo, lut_ScreenRowHi
 .export DrawCursor, UpdateSprites, VerifyChecksum, DrawOBSprite, EraseBox, DoOverworld, DrawItemBox, SortEquipmentList
 .export DrawEquipMenuStrings, UnadjustEquipStats, ReadjustEquipStats
-.export lut_NES_to_C64, lut_OWMetatileColors
+.export lut_NES_to_C64, lut_OWMetatileColors, lut_TownCharColors
+.export EnterCorneliaTown
 .export LoadPrice
 
 .import EnterIntroStory, EnterTitleScreen, NewGamePartyGeneration, EnterMainMenu, EnterLineupMenu
@@ -254,6 +255,20 @@ EnterOverworldLoop:
 
     LDA move_speed
     BNE :+
+      ; Check for entry teleport into Cornelia Town (Teleport ID 1)
+      LDA vehicle
+      CMP #$08                  ; Airship flies over towns
+      BEQ @NoTele
+      LDA tileprop+1
+      AND #$80                  ; Teleport bit?
+      BEQ @NoTele
+      LDA tileprop+1
+      AND #$1F                  ; Teleport destination ID
+      CMP #$01                  ; Cornelia Town?
+      BNE @NoTele               ; Ignore other castles and dungeons
+      JSR EnterCorneliaTown
+      JMP EnterOverworldLoop
+@NoTele:
       JSR ProcessOWInput
 :
     JSR WaitForVBlank_L
@@ -552,8 +567,11 @@ GetOWTile:
     ASL A                       ; 2 bytes per metatile property
     TAX
     LDA tileset_prop, X         ; Read first property byte
+    STA tileprop
     AND #OWTP_SPEC_MASK
     STA inforest
+    LDA tileset_prop+1, X       ; Read second property byte (teleport / battle)
+    STA tileprop+1
     RTS
 
 
@@ -1733,6 +1751,687 @@ lut_OWMetatileColors:
     .byte $0E, $0E, $0F, $0F, $0A, $0B, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $50-$5F
     .byte $0A, $0A, $0B, $0B, $0F, $0F, $0D, $0D, $0D, $0D, $0D, $09, $0D, $09, $0D, $09  ; $60-$6F
     .byte $0A, $0A, $0B, $0B, $0F, $0F, $09, $09, $09, $09, $09, $09, $09, $09, $09, $09  ; $70-$7F
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  lut_TownCharColors
+;;
+;;  Lookup table mapping each of the 128 Town character tile IDs ($00-$7F)
+;;  to its MultiColor Color RAM nybble ($08-$0F with bit 3 set to 1).
+;;  Derived directly from res/maps/town/towncolor.png.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+lut_TownCharColors:
+    .byte $08, $0A, $08, $09, $08, $08, $09, $09, $09, $08, $08, $08, $08, $08, $08, $0B
+    .byte $08, $0A, $08, $09, $08, $08, $09, $09, $09, $08, $08, $08, $08, $08, $08, $08
+    .byte $08, $08, $0B, $0B, $08, $08, $0F, $08, $08, $08, $08, $08, $08, $08, $08, $08
+    .byte $08, $08, $0B, $0B, $08, $08, $0F, $08, $08, $08, $0F, $08, $08, $08, $08, $08
+    .byte $0B, $0B, $09, $09, $08, $09, $09, $09, $09, $08, $08, $08, $08, $0E, $08, $08
+    .byte $0B, $0B, $09, $09, $08, $08, $08, $0F, $08, $08, $08, $08, $08, $0E, $08, $08
+    .byte $0E, $0E, $08, $08, $08, $08, $09, $08, $08, $08, $08, $08, $08, $08, $08, $08
+    .byte $0E, $0E, $08, $08, $08, $08, $09, $09, $08, $08, $08, $08, $08, $08, $08, $08
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  EnterCorneliaTown
+;;
+;;  Prepares and runs the town loop for the first town (Cornelia).
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+EnterCorneliaTown:
+    ; 1. Save overworld scroll position
+    LDA ow_scroll_x
+    STA saved_ow_scroll_x
+    LDA ow_scroll_y
+    STA saved_ow_scroll_y
+
+    ; 2. Initialize map and movement flags
+    LDA #1
+    STA mapflags                ; Bit 0 = standard map
+    LDA #0
+    STA move_speed
+    STA move_ctr_x
+    STA move_ctr_y
+    STA town_exit_flag
+    STA joy_a
+    STA joy_b
+    STA joy_start
+    STA joy_select
+
+    ; 3. Set initial scroll position for Cornelia
+    ; Entry coords: X = 16, Y = 23 (lut_EntrTele_X[1], lut_EntrTele_Y[1])
+    ; Screen center is at (9, 6), so sm_scroll = entry_coord - screen_center
+    LDA #16 - OW_PLAYER_METATILE_X  ; 16 - 9 = 7
+    STA sm_scroll_x
+    LDA #23 - OW_PLAYER_METATILE_Y  ; 23 - 6 = 17 ($11)
+    STA sm_scroll_y
+
+    LDA #UP
+    STA facing                  ; Face into town
+
+    ; 4. Load Town Map, Tileset, CHR and Colors
+    JSR LoadTownMap
+    JSR LoadTownTilesetData
+    JSR LoadTownCHR
+    JSR DrawTownPalette
+
+    ; 5. Position player sprite at screen center
+    LDA #OW_PLAYER_SPR_X
+    STA shadow_spr_x + 0
+    STA shadow_spr_x + 1
+    LDA #OW_PLAYER_SPR_Y
+    STA shadow_spr_y + 0
+    STA shadow_spr_y + 1
+    LDA #%00000011             ; Enable sprites 0 & 1 only (outline + base)
+    STA shadow_spr_en
+    STA SPENA
+
+    ; 6. Start town music ($47)
+    LDA #$47
+    STA music_track
+
+    ; 7. Initial draw of the town screen
+    JSR DrawStandardMap
+    JSR UpdatePlayerMapmanPose
+    JSR UpdateSprites
+    JSR UpdateOWFineScroll
+
+CorneliaTownLoop:
+    JSR UpdateJoy_L
+    JSR TownMovement
+
+    LDA town_exit_flag
+    BNE @ExitTown
+
+    LDA move_speed
+    BNE :+
+      JSR ProcessTownInput
+:   JSR WaitForVBlank_L
+    INC framecounter
+    JSR UpdateOWFineScroll
+    JSR DrawPlayerMapmanSprite
+    JSR UpdateSprites
+    JMP CorneliaTownLoop
+
+@ExitTown:
+    LDA #0
+    STA mapflags
+    STA tileprop
+    STA tileprop+1
+    LDA saved_ow_scroll_x
+    STA ow_scroll_x
+    LDA saved_ow_scroll_y
+    CLC
+    ADC #1                      ; Return 1 tile south of Cornelia
+    STA ow_scroll_y
+    LDA #DOWN
+    STA facing
+    JMP DoOverworld
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  ProcessTownInput
+;;
+;;  Processes joypad inputs inside town.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ProcessTownInput:
+    LDA joy_start
+    BEQ @NoStart
+    LDA #0
+    STA joy_start
+    LDA #BANK_MENUS
+    JSR SwapPRG_L
+    JSR EnterMainMenu
+    ; Re-enter town screen after menu closes
+    JSR LoadTownCHR
+    JSR DrawTownPalette
+    JSR DrawStandardMap
+    LDA #$47
+    STA music_track
+    RTS
+
+@NoStart:
+    LDA joy_select
+    BEQ @NoSelect
+    LDA #0
+    STA joy_select
+    LDA #BANK_MENUS
+    JSR SwapPRG_L
+    JSR EnterLineupMenu
+    ; Re-enter town screen after formation menu closes
+    JSR LoadTownCHR
+    JSR DrawTownPalette
+    JSR DrawStandardMap
+    LDA #$47
+    STA music_track
+    RTS
+
+@NoSelect:
+    LDA joy
+    AND #(RIGHT | LEFT | DOWN | UP)
+    BEQ @Exit
+
+    LDA joy
+    AND #RIGHT
+    BNE @SetRight
+    LDA joy
+    AND #LEFT
+    BNE @SetLeft
+    LDA joy
+    AND #DOWN
+    BNE @SetDown
+    LDA #UP
+    BNE @SetFacing
+@SetRight:
+    LDA #RIGHT
+    BNE @SetFacing
+@SetLeft:
+    LDA #LEFT
+    BNE @SetFacing
+@SetDown:
+    LDA #DOWN
+@SetFacing:
+    STA facing
+
+    JSR SMCanMove
+    BCS @Exit
+
+    LDA #$01                    ; Walking speed
+    STA move_speed
+    LDA #$00
+    STA move_ctr_x
+    STA move_ctr_y
+@Exit:
+    RTS
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  TownMovement
+;;
+;;  Updates player position and animation when moving between tiles in town.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+TownMovement:
+    LDA move_speed
+    BEQ @Exit
+
+    LDA facing
+    LSR A
+    BCS @MoveRight
+    LSR A
+    BCS @MoveLeft
+    LSR A
+    BCS @MoveDown
+    LSR A
+    BCS @MoveUp
+@Exit:
+    RTS
+
+@MoveRight:
+    LDA move_ctr_x
+    CLC
+    ADC move_speed
+    STA move_ctr_x
+    CMP #16
+    BCC @Exit
+    INC sm_scroll_x
+    LDA sm_scroll_x
+    AND #$3F
+    STA sm_scroll_x
+    JMP @StepDone
+
+@MoveLeft:
+    LDA move_ctr_x
+    CLC
+    ADC move_speed
+    STA move_ctr_x
+    CMP #16
+    BCC @Exit
+    DEC sm_scroll_x
+    LDA sm_scroll_x
+    AND #$3F
+    STA sm_scroll_x
+    JMP @StepDone
+
+@MoveDown:
+    LDA move_ctr_y
+    CLC
+    ADC move_speed
+    STA move_ctr_y
+    CMP #16
+    BCC @Exit
+    INC sm_scroll_y
+    LDA sm_scroll_y
+    AND #$3F
+    STA sm_scroll_y
+    JMP @StepDone
+
+@MoveUp:
+    LDA move_ctr_y
+    CLC
+    ADC move_speed
+    STA move_ctr_y
+    CMP #16
+    BCC @Exit
+    DEC sm_scroll_y
+    LDA sm_scroll_y
+    AND #$3F
+    STA sm_scroll_y
+    JMP @StepDone
+
+@StepDone:
+    LDA #0
+    STA move_ctr_x
+    STA move_ctr_y
+    STA move_speed
+
+    JSR DrawStandardMap
+
+    ; Check if stepped on exit tile
+    LDA sm_scroll_x
+    CLC
+    ADC #OW_PLAYER_METATILE_X
+    AND #$3F
+    STA tmp+10
+    LDA sm_scroll_y
+    CLC
+    ADC #OW_PLAYER_METATILE_Y
+    AND #$3F
+    TAX
+
+    TXA
+    LSR A
+    LSR A
+    ORA #>mapdata
+    STA tmp+9
+    TXA
+    ROR A
+    ROR A
+    ROR A
+    AND #$C0
+    STA tmp+8
+
+    LDY tmp+10
+    LDA (tmp+8), Y
+    CMP #$47                  ; Cornelia town exit border tile
+    BEQ @TriggerExit
+    ASL A
+    TAX
+    LDA tileset_prop, X
+    AND #TP_TELE_WARP         ; $40 / $C0
+    BNE @TriggerExit
+    RTS
+
+@TriggerExit:
+    LDA #1
+    STA town_exit_flag
+    RTS
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  SMCanMove
+;;
+;;  Checks collision against tileset properties for the target tile in town.
+;;  Bit 0 of tileset_prop is NoMove (solid tile).
+;;
+;;  OUT: C clear = passable
+;;       C set   = blocked
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+SMCanMove:
+    LDA facing
+    LSR A
+    BCS @Right
+    LSR A
+    BCS @Left
+    LSR A
+    BCS @Down
+
+@Up:
+    LDA sm_scroll_x
+    CLC
+    ADC #OW_PLAYER_METATILE_X
+    STA tmp+10
+    LDA sm_scroll_y
+    CLC
+    ADC #OW_PLAYER_METATILE_Y - 1
+    STA tmp+11
+    JMP @CheckTile
+
+@Down:
+    LDA sm_scroll_x
+    CLC
+    ADC #OW_PLAYER_METATILE_X
+    STA tmp+10
+    LDA sm_scroll_y
+    CLC
+    ADC #OW_PLAYER_METATILE_Y + 1
+    STA tmp+11
+    JMP @CheckTile
+
+@Right:
+    LDA sm_scroll_x
+    CLC
+    ADC #OW_PLAYER_METATILE_X + 1
+    STA tmp+10
+    LDA sm_scroll_y
+    CLC
+    ADC #OW_PLAYER_METATILE_Y
+    STA tmp+11
+    JMP @CheckTile
+
+@Left:
+    LDA sm_scroll_x
+    CLC
+    ADC #OW_PLAYER_METATILE_X - 1
+    STA tmp+10
+    LDA sm_scroll_y
+    CLC
+    ADC #OW_PLAYER_METATILE_Y
+    STA tmp+11
+
+@CheckTile:
+    LDA tmp+10
+    AND #$3F
+    STA tmp+10
+    LDA tmp+11
+    AND #$3F
+    TAX
+
+    TXA
+    LSR A
+    LSR A
+    ORA #>mapdata
+    STA tmp+9
+    TXA
+    ROR A
+    ROR A
+    ROR A
+    AND #$C0
+    STA tmp+8
+
+    LDY tmp+10
+    LDA (tmp+8), Y
+    ASL A
+    TAX
+    LDA tileset_prop, X
+    AND #$01                  ; Solid/NoMove check
+    BNE @Blocked
+    CLC
+    RTS
+
+@Blocked:
+    SEC
+    RTS
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  LoadTownMap
+;;
+;;  Decompresses the Cornelia town map (Map 0) from Bank 4 into mapdata ($7000).
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LoadTownMap:
+    LDA #BANK_STANDARDMAPS
+    JSR SwapPRG_L
+
+    LDA lut_SMPtrTbl
+    STA tmp
+    LDA lut_SMPtrTbl + 1
+    AND #$3F
+    ORA #$80
+    STA tmp+1
+
+    LDA #<mapdata
+    STA tmp+2
+    LDA #>mapdata
+    STA tmp+3
+
+    LDA #BANK_STANDARDMAPS
+    STA tmp+5
+    JMP DecompressMap
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  LoadTownTilesetData
+;;
+;;  Loads properties, TSA, and attributes for Town Tileset 0 into RAM ($0400).
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LoadTownTilesetData:
+    LDA #BANK_SMINFO
+    JSR SwapPRG_L
+
+    LDX #0
+:   LDA lut_SMTilesetProp, X
+    STA tileset_prop, X
+    INX
+    BNE :-
+
+    LDX #0
+:   LDA lut_SMTilesetTSA, X
+    STA tsa_ul, X
+    LDA lut_SMTilesetTSA + 256, X
+    STA tsa_ul + 256, X
+    INX
+    BNE :-
+
+    LDX #0
+:   LDA lut_SMTilesetAttr, X
+    STA tsa_attr, X
+    INX
+    CPX #128
+    BNE :-
+    RTS
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  LoadTownCHR
+;;
+;;  Loads town charset (1024 bytes = 128 characters 0-127) from Bank 3
+;;  into C64 VIC-II Character Memory at $4800-$4BFF.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+LoadTownCHR:
+    LDA #BANK_TILESETCHR
+    JSR SwapPRG_L
+
+    LDA #<lut_TownCHR
+    STA tmp
+    LDA #>lut_TownCHR
+    STA tmp+1
+
+    LDX #$04
+    LDA #$00
+    JSR CHRLoadToA
+    JMP LoadMenuCHR
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawTownPalette
+;;
+;;  Sets the background and border colors for the town screen.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawTownPalette:
+    LDA #COLOR_BLACK
+    STA EXTCOL
+    LDA #COLOR_GREEN
+    STA BGCOL0
+    LDA #COLOR_DARKGREY
+    STA BGCOL1
+    LDA #COLOR_LIGHTGREY
+    STA BGCOL2
+    RTS
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  DrawStandardMap
+;;
+;;  Renders the 40x25 standard map display from mapdata ($7000..$7FFF)
+;;  around (sm_scroll_x, sm_scroll_y) using town TSA tiles and lut_TownCharColors.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+DrawStandardMap:
+    LDX #0
+@ScreenRowLoop:
+    STX tmp+15
+
+    ; 1. Calculate metatile row and half
+    TXA
+    LSR A                         ; C = half (0 = top, 1 = bottom), A = metatile row offset (0..12)
+    PHP                           ; save Carry (half) on stack
+    CLC
+    ADC sm_scroll_y               ; A = world metatile row
+    AND #$3F                      ; 64 rows (0..63)
+    TAX                           ; X = row (0..63)
+
+    ; Calculate row pointer in mapdata: $7000 + X * 64
+    TXA
+    LSR A
+    LSR A
+    ORA #>mapdata
+    STA tmp+9                     ; High byte
+    TXA
+    ROR A
+    ROR A
+    ROR A
+    AND #$C0
+    STA tmp+8                     ; Low byte: (tmp+8) = mapdata row pointer
+
+    ; 2. Screen RAM & Color RAM row pointers for screen row tmp+15
+    LDX tmp+15
+    LDA lut_ScreenRowLo, X
+    STA tmp+0                     ; Screen RAM low
+    STA tmp+2                     ; Color RAM low
+    LDA lut_ScreenRowHi, X
+    STA tmp+1                     ; Screen RAM high ($40..$43)
+    CLC
+    ADC #$98                      ; $D800 - $4000 = +$9800
+    STA tmp+3                     ; Color RAM high ($D8..$DB)
+
+    PLP
+    BCS @DrawBotHalf
+
+@DrawTopHalf:
+    LDX #0
+@TopColLoop:
+    TXA
+    CLC
+    ADC sm_scroll_x
+    AND #$3F                      ; World metatile column (0..63)
+    TAY
+    LDA (tmp+8), Y                ; Metatile ID from mapdata
+    TAY
+
+    LDA tsa_ul, Y
+    PHA
+    LDA tsa_ur, Y
+    STA tmp+14
+
+    TXA
+    ASL A
+    TAY
+
+    PLA
+    STA (tmp+0), Y                ; Write to Screen RAM
+    TAX                           ; X = Left char
+    LDA lut_TownCharColors, X
+    STA (tmp+2), Y                ; Write to Color RAM
+
+    INY
+    LDA tmp+14
+    STA (tmp+0), Y                ; Write to Screen RAM
+    TAX                           ; X = Right char
+    LDA lut_TownCharColors, X
+    STA (tmp+2), Y                ; Write to Color RAM
+
+    TYA
+    LSR A
+    TAX
+    INX
+    CPX #20
+    BNE @TopColLoop
+    JMP @NextScreenRow
+
+@DrawBotHalf:
+    LDX #0
+@BotColLoop:
+    TXA
+    CLC
+    ADC sm_scroll_x
+    AND #$3F                      ; World metatile column (0..63)
+    TAY
+    LDA (tmp+8), Y                ; Metatile ID from mapdata
+    TAY
+
+    LDA tsa_dl, Y
+    PHA
+    LDA tsa_dr, Y
+    STA tmp+14
+
+    TXA
+    ASL A
+    TAY
+
+    PLA
+    STA (tmp+0), Y                ; Write to Screen RAM
+    TAX                           ; X = Left char
+    LDA lut_TownCharColors, X
+    STA (tmp+2), Y                ; Write to Color RAM
+
+    INY
+    LDA tmp+14
+    STA (tmp+0), Y                ; Write to Screen RAM
+    TAX                           ; X = Right char
+    LDA lut_TownCharColors, X
+    STA (tmp+2), Y                ; Write to Color RAM
+
+    TYA
+    LSR A
+    TAX
+    INX
+    CPX #20
+    BNE @BotColLoop
+
+@NextScreenRow:
+    LDX tmp+15
+    INX
+    CPX #25
+    BEQ @Done
+    JMP @ScreenRowLoop
+@Done:
+    RTS
 
 
 

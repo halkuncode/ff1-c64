@@ -461,6 +461,7 @@ lut_MapObjCHR      = $A200   ; BANK_MAPCHR
 lut_MapmanPalettes = $83A0   ; BANK_MAPMANPAL
 lut_OWPtrTbl       = $8000   ; BANK_OWMAP
 lut_SMPtrTbl       = $8000   ; BANK_STANDARDMAPS
+lut_TownCHR        = $8000   ; BANK_TILESETCHR
 lut_EnemyAttack    = $B600   ; BANK_ITEMS
 lut_ItemNamePtrTbl = $B700   ; BANK_ITEMS
 lut_Domains        = $8000   ; BANK_DOMAINS -- MUST be on page boundary

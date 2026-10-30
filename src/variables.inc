@@ -108,6 +108,7 @@ ppu_dest        = $54  ; 2 bytes
 dlgflg_reentermap = $56  ; flag to indicate the map needs re-entering due to dialogue (Bahamut/class change)
 cur_bank        = $57
 ret_bank        = $58
+town_exit_flag  = $59
 
 format_buf      = $60  ; 7 bytes (5A-60) -- must not cross page bound
 
@@ -355,6 +356,8 @@ unsram_ow_scroll_y   = unsram + $11
 
 has_canoe            = unsram + $12 ; (not to be confused with item_canoe)
 unsram_vehicle       = unsram + $14
+saved_ow_scroll_x    = unsram + $18
+saved_ow_scroll_y    = unsram + $19
 
 bridgescene     = unsram + $16  ; 00=hasn't happened yet. 01=happens when move is complete, 80=already has happened
 
