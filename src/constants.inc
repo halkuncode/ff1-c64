@@ -4,8 +4,8 @@
 ; ==============================================================================
 ; SKIP_TO_MAP = 1: Quick-boot directly to Party Generation, where F1 immediately
 ;                  confirms default party and enters the overworld map.
-; SKIP_TO_MAP = 0: Normal game flow (Intro -> Title -> Normal Party Generation).
-SKIP_TO_MAP = 0
+; SKIP_TO_MAP = 1: Normal game flow (Intro -> Title -> Normal Party Generation).
+SKIP_TO_MAP = 1
 ; ==============================================================================
 
 ;;;;;;;;;;;;;;;;;;
@@ -523,5 +523,5 @@ BLOCK_MAPMAN_BASE       = ($5800 - $4000) / 64   ; Block 96 ($60, $5800-$5BFF: 1
 ; Screen col 0 starts at VIC-II X = 24; screen row 0 starts at VIC-II Y = 50.
 OW_PLAYER_METATILE_X    = 9
 OW_PLAYER_METATILE_Y    = 6
-OW_PLAYER_SPR_X         = 24 + (OW_PLAYER_METATILE_X * 16)   ; 168
-OW_PLAYER_SPR_Y         = 50 + (OW_PLAYER_METATILE_Y * 16)   ; 146
+OW_PLAYER_SPR_X         = 24 + (OW_PLAYER_METATILE_X * 16)       ; 168
+OW_PLAYER_SPR_Y         = 50 + (OW_PLAYER_METATILE_Y * 16) - 3   ; 143 (3 pixel rows higher)

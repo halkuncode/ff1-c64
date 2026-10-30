@@ -413,14 +413,13 @@ OverworldMovement:
 ;;
 ;;  UpdateOWFineScroll
 ;;
-;;  VIC-II scroll configuration.
-;;  Maintains stable 38-column / 24-row border masking.
+;;  Standard 40-column / 25-row screen display (fine scroll 0).
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 UpdateOWFineScroll:
-    ; Stable 38 cols, 24 rows, fine scroll 0 (no jitter)
-    LDA #$10
+    ; Standard 40 cols, 25 rows, fine scroll 0
+    LDA #$18
     STA SCROLX
     STA SCROLY
     RTS
@@ -623,8 +622,8 @@ LoadOWTilesetData:
 
 SetOWScroll_PPUOn:
 SetOWScroll:
-    ; Configure 38 Columns and 24 Rows on VIC-II
-    LDA #$10
+    ; Standard 40 Columns and 25 Rows on VIC-II
+    LDA #$18
     STA SCROLX
     STA SCROLY
     RTS
