@@ -1171,9 +1171,10 @@ LoadOWTilesetData:
 
 SetOWScroll_PPUOn:
 SetOWScroll:
-    ; Standard 40 Columns and 25 Rows on VIC-II
+    ; Standard 40 Columns and 25 Rows on VIC-II (Multicolor, YSCROLL = 3)
     LDA #$18
     STA SCROLX
+    LDA #$1B
     STA SCROLY
     RTS
 
@@ -1686,7 +1687,7 @@ lut_OWMetatileColors:
 lut_TownCharColors:
     .byte $08, $0A, $08, $09, $08, $08, $09, $09, $09, $08, $08, $08, $08, $08, $08, $0B
     .byte $08, $0A, $08, $09, $08, $08, $09, $09, $09, $08, $08, $08, $08, $08, $08, $08
-    .byte $08, $08, $0B, $0B, $08, $08, $0F, $08, $08, $08, $08, $08, $08, $08, $08, $08
+    .byte $08, $08, $0B, $0B, $08, $08, $0F, $08, $08, $08, $09, $09, $08, $08, $08, $08
     .byte $08, $08, $0B, $0B, $08, $08, $0A, $0A, $08, $08, $0F, $08, $08, $08, $08, $08
     .byte $0B, $0B, $09, $09, $08, $09, $09, $09, $09, $08, $08, $08, $08, $0B, $08, $08
     .byte $0B, $0B, $09, $09, $08, $08, $08, $0F, $08, $08, $08, $08, $08, $0B, $08, $08
@@ -1739,6 +1740,7 @@ EnterCorneliaTown:
     JSR LoadTownTilesetData
     JSR LoadTownCHR
     JSR DrawTownPalette
+    JSR SetOWScroll
 
     ; 5. Position player sprite at screen center
     LDA #OW_PLAYER_SPR_X
@@ -2125,7 +2127,12 @@ LoadTownMap:
 
     LDA #BANK_STANDARDMAPS
     STA tmp+5
-    JMP DecompressMap
+    JSR DecompressMap
+
+    ; Clear VIC Bank 1 idle-state fetch byte ($7FFF)
+    LDA #0
+    STA $7FFF
+    RTS
 
 
 
